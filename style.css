@@ -36,7 +36,7 @@ body {
   box-shadow: var(--shadow);
   position: sticky;
   top: 0;
-  z-index: 100;
+  z-index: 160;
   border-bottom: 3px solid var(--primary);
 }
 
@@ -63,6 +63,7 @@ body {
   height: 95px;
   width: auto;
   object-fit: contain;
+  flex-shrink: 0;
   filter: brightness(1.15);
   transition: all 0.3s ease;
 }
@@ -968,7 +969,7 @@ body {
   inset: 0;
   background: rgba(0, 0, 0, 0.6);
   z-index: 149;
-  backdrop-filter: blur(3px);
+  
 }
 
 .nav-overlay.active {
