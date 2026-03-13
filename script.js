@@ -636,9 +636,9 @@ function handleServiceChange() {
   updateCalendarHint();
 }
 
-// Scroll to booking section
+// Scroll to services section
 document.getElementById('bookBtn').addEventListener('click', () => {
-  document.getElementById('booking').scrollIntoView({ behavior: 'smooth' });
+  document.getElementById('services').scrollIntoView({ behavior: 'smooth' });
 });
 
 // Service prices by size
@@ -968,8 +968,9 @@ document.addEventListener('DOMContentLoaded', async function() {
     });
     // change size inside card updates price display and keeps card selected
     if (sizeSelect) {
+      sizeSelect.addEventListener('click', (e) => e.stopPropagation());
       sizeSelect.addEventListener('change', (e) => {
-        e.stopPropagation(); // prevent outer click firing
+        e.stopPropagation();
         updateCardPrice();
       });
     }
