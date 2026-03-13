@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Betalning avbruten - Prima Bilvård</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #0A3D78;
+      --accent: #1E5AA8;
+      --bg-dark: #0B0B0B;
+      --bg-secondary: #1A1A1A;
+      --text-primary: #FFFFFF;
+      --text-secondary: #C7CCD1;
+      --border: #333333;
+    }
+    * { box-sizing: border-box; font-family: 'Montserrat', sans-serif; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: linear-gradient(160deg, #0b0b0b, #111827);
+      color: var(--text-primary);
+      display: grid;
+      place-items: center;
+      padding: 20px;
+    }
+    .card {
+      width: 100%;
+      max-width: 560px;
+      background: var(--bg-secondary);
+      border: 2px solid var(--border);
+      border-left: 5px solid #b04a4a;
+      border-radius: 14px;
+      padding: 30px 24px;
+      text-align: center;
+      box-shadow: 0 18px 40px rgba(0,0,0,.45);
+    }
+    .icon { font-size: 52px; margin-bottom: 10px; }
+    h1 { margin: 0 0 10px; font-size: 1.9rem; }
+    p { margin: 8px 0; color: var(--text-secondary); line-height: 1.6; }
+    .actions { display: grid; gap: 10px; margin-top: 22px; }
+    .btn {
+      display: inline-block;
+      text-decoration: none;
+      border-radius: 10px;
+      padding: 14px 16px;
+      font-weight: 700;
+      border: 2px solid transparent;
+      transition: .2s ease;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: white;
+      border-color: #9fb6d5;
+    }
+    .btn:hover { transform: translateY(-1px); }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <div class="icon">⚠️</div>
+    <h1>Betalningen avbröts</h1>
+    <p>Ingen betalning drogs.</p>
+    <p>Du kan prova igen när du vill.</p>
+
+    <div class="actions">
+      <a class="btn" href="index.html#booking">Försök igen</a>
+    </div>
+  </main>
+</body>
+</html>
