@@ -1,3 +1,39 @@
+// ===== MOBILE HAMBURGER MENU =====
+(function() {
+  const hamburger = document.getElementById('hamburger');
+  const navMenu = document.getElementById('navMenu');
+  const navOverlay = document.getElementById('navOverlay');
+
+  function openMenu() {
+    hamburger.classList.add('open');
+    navMenu.classList.add('open');
+    navOverlay.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeMenu() {
+    hamburger.classList.remove('open');
+    navMenu.classList.remove('open');
+    navOverlay.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  if (hamburger) {
+    hamburger.addEventListener('click', () => {
+      hamburger.classList.contains('open') ? closeMenu() : openMenu();
+    });
+  }
+
+  if (navOverlay) {
+    navOverlay.addEventListener('click', closeMenu);
+  }
+
+  // Close menu when a nav link is clicked
+  document.querySelectorAll('.nav-link').forEach(link => {
+    link.addEventListener('click', closeMenu);
+  });
+})();
+
 // ===== CALENDAR FUNCTIONALITY =====
 
 let currentDate = new Date();
@@ -664,7 +700,7 @@ document.querySelectorAll('#asphaltAddonButtons .addon-btn').forEach(btn => {
 });
 
 // Form submission
-document.getElementById('bookingForm').addEventListener('submit', function(e) {
+document.getElementById('bookingForm').addEventListener('submit', async function(e) {
   e.preventDefault();
   
   const name = document.getElementById('name').value;
@@ -727,8 +763,8 @@ document.getElementById('bookingForm').addEventListener('submit', function(e) {
     sortKey
   };
 
-  // Save to localStorage for owner view
-  saveBooking(booking);
+  // Save to Firebase for owner view
+  await saveBooking(booking);
 
   // Send email notification via Formspree (to owner)
   fetch('https://formspree.io/f/mgoydkqd', {
@@ -793,24 +829,40 @@ document.getElementById('bookingForm').addEventListener('submit', function(e) {
 });
 
 // ===== BOOKING STORAGE & OWNER VIEW HELPERS =====
-function saveBooking(booking) {
-  const bookings = loadBookings();
-  bookings.push(booking);
-  bookings.sort((a, b) => a.sortKey - b.sortKey);
-  localStorage.setItem('bookings', JSON.stringify(bookings));
-}
+let cachedBookings = [];
 
-function loadBookings() {
+async function saveBooking(booking) {
   try {
-    return JSON.parse(localStorage.getItem('bookings') || '[]');
+    await window.db.collection('bookings').doc(String(booking.id)).set(booking);
+    cachedBookings.push(booking);
+    cachedBookings.sort((a, b) => a.sortKey - b.sortKey);
   } catch (e) {
-    return [];
+    console.error('Firebase save error:', e);
   }
 }
 
-function deleteBooking(id) {
-  const bookings = loadBookings().filter(b => String(b.id) !== String(id));
-  localStorage.setItem('bookings', JSON.stringify(bookings));
+function loadBookings() {
+  return cachedBookings;
+}
+
+async function loadBookingsFromFirebase() {
+  try {
+    const snapshot = await window.db.collection('bookings').get();
+    cachedBookings = snapshot.docs.map(doc => doc.data());
+    cachedBookings.sort((a, b) => a.sortKey - b.sortKey);
+  } catch (e) {
+    console.error('Firebase load error:', e);
+    cachedBookings = [];
+  }
+}
+
+async function deleteBooking(id) {
+  try {
+    await window.db.collection('bookings').doc(String(id)).delete();
+    cachedBookings = cachedBookings.filter(b => String(b.id) !== String(id));
+  } catch (e) {
+    console.error('Firebase delete error:', e);
+  }
   renderBookingsTable();
 }
 
@@ -879,9 +931,11 @@ function getServiceLabel(service, seatAddonType = 'none', asphaltAddonType = 'no
 }
 
 // Initialize on page load
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
   // Reset scroll to top
   window.scrollTo(0, 0);
+  // Load bookings from Firebase so calendar availability is correct
+  await loadBookingsFromFirebase();
   loadServiceDurationsFromCards();
   initCalendar();
   updateSeatAddonVisibility();
@@ -962,9 +1016,17 @@ document.addEventListener('DOMContentLoaded', function() {
   if (exportBtn) exportBtn.addEventListener('click', exportCSV);
 
   const clearBtn = document.getElementById('clearBtn');
-  if (clearBtn) clearBtn.addEventListener('click', function() {
+  if (clearBtn) clearBtn.addEventListener('click', async function() {
     if (confirm('Rensa alla bokningar? Detta kan inte ångras.')) {
-      localStorage.removeItem('bookings');
+      try {
+        const batch = window.db.batch();
+        const snapshot = await window.db.collection('bookings').get();
+        snapshot.docs.forEach(doc => batch.delete(doc.ref));
+        await batch.commit();
+        cachedBookings = [];
+      } catch (e) {
+        console.error('Firebase clear error:', e);
+      }
       renderBookingsTable();
       alert('Bokningar rensade');
     }
