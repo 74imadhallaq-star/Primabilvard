@@ -18,14 +18,18 @@
       <img src="logo.png" alt="Prima Bilvård Logo" class="logo-img">
       <span class="logo-text">Prima Bilvård</span>
     </div>
-    <ul class="nav-menu">
-      <li><a href="#services">Tjänster</a></li>
-      <li><a href="#portfolio">Vårt Arbete</a></li>
-      <li><a href="#booking">Boka</a></li>
-      <li><a href="#contact">Kontakt</a></li>
+    <button class="hamburger" id="hamburger" aria-label="Öppna meny">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-menu" id="navMenu">
+      <li><a href="#services" class="nav-link">Tjänster</a></li>
+      <li><a href="#portfolio" class="nav-link">Vårt Arbete</a></li>
+      <li><a href="#booking" class="nav-link">Boka</a></li>
+      <li><a href="#contact" class="nav-link">Kontakt</a></li>
     </ul>
   </div>
 </nav>
+<div class="nav-overlay" id="navOverlay"></div>
 
 <!-- HEADER -->
 <header class="hero">
@@ -339,6 +343,24 @@
     </table>
   </div>
 </section>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<script>
+  // *** KLISTRA IN DIN FIREBASE CONFIG HÄR ***
+  const firebaseConfig = {
+    apiKey: "AIzaSyAD1eXQlseZnyCAT5hJPyDEf2BCHMQb1jI",
+    authDomain: "primabilvard-6c99e.firebaseapp.com",
+    projectId: "primabilvard-6c99e",
+    storageBucket: "primabilvard-6c99e.firebasestorage.app",
+    messagingSenderId: "989347315654",
+    appId: "1:989347315654:web:c35209e7f9a65fb2eb7cc7",
+    measurementId: "G-ZMW45RPSQ3"
+  };
+  firebase.initializeApp(firebaseConfig);
+  window.db = firebase.firestore();
+</script>
 
 <script src="script.js"></script>
 </body>
