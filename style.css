@@ -842,35 +842,36 @@ body {
 
 .contact-info {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 40px;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 18px;
 }
 
 .contact-item {
   background: var(--bg-secondary);
-  padding: 40px 30px;
+  padding: 26px 20px;
   border-radius: 12px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
   text-align: center;
   border: 2px solid var(--primary);
   transition: all 0.3s ease;
+  display: block;
 }
 
 .contact-item:hover {
-  transform: translateY(-8px);
+  transform: translateY(-6px);
   box-shadow: 0 10px 30px rgba(30, 90, 168, 0.3);
   border-color: var(--accent);
 }
 
 .contact-item .icon {
-  font-size: 3rem;
+  font-size: 2.4rem;
   display: block;
-  margin-bottom: 15px;
+  margin-bottom: 10px;
   color: var(--primary);
 }
 
 .contact-item p {
-  font-size: 1.1rem;
+  font-size: 0.98rem;
   color: var(--text-primary);
   font-weight: 500;
 }
@@ -878,7 +879,7 @@ body {
 .contact-facebook-btn {
   display: inline-block;
   margin-top: 10px;
-  padding: 10px 18px;
+  padding: 10px 16px;
   border-radius: 8px;
   border: 2px solid var(--accent);
   background: linear-gradient(135deg, var(--primary), var(--accent));
@@ -891,6 +892,19 @@ body {
 .contact-facebook-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 18px rgba(30, 90, 168, 0.35);
+}
+
+/* Kontakt-layout: 3 kort överst, 2 centrerade under */
+.contact-item:nth-child(-n+3) {
+  grid-column: span 2;
+}
+
+.contact-item:nth-child(4) {
+  grid-column: 2 / span 2;
+}
+
+.contact-item:nth-child(5) {
+  grid-column: 4 / span 2;
 }
 
 /* ===== FOOTER ===== */
@@ -977,6 +991,17 @@ body {
 
 /* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
+
+  html {
+    scroll-padding-top: 90px;
+  }
+
+  .services,
+  .portfolio,
+  .booking,
+  .contact {
+    margin: 42px auto;
+  }
 
   /* --- NAVBAR --- */
   .hamburger {
@@ -1175,8 +1200,9 @@ body {
 
   .booking-form-section,
   .calendar-section {
-    padding: 22px 16px;
+    padding: 18px 14px;
     border-radius: 10px;
+    border-left-width: 3px;
   }
 
   .booking-form-section h2,
@@ -1206,9 +1232,9 @@ body {
   }
 
   .submit-btn {
-    padding: 18px;
+    padding: 16px;
     font-size: 1rem;
-    margin-top: 14px;
+    margin-top: 12px;
   }
 
   /* --- CALENDAR --- */
@@ -1273,7 +1299,7 @@ body {
 
   /* --- CONTACT --- */
   .contact {
-    margin: 50px auto;
+    margin: 42px auto;
     padding: 0 14px;
   }
 
@@ -1284,26 +1310,27 @@ body {
 
   .contact-info {
     grid-template-columns: 1fr;
-    gap: 16px;
+    gap: 14px;
   }
 
   .contact-item {
-    padding: 24px 20px;
+    grid-column: auto !important;
+    padding: 20px 16px;
     border-radius: 10px;
   }
 
   .contact-item .icon {
-    font-size: 2.2rem;
-    margin-bottom: 10px;
+    font-size: 2rem;
+    margin-bottom: 8px;
   }
 
   .contact-item p {
-    font-size: 1rem;
+    font-size: 0.95rem;
   }
 
   .contact-facebook-btn {
-    padding: 12px 22px;
-    font-size: 0.95rem;
+    padding: 11px 18px;
+    font-size: 0.92rem;
   }
 
   /* --- FOOTER --- */
