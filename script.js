@@ -42,6 +42,51 @@ let selectedTime = null;
 const MAX_CONCURRENT_BOOKINGS = 2;
 const SLOT_STEP_MINUTES = 30;
 
+// ===== OWNER ACCESS SECURITY (client-side hardening) =====
+// NOTE: On a static frontend this is only a deterrent, not true security.
+// For real security, use Firebase Auth + Firestore rules.
+const OWNER_ACCESS_CONFIG = {
+  // SHA-256 hash of owner code (case-sensitive)
+  codeHashSha256: 'eca285b5a4a15ad8fabcf65748d80fdcb774c1920623fe1ea4aa2a4f6d2a95e5',
+  maxAttempts: 5,
+  lockoutMs: 10 * 60 * 1000,
+  authSessionMs: 3 * 60 * 60 * 1000
+};
+
+const ownerAccessState = {
+  failedAttempts: 0,
+  lockedUntil: 0,
+  authenticatedUntil: 0
+};
+
+function isOwnerTemporarilyLocked() {
+  return Date.now() < ownerAccessState.lockedUntil;
+}
+
+function isOwnerAuthenticated() {
+  return Date.now() < ownerAccessState.authenticatedUntil;
+}
+
+function timingSafeEqual(a, b) {
+  if (!a || !b || a.length !== b.length) return false;
+  let mismatch = 0;
+  for (let i = 0; i < a.length; i++) {
+    mismatch |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  }
+  return mismatch === 0;
+}
+
+async function sha256Hex(text) {
+  const data = new TextEncoder().encode(text);
+  const digest = await crypto.subtle.digest('SHA-256', data);
+  return Array.from(new Uint8Array(digest)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+async function verifyOwnerCode(inputCode) {
+  const hash = await sha256Hex(String(inputCode ?? ''));
+  return timingSafeEqual(hash, OWNER_ACCESS_CONFIG.codeHashSha256);
+}
+
 const DEFAULT_SERVICE_DURATIONS = {
   'test': 15,
   'basic': 20,
@@ -1224,18 +1269,51 @@ document.addEventListener('DOMContentLoaded', async function() {
   // Owner / admin wiring (client-side PIN protection)
   const ownerLink = document.getElementById('ownerLink');
   if (ownerLink) {
-    ownerLink.addEventListener('click', function(e) {
+    ownerLink.addEventListener('click', async function(e) {
       e.preventDefault();
-      const pin = prompt('Ange ägar-PIN för att visa bokningar:');
-      if (pin === '1234') {
+
+      if (isOwnerAuthenticated()) {
         const ownerSection = document.getElementById('ownerSection');
         if (ownerSection) {
           ownerSection.style.display = 'block';
           renderBookingsTable();
           ownerSection.scrollIntoView({ behavior: 'smooth' });
         }
-      } else if (pin !== null) {
-        alert('Fel PIN');
+        return;
+      }
+
+      if (isOwnerTemporarilyLocked()) {
+        const secondsLeft = Math.ceil((ownerAccessState.lockedUntil - Date.now()) / 1000);
+        alert(`För många försök. Vänta ${secondsLeft} sekunder innan du försöker igen.`);
+        return;
+      }
+
+      const code = prompt('Ange ägar-kod för att visa bokningar:');
+      if (code === null) return;
+
+      const isValid = await verifyOwnerCode(code);
+      if (isValid) {
+        ownerAccessState.failedAttempts = 0;
+        ownerAccessState.authenticatedUntil = Date.now() + OWNER_ACCESS_CONFIG.authSessionMs;
+
+        const ownerSection = document.getElementById('ownerSection');
+        if (ownerSection) {
+          ownerSection.style.display = 'block';
+          renderBookingsTable();
+          ownerSection.scrollIntoView({ behavior: 'smooth' });
+        }
+      } else {
+        ownerAccessState.failedAttempts += 1;
+
+        if (ownerAccessState.failedAttempts >= OWNER_ACCESS_CONFIG.maxAttempts) {
+          ownerAccessState.failedAttempts = 0;
+          ownerAccessState.lockedUntil = Date.now() + OWNER_ACCESS_CONFIG.lockoutMs;
+          alert('För många felaktiga försök. Åtkomst är tillfälligt låst.');
+          return;
+        }
+
+        const remaining = OWNER_ACCESS_CONFIG.maxAttempts - ownerAccessState.failedAttempts;
+        alert(`Fel kod. ${remaining} försök kvar.`);
       }
     });
   }
