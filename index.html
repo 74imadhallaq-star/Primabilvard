@@ -193,6 +193,7 @@
           <label for="service">Välj Tjänst</label>
           <select id="service" required>
             <option value="">-- Välj tjänst --</option>
+            <option value="test">TEST</option>
             <option value="basic">Utvändig Handtvätt</option>
             <option value="interior-wash">Invändig Tvätt</option>
             <option value="premium">Komplett In- & Utvändig Tvätt</option>
@@ -242,11 +243,9 @@
             <span>Pris:</span>
             <span id="totalPrice">-</span>
           </div>
-          <button type="button" id="stripePayBtn" class="submit-btn" style="background:#5469d4;border-color:#5469d4;cursor:not-allowed;opacity:0.6;">Betala med Stripe (kommer snart)</button>
+          <button type="submit" id="stripePayBtn" class="submit-btn" style="background:#5469d4;border-color:#5469d4;">Betala &amp; Bekräfta Bokning</button>
           <p class="payment-note">* Betalning är obligatorisk för att bekräfta bokningen</p>
         </div>
-
-        <button type="submit" class="submit-btn">Bekräfta Bokning</button>
       </form>
     </div>
 
