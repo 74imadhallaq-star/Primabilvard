@@ -184,6 +184,66 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
+    const SERVICE_LABELS = {
+      test: 'TEST',
+      basic: 'Utvändig Handtvätt',
+      'interior-wash': 'Invändig Tvätt',
+      premium: 'Komplett In- & Utvändig Tvätt',
+      inout: 'In- & Utvändig Tvätt Med Sätten',
+      interior: 'Hel Glans',
+      full: 'Fullservice Rekond'
+    };
+
+    const SEAT_ADDON_LABELS = {
+      '2': 'Tvätt av 2 säten',
+      '5': 'Tvätt av 5 säten'
+    };
+
+    function getServiceText(booking) {
+      const base = SERVICE_LABELS[booking.service] || booking.service || '-';
+      const extras = [];
+
+      if (booking.seatAddon && booking.seatAddon !== 'none') {
+        extras.push(SEAT_ADDON_LABELS[booking.seatAddon] || `Tillägg säten (${booking.seatAddon})`);
+      }
+
+      if (booking.asphaltAddon && booking.asphaltAddon !== 'none') {
+        extras.push('Asfaltrengöring');
+      }
+
+      if (booking.addonLabel && !extras.length) {
+        extras.push(booking.addonLabel);
+      }
+
+      return extras.length ? `${base} + ${extras.join(' + ')}` : base;
+    }
+
+    function renderBookingSummary(summaryBox, booking, heading = 'Bokning bekräftad:') {
+      const serviceText = getServiceText(booking);
+      const priceText = booking.price != null ? `${booking.price} kr` : '-';
+      summaryBox.innerHTML = `<strong>${heading}</strong><br>
+        Datum: ${booking.date || '-'}<br>
+        Tid: ${booking.time || '-'}<br>
+        Tjänst: ${serviceText}<br>
+        Storlek: ${booking.size || '-'}<br>
+        Pris: ${priceText}`;
+    }
+
+    async function tryLoadRecentBookingFallback() {
+      try {
+        const snapshot = await db.collection('bookings').orderBy('id', 'desc').limit(1).get();
+        if (snapshot.empty) return null;
+
+        const booking = snapshot.docs[0].data();
+        const bookingId = Number(booking.id);
+        const isRecent = Number.isFinite(bookingId) && Math.abs(Date.now() - bookingId) <= 2 * 60 * 60 * 1000;
+        return isRecent ? booking : null;
+      } catch (e) {
+        console.error('Kunde inte läsa fallback-bokning:', e);
+        return null;
+      }
+    }
+
     function getCookie(name) {
       const prefix = `${name}=`;
       const parts = document.cookie.split(';').map(v => v.trim());
@@ -204,10 +264,19 @@
 
       const pendingBookingId = getCookie('pendingBookingId');
       if (!pendingBookingId) {
+        const fallbackBooking = await tryLoadRecentBookingFallback();
+        if (fallbackBooking) {
+          successTitle.textContent = 'Tack! Betalningen gick igenom';
+          successText1.textContent = 'Betalningen är registrerad.';
+          successText2.textContent = 'Här är din senaste bokningsinformation:';
+          renderBookingSummary(summaryBox, fallbackBooking, 'Bokning registrerad:');
+          return;
+        }
+
         successTitle.textContent = 'Betalning klar';
         successText1.textContent = 'Vi hittade ingen väntande bokning att slutföra automatiskt.';
         successText2.textContent = 'Kontakta oss så verifierar vi betalningen i Stripe och bekräftar bokningen manuellt.';
-        summaryBox.innerHTML = '<strong>Info:</strong><br>Ingen extra debitering har gjorts här.';
+        summaryBox.innerHTML = '<strong>Info:</strong><br>Bokningsdetaljer kunde inte hämtas automatiskt.';
         return;
       }
 
@@ -216,10 +285,21 @@
         const pendingSnap = await pendingRef.get();
 
         if (!pendingSnap.exists) {
+          const existingBookingSnap = await db.collection('bookings').doc(String(pendingBookingId)).get();
+          if (existingBookingSnap.exists) {
+            const existingBooking = existingBookingSnap.data();
+            successTitle.textContent = 'Tack! Betalningen gick igenom';
+            successText1.textContent = 'Bokningen var redan registrerad.';
+            successText2.textContent = 'Här är dina bokningsdetaljer:';
+            renderBookingSummary(summaryBox, existingBooking, 'Bokning bekräftad:');
+            clearPendingCookie();
+            return;
+          }
+
           successTitle.textContent = 'Betalning klar';
           successText1.textContent = 'Ingen väntande bokning hittades för denna betalning.';
           successText2.textContent = 'Kontakta oss så hjälper vi dig direkt.';
-          summaryBox.innerHTML = '<strong>Info:</strong><br>Vi kan verifiera betalningen manuellt i Stripe.';
+          summaryBox.innerHTML = '<strong>Info:</strong><br>Bokningsdetaljer kunde inte hittas automatiskt.';
           clearPendingCookie();
           return;
         }
@@ -259,7 +339,7 @@
 
         clearPendingCookie();
 
-        summaryBox.innerHTML = `<strong>Bokning bekräftad:</strong><br>${finalizedBooking.date} kl ${finalizedBooking.time}<br>${finalizedBooking.size} · ${finalizedBooking.price} kr`;
+        renderBookingSummary(summaryBox, finalizedBooking, 'Bokning bekräftad:');
       } catch (e) {
         console.error('Fel vid bokningsslutförande:', e);
         statusBadge.textContent = '⚠ Betalning mottagen';
