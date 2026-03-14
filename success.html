@@ -149,13 +149,13 @@
 </head>
 <body>
   <main class="card">
-    <div class="status">✔ Betalning mottagen</div>
+    <div class="status" id="statusBadge">✔ Betalning mottagen</div>
     <div class="icon">✅</div>
-    <h1>Tack! Betalningen gick igenom</h1>
-    <p>Din betalning är registrerad hos Prima Bilvård.</p>
-    <p>Vi kontaktar dig snart för att bekräfta bokningen och tiden.</p>
+    <h1 id="successTitle">Tack! Betalningen gick igenom</h1>
+    <p id="successText1">Din betalning är registrerad hos Prima Bilvård.</p>
+    <p id="successText2">Vi kontaktar dig snart för att bekräfta bokningen och tiden.</p>
 
-    <div class="summary">
+    <div class="summary" id="summaryBox">
       <strong>Nästa steg:</strong><br>
       1. Vi granskar din bokning<br>
       2. Du får bekräftelse via telefon eller e-post<br>
@@ -167,5 +167,110 @@
       <a class="btn btn-secondary" href="index.html">Till startsidan</a>
     </div>
   </main>
+
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyAD1eXQlseZnyCAT5hJPyDEf2BCHMQb1jI",
+      authDomain: "primabilvard-6c99e.firebaseapp.com",
+      projectId: "primabilvard-6c99e",
+      storageBucket: "primabilvard-6c99e.firebasestorage.app",
+      messagingSenderId: "989347315654",
+      appId: "1:989347315654:web:c35209e7f9a65fb2eb7cc7",
+      measurementId: "G-ZMW45RPSQ3"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    function getCookie(name) {
+      const prefix = `${name}=`;
+      const parts = document.cookie.split(';').map(v => v.trim());
+      const found = parts.find(v => v.startsWith(prefix));
+      return found ? decodeURIComponent(found.slice(prefix.length)) : '';
+    }
+
+    function clearPendingCookie() {
+      document.cookie = 'pendingBookingId=; Path=/; Max-Age=0; SameSite=Lax';
+    }
+
+    async function finalizeBookingAfterPayment() {
+      const statusBadge = document.getElementById('statusBadge');
+      const successTitle = document.getElementById('successTitle');
+      const successText1 = document.getElementById('successText1');
+      const successText2 = document.getElementById('successText2');
+      const summaryBox = document.getElementById('summaryBox');
+
+      const pendingBookingId = getCookie('pendingBookingId');
+      if (!pendingBookingId) {
+        successTitle.textContent = 'Betalning klar';
+        successText1.textContent = 'Vi hittade ingen väntande bokning att slutföra automatiskt.';
+        successText2.textContent = 'Kontakta oss så verifierar vi betalningen i Stripe och bekräftar bokningen manuellt.';
+        summaryBox.innerHTML = '<strong>Info:</strong><br>Ingen extra debitering har gjorts här.';
+        return;
+      }
+
+      try {
+        const pendingRef = db.collection('pendingBookings').doc(String(pendingBookingId));
+        const pendingSnap = await pendingRef.get();
+
+        if (!pendingSnap.exists) {
+          successTitle.textContent = 'Betalning klar';
+          successText1.textContent = 'Ingen väntande bokning hittades för denna betalning.';
+          successText2.textContent = 'Kontakta oss så hjälper vi dig direkt.';
+          summaryBox.innerHTML = '<strong>Info:</strong><br>Vi kan verifiera betalningen manuellt i Stripe.';
+          clearPendingCookie();
+          return;
+        }
+
+        const booking = pendingSnap.data();
+        const finalizedBooking = {
+          ...booking,
+          paymentStatus: 'Paid'
+        };
+
+        await db.collection('bookings').doc(String(finalizedBooking.id)).set(finalizedBooking);
+        await pendingRef.delete();
+
+        fetch('https://formspree.io/f/mgoydkqd', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify({
+            name: finalizedBooking.name,
+            email: finalizedBooking.email,
+            phone: finalizedBooking.phone,
+            registration: finalizedBooking.registration,
+            service: finalizedBooking.service,
+            seatAddon: finalizedBooking.seatAddon || 'none',
+            asphaltAddon: finalizedBooking.asphaltAddon || 'none',
+            size: finalizedBooking.size,
+            date: finalizedBooking.date,
+            time: finalizedBooking.time,
+            price: finalizedBooking.price + ' kr',
+            paymentStatus: 'Paid',
+            _replyto: finalizedBooking.email,
+            _subject: `Ny BETALD bokning från ${finalizedBooking.name}`
+          })
+        }).catch(err => console.error('Formspree error:', err));
+
+        clearPendingCookie();
+
+        summaryBox.innerHTML = `<strong>Bokning bekräftad:</strong><br>${finalizedBooking.date} kl ${finalizedBooking.time}<br>${finalizedBooking.size} · ${finalizedBooking.price} kr`;
+      } catch (e) {
+        console.error('Fel vid bokningsslutförande:', e);
+        statusBadge.textContent = '⚠ Betalning mottagen';
+        successTitle.textContent = 'Betalning klar, men bokning kunde inte sparas automatiskt';
+        successText1.textContent = 'Du har inte blivit dubbeldebiterad.';
+        successText2.textContent = 'Kontakta oss så bekräftar vi bokningen manuellt direkt.';
+        summaryBox.innerHTML = '<strong>Tekniskt fel:</strong><br>Vi kunde inte spara bokningen i databasen just nu.';
+      }
+    }
+
+    finalizeBookingAfterPayment();
+  </script>
 </body>
 </html>
