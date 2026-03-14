@@ -328,6 +328,48 @@
   </div>
 
   <div style="margin-top:18px;padding:14px;border:1px solid var(--border);border-radius:10px;background:var(--bg-secondary);">
+    <h3 style="margin:0 0 10px 0;color:var(--text-primary);font-size:1.05rem;">Lägg till manuell bokning (telefon/IRL)</h3>
+    <p style="margin:0 0 12px 0;color:var(--text-secondary);font-size:0.9rem;">Använd detta när du tar emot bokning via telefon eller på plats.</p>
+
+    <form id="ownerManualBookingForm" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px;">
+      <input id="ownerName" type="text" placeholder="Namn *" style="padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:#0f0f0f;color:var(--text-primary);" required />
+      <input id="ownerPhone" type="text" placeholder="Telefon *" style="padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:#0f0f0f;color:var(--text-primary);" required />
+      <input id="ownerEmail" type="email" placeholder="E-post (valfritt)" style="padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:#0f0f0f;color:var(--text-primary);" />
+      <input id="ownerReg" type="text" placeholder="Reg.nr (valfritt)" style="padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:#0f0f0f;color:var(--text-primary);" />
+
+      <select id="ownerService" style="padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:#0f0f0f;color:var(--text-primary);" required>
+        <option value="">Tjänst *</option>
+        <option value="test">TEST</option>
+        <option value="basic">Utvändig Handtvätt</option>
+        <option value="interior-wash">Invändig Tvätt</option>
+        <option value="premium">Komplett In- & Utvändig Tvätt</option>
+        <option value="inout">In- & Utvändig Tvätt Med Sätten</option>
+        <option value="interior">Hel Glans</option>
+        <option value="full">Fullservice Rekond</option>
+      </select>
+
+      <select id="ownerSize" style="padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:#0f0f0f;color:var(--text-primary);" required>
+        <option value="">Storlek *</option>
+        <option value="small">Liten</option>
+        <option value="medium">Mellan</option>
+        <option value="large">Stor</option>
+      </select>
+
+      <input id="ownerDate" type="date" style="padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:#0f0f0f;color:var(--text-primary);" required />
+      <input id="ownerTime" type="time" step="1800" style="padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:#0f0f0f;color:var(--text-primary);" required />
+
+      <input id="ownerPrice" type="number" min="0" step="1" placeholder="Pris (valfritt)" style="padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:#0f0f0f;color:var(--text-primary);" />
+      <select id="ownerPaymentStatus" style="padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:#0f0f0f;color:var(--text-primary);">
+        <option value="Manuell (Telefon)">Manuell (Telefon)</option>
+        <option value="Paid">Paid</option>
+        <option value="Pending">Pending</option>
+      </select>
+
+      <button type="submit" class="submit-btn" style="grid-column:1/-1;width:auto;margin:0;padding:10px 14px;">Spara manuell bokning</button>
+    </form>
+
+    <hr style="margin:14px 0;border:none;border-top:1px solid var(--border);" />
+
     <h3 style="margin:0 0 10px 0;color:var(--text-primary);font-size:1.05rem;">Kalender: Blockera datum</h3>
     <p style="margin:0 0 12px 0;color:var(--text-secondary);font-size:0.9rem;">Välj ett datum för att göra det otillgängligt i bokningskalendern.</p>
     <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
