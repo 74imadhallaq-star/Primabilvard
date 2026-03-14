@@ -168,7 +168,7 @@
 <section id="booking" class="booking">
   <div class="booking-header">
     <h2>Boka Din Tid</h2>
-    <a href="tel:0701234567" class="phone-booking-btn">📞 Boka via Telefon</a>
+    <a href="tel:0737542220" class="phone-booking-btn">📞 Boka via Telefon</a>
   </div>
   <div class="booking-container">
     <div class="booking-form-section">
@@ -181,7 +181,7 @@
 
         <div class="form-group">
           <label for="phone">Telefonnummer</label>
-          <input type="tel" id="phone" placeholder="070-123 45 67" required>
+          <input type="tel" id="phone" placeholder="073-754 22 20" required>
         </div>
 
         <div class="form-group">
@@ -284,11 +284,11 @@
   <div class="contact-info">
     <div class="contact-item">
       <span class="icon">📞</span>
-      <p><strong>Telefon:</strong> 070-123 45 67</p>
+      <p><strong>Telefon:</strong> 073-754 22 20</p>
     </div>
     <div class="contact-item">
       <span class="icon">📍</span>
-      <p><strong>Adress:</strong> Stockholm</p>
+      <p><strong>Adress:</strong> Karlsgatan 21, 291 95 Kristianstad</p>
     </div>
     <div class="contact-item">
       <span class="icon">🕐</span>
@@ -298,6 +298,11 @@
       <span class="icon">📘</span>
       <p><strong>Facebook:</strong></p>
       <a href="https://www.facebook.com/p/Prima-Bilvård-100063472974096/?locale=sv_SE" target="_blank" rel="noopener noreferrer" class="contact-facebook-btn">Besök vår Facebook</a>
+    </div>
+    <div class="contact-item">
+      <span class="icon">📸</span>
+      <p><strong>Instagram:</strong></p>
+      <a href="https://www.instagram.com/shineuppcarwash?igsh=Y3RIZmJjYmQ3NzA1" target="_blank" rel="noopener noreferrer" class="contact-facebook-btn">Besök vår Instagram</a>
     </div>
   </div>
 </section>
@@ -319,6 +324,35 @@
       <button id="exportBtn" class="submit-btn" style="padding:10px 16px;">Exportera CSV</button>
       <button id="clearBtn" class="submit-btn" style="background:#aa3333;border-color:#ffdddd;padding:10px 16px;">Rensa alla</button>
       <button id="closeOwnerBtn" class="submit-btn" style="background:#444;border-color:#666;padding:10px 16px;">Stäng</button>
+    </div>
+  </div>
+
+  <div style="margin-top:18px;padding:14px;border:1px solid var(--border);border-radius:10px;background:var(--bg-secondary);">
+    <h3 style="margin:0 0 10px 0;color:var(--text-primary);font-size:1.05rem;">Kalender: Blockera datum</h3>
+    <p style="margin:0 0 12px 0;color:var(--text-secondary);font-size:0.9rem;">Välj ett datum för att göra det otillgängligt i bokningskalendern.</p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+      <input type="date" id="blockDateInput" style="padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:#0f0f0f;color:var(--text-primary);" />
+      <button id="addBlockedDateBtn" class="submit-btn" style="width:auto;margin:0;padding:10px 14px;">Blockera datum</button>
+      <button id="removeBlockedDateBtn" class="submit-btn" style="width:auto;margin:0;padding:10px 14px;background:#444;border-color:#666;">Ta bort blockering</button>
+    </div>
+    <div style="margin-top:10px;">
+      <strong style="color:var(--text-secondary);font-size:0.9rem;">Blockerade datum:</strong>
+      <ul id="blockedDatesList" style="margin:8px 0 0 18px;color:var(--text-primary);"></ul>
+    </div>
+
+    <hr style="margin:14px 0;border:none;border-top:1px solid var(--border);" />
+
+    <h3 style="margin:0 0 10px 0;color:var(--text-primary);font-size:1.05rem;">Kalender: Blockera tider</h3>
+    <p style="margin:0 0 12px 0;color:var(--text-secondary);font-size:0.9rem;">Välj datum och tid för att göra just den tiden otillgänglig.</p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+      <input type="date" id="blockTimeDateInput" style="padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:#0f0f0f;color:var(--text-primary);" />
+      <input type="time" id="blockTimeInput" step="1800" style="padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:#0f0f0f;color:var(--text-primary);" />
+      <button id="addBlockedTimeBtn" class="submit-btn" style="width:auto;margin:0;padding:10px 14px;">Blockera tid</button>
+      <button id="removeBlockedTimeBtn" class="submit-btn" style="width:auto;margin:0;padding:10px 14px;background:#444;border-color:#666;">Ta bort tidsblockering</button>
+    </div>
+    <div style="margin-top:10px;">
+      <strong style="color:var(--text-secondary);font-size:0.9rem;">Blockerade tider:</strong>
+      <ul id="blockedTimesList" style="margin:8px 0 0 18px;color:var(--text-primary);"></ul>
     </div>
   </div>
 
