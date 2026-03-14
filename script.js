@@ -43,6 +43,7 @@ const MAX_CONCURRENT_BOOKINGS = 2;
 const SLOT_STEP_MINUTES = 30;
 
 const DEFAULT_SERVICE_DURATIONS = {
+  'test': 15,
   'basic': 20,
   'interior-wash': 40,
   'premium': 100,
@@ -53,6 +54,7 @@ const DEFAULT_SERVICE_DURATIONS = {
 let serviceDurations = { ...DEFAULT_SERVICE_DURATIONS };
 
 const SERVICE_LABELS = {
+  'test': 'TEST',
   'basic': 'Utvändig Handtvätt',
   'interior-wash': 'Invändig Tvätt',
   'premium': 'Komplett In- & Utvändig Tvätt',
@@ -643,6 +645,7 @@ document.getElementById('bookBtn').addEventListener('click', () => {
 
 // Service prices by size
 const servicePrices = {
+  'test': { small: 1, medium: 1, large: 1 },
   'basic': { small: 199, medium: 249, large: 279 },
   'interior-wash': { small: 249, medium: 279, large: 300 },
   'premium': { small: 399, medium: 449, large: 479 },
@@ -650,6 +653,96 @@ const servicePrices = {
   'interior': { small: 1500, medium: 1700, large: 1900 },
   'full': { small: 2000, medium: 2300, large: 2600 }
 };
+
+// Stripe Payment Links per kombination (lägg till fler länkar här)
+const STRIPE_PAYMENT_LINKS = {
+  // TEST (tillfällig)
+  'test|small|none|none': 'https://buy.stripe.com/test_3cI00ldvYfwY3C55Vd0Ba01',
+  'test|medium|none|none': 'https://buy.stripe.com/test_3cI00ldvYfwY3C55Vd0Ba01',
+  'test|large|none|none': 'https://buy.stripe.com/test_3cI00ldvYfwY3C55Vd0Ba01',
+  // Invändig Tvätt - Liten
+  'interior-wash|small|none|none': 'https://buy.stripe.com/cNifZj0J20o421P35Zasg00',
+  // Invändig Tvätt - Mellan
+  'interior-wash|medium|none|none': 'https://buy.stripe.com/28E9AVfDWdaQfSFayrasg01',
+  // Invändig Tvätt - Stor
+  'interior-wash|large|none|none': 'https://buy.stripe.com/eVq6oJ3Veb2I9uh35Zasg02',
+  // Utvändig Handtvätt - Liten
+  'basic|small|none|none': 'https://buy.stripe.com/eVqdRbfDWc6MdKx6ibasg03',
+  // Utvändig Handtvätt - Mellan
+  'basic|medium|none|none': 'https://buy.stripe.com/8x2cN71N6gn26i5dKDasg04',
+  // Utvändig Handtvätt - Stor
+  'basic|large|none|none': 'https://buy.stripe.com/14AdRb3Ve7Qw5e121Vasg05',
+  // Komplett In- & Utvändig Tvätt - Liten
+  'premium|small|none|none': 'https://buy.stripe.com/fZu14pcrK1s8eOB8qjasg06',
+  // Komplett In- & Utvändig Tvätt - Mellan
+  'premium|medium|none|none': 'https://buy.stripe.com/6oUfZj8bu6Ms6i59unasg07',
+  // Komplett In- & Utvändig Tvätt - Stor
+  'premium|large|none|none': 'https://buy.stripe.com/5kQ8wRajC5IogWJgWPasg08',
+  // In- & Utvändig Tvätt Med Sätten - Liten
+  'inout|small|none|none': 'https://buy.stripe.com/eVqfZjfDW3Ag7m9dKDasg09',
+  // In- & Utvändig Tvätt Med Sätten - Mellan
+  'inout|medium|none|none': 'https://buy.stripe.com/cNi3cx0J20o4eOBfSLasg0a',
+  // In- & Utvändig Tvätt Med Sätten - Stor
+  'inout|large|none|none': 'https://buy.stripe.com/aFa00l9fy3AgdKx21Vasg0b',
+  // Hel Glans - Liten
+  'interior|small|none|none': 'https://buy.stripe.com/3cIbJ3ajCgn26i56ibasg0c',
+  // Hel Glans - Mellan
+  'interior|medium|none|none': 'https://buy.stripe.com/fZu9AV77q8UAgWJayrasg0d',
+  // Hel Glans - Stor
+  'interior|large|none|none': 'https://buy.stripe.com/7sYbJ377q0o421PdKDasg0e',
+  // Fullservice Rekond - Liten
+  'full|small|none|none': 'https://buy.stripe.com/7sYaEZgI09YEcGtgWPasg0f',
+  // Fullservice Rekond - Mellan
+  'full|medium|none|none': 'https://buy.stripe.com/9B64gBezS7Qw49X5e7asg0g',
+  // Fullservice Rekond - Stor
+  'full|large|none|none': 'https://buy.stripe.com/dRmfZj3VefiY49X8qjasg0h'
+};
+
+function buildStripeLinkKey(service, size, seatAddonType, asphaltAddonType) {
+  return `${service}|${size}|${seatAddonType || 'none'}|${asphaltAddonType || 'none'}`;
+}
+
+function getStripePaymentLink(service, size, seatAddonType, asphaltAddonType) {
+  if (!service || !size) return null;
+  const key = buildStripeLinkKey(service, size, seatAddonType, asphaltAddonType);
+  return STRIPE_PAYMENT_LINKS[key] || null;
+}
+
+function updateStripePayButton() {
+  const btn = document.getElementById('stripePayBtn');
+  if (!btn) return;
+
+  const service = document.getElementById('service').value;
+  const size = document.getElementById('size').value;
+  const seatAddonType = getSelectedSeatAddon();
+  const asphaltAddonType = getSelectedAsphaltAddon();
+  const paymentLink = getStripePaymentLink(service, size, seatAddonType, asphaltAddonType);
+
+  // Innan användaren valt tjänst/storlek: visa normal knapptext,
+  // så att formuläret beter sig som andra obligatoriska fält.
+  if (!service || !size) {
+    btn.disabled = false;
+    btn.style.cursor = 'pointer';
+    btn.style.opacity = '1';
+    btn.textContent = 'Betala & Bekräfta Bokning';
+    btn.dataset.paymentLink = '';
+    return;
+  }
+
+  if (paymentLink) {
+    btn.disabled = false;
+    btn.style.cursor = 'pointer';
+    btn.style.opacity = '1';
+    btn.textContent = 'Betala & Bekräfta Bokning';
+    btn.dataset.paymentLink = paymentLink;
+  } else {
+    btn.disabled = true;
+    btn.style.cursor = 'not-allowed';
+    btn.style.opacity = '0.6';
+    btn.textContent = 'Betala & Bekräfta Bokning (ej konfigurerad för detta val)';
+    btn.dataset.paymentLink = '';
+  }
+}
 
 // helper to compute displayed price (lowest value)
 function getBasePrice(service) {
@@ -679,6 +772,8 @@ function updatePriceDisplay() {
     const totalBase = base ? base + getSeatAddonPrice(service, seatAddonType) + estimatedAsphalt : null;
     priceDisplay.textContent = totalBase ? 'Från ' + totalBase + ' kr' : '-';
   }
+
+  updateStripePayButton();
 }
 
 document.getElementById('service').addEventListener('change', handleServiceChange);
@@ -763,69 +858,22 @@ document.getElementById('bookingForm').addEventListener('submit', async function
     sortKey
   };
 
-  // Save to Firebase for owner view
-  await saveBooking(booking);
+  const paymentLink = getStripePaymentLink(service, size, seatAddon, asphaltAddon);
+  if (!paymentLink) {
+    alert('Ingen Stripe-länk är konfigurerad för den valda tjänsten/storleken ännu.');
+    return;
+  }
 
-  // Send email notification via Formspree (to owner)
-  fetch('https://formspree.io/f/mgoydkqd', {
-    method: 'POST',
-    headers: { 
-      'Content-Type': 'application/json',
-      'Accept': 'application/json'
-    },
-    body: JSON.stringify({
-      name: name,
-      email: email,
-      phone: phone,
-      registration: registration,
-      service: service,
-      serviceLabel: SERVICE_LABELS[service] || service,
-      seatAddon: seatAddonLabel || 'Ingen',
-      asphaltAddon: asphaltAddonLabel || 'Ingen',
-      price: computedPrice + ' kr',
-      size: size,
-      date: dateString,
-      time: selectedTime,
-      paymentStatus: 'Pending',
-      _replyto: email,
-      _subject: `Ny bokning från ${name}`
-    })
-  })
-  .then(response => {
-    if (response.ok) {
-      console.log('Formspree: Email sent successfully');
-    } else {
-      console.error('Formspree error:', response.status);
-    }
-    return response.json();
-  })
-  .then(data => {
-    console.log('Formspree response:', data);
-  })
-  .catch(err => {
-    console.error('Formspree fetch error:', err);
-  });
+  try {
+    await savePendingBooking(booking);
+    setPendingBookingCookie(booking.id);
+  } catch (err) {
+    console.error('Pending booking save error:', err);
+    alert('Kunde inte starta betalningen just nu. Försök igen om en stund.');
+    return;
+  }
 
-  const serviceLabel = SERVICE_LABELS[service] || service;
-  const message = `Bokning mottagen!\n\nNamn: ${name}\nE-post: ${email}\nTelefon: ${phone}\nRegistreringsnummer: ${registration}\nTjänst: ${serviceLabel}${addonLabel ? ` + ${addonLabel}` : ''} (${size})\nPris: ${computedPrice} kr\nDatum: ${dateString}\nTid: ${selectedTime}\n\nBetalning: Väntar på Stripe-integrering\n\nVi kontaktar dig snart för bekräftelse!`;
-  alert(message);
-
-  // Reset form
-  document.getElementById('bookingForm').reset();
-  document.querySelectorAll('#seatAddonButtons .addon-btn').forEach(b => b.classList.remove('active'));
-  const noneBtn = document.querySelector('#seatAddonButtons .addon-btn[data-addon="none"]');
-  if (noneBtn) noneBtn.classList.add('active');
-  document.querySelectorAll('#asphaltAddonButtons .addon-btn').forEach(b => b.classList.remove('active'));
-  const asphaltNoneBtn = document.querySelector('#asphaltAddonButtons .addon-btn[data-addon="none"]');
-  if (asphaltNoneBtn) asphaltNoneBtn.classList.add('active');
-  updateSeatAddonVisibility();
-  updateAsphaltAddonVisibility();
-  document.getElementById('totalPrice').textContent = '-';
-  selectedDate = null;
-  selectedTime = null;
-  document.getElementById('timesSection').style.display = 'none';
-  renderCalendar();
-  updateCalendarHint();
+  window.location.href = paymentLink;
 });
 
 // ===== BOOKING STORAGE & OWNER VIEW HELPERS =====
@@ -839,6 +887,19 @@ async function saveBooking(booking) {
   } catch (e) {
     console.error('Firebase save error:', e);
   }
+}
+
+async function savePendingBooking(booking) {
+  try {
+    await window.db.collection('pendingBookings').doc(String(booking.id)).set(booking);
+  } catch (e) {
+    console.error('Firebase save pending error:', e);
+    throw e;
+  }
+}
+
+function setPendingBookingCookie(bookingId) {
+  document.cookie = `pendingBookingId=${encodeURIComponent(String(bookingId))}; Path=/; Max-Age=1800; SameSite=Lax`;
 }
 
 function loadBookings() {
