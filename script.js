@@ -1325,6 +1325,87 @@ document.addEventListener('DOMContentLoaded', async function() {
   const blockTimeInput = document.getElementById('blockTimeInput');
   const addBlockedTimeBtn = document.getElementById('addBlockedTimeBtn');
   const removeBlockedTimeBtn = document.getElementById('removeBlockedTimeBtn');
+  const ownerManualBookingForm = document.getElementById('ownerManualBookingForm');
+
+  if (ownerManualBookingForm) {
+    ownerManualBookingForm.addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      const name = (document.getElementById('ownerName')?.value || '').trim();
+      const phone = (document.getElementById('ownerPhone')?.value || '').trim();
+      const email = (document.getElementById('ownerEmail')?.value || '').trim();
+      const registration = (document.getElementById('ownerReg')?.value || '').trim();
+      const service = document.getElementById('ownerService')?.value || '';
+      const size = document.getElementById('ownerSize')?.value || '';
+      const dateId = document.getElementById('ownerDate')?.value || '';
+      const time = document.getElementById('ownerTime')?.value || '';
+      const priceInput = document.getElementById('ownerPrice')?.value || '';
+      const paymentStatus = document.getElementById('ownerPaymentStatus')?.value || 'Manuell (Telefon)';
+
+      if (!name || !phone || !service || !size || !dateId || !time) {
+        alert('Fyll i alla obligatoriska fält för manuell bokning.');
+        return;
+      }
+
+      const [y, m, d] = dateId.split('-').map(Number);
+      const bookingDate = new Date(y, (m || 1) - 1, d || 1);
+      const dateSv = bookingDate.toLocaleDateString('sv-SE');
+
+      if (!isSlotAvailable(bookingDate, time, service, 'none', 'none')) {
+        alert('Tiden är inte tillgänglig (upptagen, blockerad eller passerad). Välj annan tid.');
+        return;
+      }
+
+      const computedPrice = priceInput !== ''
+        ? Math.max(0, Number(priceInput))
+        : ((servicePrices[service] && servicePrices[service][size]) || 0);
+
+      const sortKey = new Date(
+        bookingDate.getFullYear(),
+        bookingDate.getMonth(),
+        bookingDate.getDate(),
+        parseInt(time.split(':')[0], 10),
+        parseInt(time.split(':')[1] || '0', 10)
+      ).getTime();
+
+      const manualBooking = {
+        id: Date.now() + Math.floor(Math.random() * 1000),
+        name,
+        email,
+        phone,
+        registration,
+        service,
+        seatAddon: 'none',
+        asphaltAddon: 'none',
+        addonLabel: '',
+        seatAddonPrice: 0,
+        seatAddonMinutes: 0,
+        asphaltAddonPrice: 0,
+        asphaltAddonMinutes: 0,
+        size,
+        date: dateSv,
+        time,
+        price: computedPrice,
+        paymentStatus,
+        sortKey,
+        source: 'owner-manual'
+      };
+
+      try {
+        await saveBooking(manualBooking);
+        renderBookingsTable();
+        renderCalendar();
+        if (selectedDate && toDateId(selectedDate) === dateId) {
+          showTimeSlots(selectedDate);
+        }
+        ownerManualBookingForm.reset();
+        alert('Manuell bokning sparad.');
+      } catch (err) {
+        console.error('Kunde inte spara manuell bokning:', err);
+        alert('Kunde inte spara manuell bokning just nu.');
+      }
+    });
+  }
 
   if (addBlockedDateBtn) {
     addBlockedDateBtn.addEventListener('click', async function() {
