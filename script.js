@@ -149,6 +149,7 @@ function getOpeningHours(date) {
   const day = date.getDay(); // 0=Sun,1=Mon,...6=Sat
   if (day === 0) return null; // Söndag stängt
   if (closedDays.includes(day)) return null;
+  if (isDateBlocked(date)) return null;
   if (day === 6) return { startHour: 10, endHour: 16 }; // Lördag
   return { startHour: 8, endHour: 18 }; // Mån-fre
 }
@@ -233,8 +234,147 @@ function generateTimeSlots(startHour, endHour, stepMinutes) {
 let availableHours = [];
 
 
-// Days that are closed (empty array means all days are available)
+// Days that are closed by weekday (empty array means all weekdays are available)
 const closedDays = [];
+
+// Specific blocked dates managed by owner panel (YYYY-MM-DD)
+let blockedDateIds = new Set();
+// Specific blocked times managed by owner panel (key: YYYY-MM-DD|HH:MM)
+let blockedTimeIds = new Set();
+
+function toDateId(date) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
+function dateIdToDisplay(dateId) {
+  const [y, m, d] = String(dateId).split('-').map(Number);
+  const date = new Date(y, (m || 1) - 1, d || 1);
+  return date.toLocaleDateString('sv-SE');
+}
+
+function isDateBlocked(date) {
+  return blockedDateIds.has(toDateId(date));
+}
+
+function blockedTimeKey(dateId, time) {
+  return `${String(dateId)}|${String(time)}`;
+}
+
+function blockedTimeDocId(dateId, time) {
+  return `${String(dateId)}_${String(time).replace(':', '-')}`;
+}
+
+function isTimeBlocked(date, time) {
+  return blockedTimeIds.has(blockedTimeKey(toDateId(date), time));
+}
+
+async function loadBlockedDatesFromFirebase() {
+  try {
+    const snapshot = await window.db.collection('blockedDates').get();
+    blockedDateIds = new Set(snapshot.docs.map(doc => String(doc.id)));
+  } catch (e) {
+    console.error('Firebase blockedDates load error:', e);
+    blockedDateIds = new Set();
+  }
+}
+
+async function loadBlockedTimesFromFirebase() {
+  try {
+    const snapshot = await window.db.collection('blockedTimes').get();
+    blockedTimeIds = new Set(
+      snapshot.docs.map(doc => {
+        const data = doc.data() || {};
+        const dateId = String(data.dateId || '').trim();
+        const time = String(data.time || '').trim();
+        if (dateId && time) return blockedTimeKey(dateId, time);
+
+        const [fallbackDate, fallbackTimeRaw] = String(doc.id).split('_');
+        const fallbackTime = String(fallbackTimeRaw || '').replace('-', ':');
+        return blockedTimeKey(fallbackDate || '', fallbackTime || '');
+      }).filter(v => v && !v.startsWith('|') && !v.endsWith('|'))
+    );
+  } catch (e) {
+    console.error('Firebase blockedTimes load error:', e);
+    blockedTimeIds = new Set();
+  }
+}
+
+function renderBlockedDatesList() {
+  const list = document.getElementById('blockedDatesList');
+  if (!list) return;
+  list.innerHTML = '';
+
+  const sorted = Array.from(blockedDateIds).sort((a, b) => a.localeCompare(b));
+  if (!sorted.length) {
+    const li = document.createElement('li');
+    li.textContent = 'Inga blockerade datum';
+    li.style.color = 'var(--text-secondary)';
+    list.appendChild(li);
+    return;
+  }
+
+  sorted.forEach(dateId => {
+    const li = document.createElement('li');
+    li.textContent = `${dateIdToDisplay(dateId)} (${dateId})`;
+    list.appendChild(li);
+  });
+}
+
+function renderBlockedTimesList() {
+  const list = document.getElementById('blockedTimesList');
+  if (!list) return;
+  list.innerHTML = '';
+
+  const sorted = Array.from(blockedTimeIds).sort((a, b) => a.localeCompare(b));
+  if (!sorted.length) {
+    const li = document.createElement('li');
+    li.textContent = 'Inga blockerade tider';
+    li.style.color = 'var(--text-secondary)';
+    list.appendChild(li);
+    return;
+  }
+
+  sorted.forEach(entry => {
+    const [dateId, time] = String(entry).split('|');
+    const li = document.createElement('li');
+    li.textContent = `${dateIdToDisplay(dateId)} kl ${time}`;
+    list.appendChild(li);
+  });
+}
+
+async function addBlockedDate(dateId) {
+  if (!dateId) return;
+  await window.db.collection('blockedDates').doc(String(dateId)).set({
+    dateId: String(dateId),
+    createdAt: Date.now()
+  });
+  blockedDateIds.add(String(dateId));
+}
+
+async function removeBlockedDate(dateId) {
+  if (!dateId) return;
+  await window.db.collection('blockedDates').doc(String(dateId)).delete();
+  blockedDateIds.delete(String(dateId));
+}
+
+async function addBlockedTime(dateId, time) {
+  if (!dateId || !time) return;
+  await window.db.collection('blockedTimes').doc(blockedTimeDocId(dateId, time)).set({
+    dateId: String(dateId),
+    time: String(time),
+    createdAt: Date.now()
+  });
+  blockedTimeIds.add(blockedTimeKey(dateId, time));
+}
+
+async function removeBlockedTime(dateId, time) {
+  if (!dateId || !time) return;
+  await window.db.collection('blockedTimes').doc(blockedTimeDocId(dateId, time)).delete();
+  blockedTimeIds.delete(blockedTimeKey(dateId, time));
+}
 
 // Initialize calendar
 function initCalendar() {
@@ -285,12 +425,19 @@ function renderCalendar() {
   for (let date = 1; date <= lastDate; date++) {
     const day = document.createElement('div');
     const dayDate = new Date(year, month, date);
+    const isBlocked = isDateBlocked(dayDate);
     const openingHours = getOpeningHours(dayDate);
     
     // Check if date is in the past
     if (dayDate < today) {
       day.className = 'day past';
       day.textContent = date;
+    }
+    // Check if specific date is blocked by owner
+    else if (isBlocked) {
+      day.className = 'day unavailable-date';
+      day.textContent = date;
+      day.title = 'Detta datum är blockerat av ägaren';
     }
     // Check if day is closed
     else if (!openingHours) {
@@ -428,6 +575,12 @@ function slotToMinutes(time) {
   return h * 60 + m;
 }
 
+function isSameCalendarDay(a, b) {
+  return a.getFullYear() === b.getFullYear()
+    && a.getMonth() === b.getMonth()
+    && a.getDate() === b.getDate();
+}
+
 // duration in minutes based on service type
 function bookingDuration(service, seatAddonType = 'none', asphaltAddonType = 'none') {
   const base = serviceDurations[service] || DEFAULT_SERVICE_DURATIONS[service] || 100;
@@ -514,6 +667,8 @@ function hasAnyAvailableSlot(date, service, seatAddonType = 'none', asphaltAddon
 function isSlotAvailable(date, time, requestedService, seatAddonType = 'none', asphaltAddonType = 'none') {
   if (!requestedService) return false;
 
+  if (isTimeBlocked(date, time)) return false;
+
   const hours = getOpeningHours(date);
   if (!hours) return false;
 
@@ -522,6 +677,13 @@ function isSlotAvailable(date, time, requestedService, seatAddonType = 'none', a
   const requestStart = slotToMinutes(time);
   const requestDuration = bookingDuration(requestedService, seatAddonType, asphaltAddonType);
   const requestEnd = requestStart + requestDuration;
+
+  // On current day: don't allow times that already passed
+  const now = new Date();
+  if (isSameCalendarDay(date, now)) {
+    const nowMinutes = now.getHours() * 60 + now.getMinutes();
+    if (requestStart < nowMinutes) return false;
+  }
 
   // must fit in opening hours
   if (requestStart < hours.startHour * 60 || requestEnd > hours.endHour * 60) return false;
@@ -995,10 +1157,14 @@ function getServiceLabel(service, seatAddonType = 'none', asphaltAddonType = 'no
 document.addEventListener('DOMContentLoaded', async function() {
   // Reset scroll to top
   window.scrollTo(0, 0);
-  // Load bookings from Firebase so calendar availability is correct
+  // Load bookings + blocked dates from Firebase so calendar availability is correct
   await loadBookingsFromFirebase();
+  await loadBlockedDatesFromFirebase();
+  await loadBlockedTimesFromFirebase();
   loadServiceDurationsFromCards();
   initCalendar();
+  renderBlockedDatesList();
+  renderBlockedTimesList();
   updateSeatAddonVisibility();
   updateAsphaltAddonVisibility();
   
@@ -1070,6 +1236,107 @@ document.addEventListener('DOMContentLoaded', async function() {
         }
       } else if (pin !== null) {
         alert('Fel PIN');
+      }
+    });
+  }
+
+  const blockDateInput = document.getElementById('blockDateInput');
+  const addBlockedDateBtn = document.getElementById('addBlockedDateBtn');
+  const removeBlockedDateBtn = document.getElementById('removeBlockedDateBtn');
+  const blockTimeDateInput = document.getElementById('blockTimeDateInput');
+  const blockTimeInput = document.getElementById('blockTimeInput');
+  const addBlockedTimeBtn = document.getElementById('addBlockedTimeBtn');
+  const removeBlockedTimeBtn = document.getElementById('removeBlockedTimeBtn');
+
+  if (addBlockedDateBtn) {
+    addBlockedDateBtn.addEventListener('click', async function() {
+      const dateId = blockDateInput ? blockDateInput.value : '';
+      if (!dateId) {
+        alert('Välj ett datum att blockera.');
+        return;
+      }
+      try {
+        await addBlockedDate(dateId);
+        renderBlockedDatesList();
+        renderCalendar();
+        if (selectedDate && isDateBlocked(selectedDate)) {
+          resetDateTimeSelection();
+          selectedDate = null;
+        }
+        alert('Datum blockerat.');
+      } catch (e) {
+        console.error('Kunde inte blockera datum:', e);
+        alert('Kunde inte blockera datum just nu.');
+      }
+    });
+  }
+
+  if (removeBlockedDateBtn) {
+    removeBlockedDateBtn.addEventListener('click', async function() {
+      const dateId = blockDateInput ? blockDateInput.value : '';
+      if (!dateId) {
+        alert('Välj ett datum att ta bort blockering för.');
+        return;
+      }
+      try {
+        await removeBlockedDate(dateId);
+        renderBlockedDatesList();
+        renderCalendar();
+        alert('Blockering borttagen.');
+      } catch (e) {
+        console.error('Kunde inte ta bort blockering:', e);
+        alert('Kunde inte ta bort blockering just nu.');
+      }
+    });
+  }
+
+  if (addBlockedTimeBtn) {
+    addBlockedTimeBtn.addEventListener('click', async function() {
+      const dateId = blockTimeDateInput ? blockTimeDateInput.value : '';
+      const time = blockTimeInput ? blockTimeInput.value : '';
+      if (!dateId || !time) {
+        alert('Välj både datum och tid att blockera.');
+        return;
+      }
+      try {
+        await addBlockedTime(dateId, time);
+        renderBlockedTimesList();
+        renderCalendar();
+
+        if (selectedDate && toDateId(selectedDate) === dateId) {
+          if (selectedTime === time) selectedTime = null;
+          showTimeSlots(selectedDate);
+        }
+
+        alert('Tid blockerad.');
+      } catch (e) {
+        console.error('Kunde inte blockera tid:', e);
+        alert('Kunde inte blockera tid just nu.');
+      }
+    });
+  }
+
+  if (removeBlockedTimeBtn) {
+    removeBlockedTimeBtn.addEventListener('click', async function() {
+      const dateId = blockTimeDateInput ? blockTimeDateInput.value : '';
+      const time = blockTimeInput ? blockTimeInput.value : '';
+      if (!dateId || !time) {
+        alert('Välj både datum och tid för att ta bort tidsblockering.');
+        return;
+      }
+      try {
+        await removeBlockedTime(dateId, time);
+        renderBlockedTimesList();
+        renderCalendar();
+
+        if (selectedDate && toDateId(selectedDate) === dateId) {
+          showTimeSlots(selectedDate);
+        }
+
+        alert('Tidsblockering borttagen.');
+      } catch (e) {
+        console.error('Kunde inte ta bort tidsblockering:', e);
+        alert('Kunde inte ta bort tidsblockering just nu.');
       }
     });
   }
