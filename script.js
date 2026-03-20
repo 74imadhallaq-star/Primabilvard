@@ -285,6 +285,35 @@ let blockedDateIds = new Set();
 // Specific blocked times managed by owner panel (key: YYYY-MM-DD|HH:MM)
 let blockedTimeIds = new Set();
 
+const LOCAL_STORAGE_KEYS = {
+  bookings: 'primabilvard_bookings',
+  pendingBookings: 'primabilvard_pendingBookings',
+  blockedDates: 'primabilvard_blockedDates',
+  blockedTimes: 'primabilvard_blockedTimes'
+};
+
+function canUseFirestore() {
+  return !!(window.db && typeof window.db.collection === 'function');
+}
+
+function readLocalArray(key) {
+  try {
+    const raw = localStorage.getItem(key);
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function writeLocalArray(key, arr) {
+  try {
+    localStorage.setItem(key, JSON.stringify(Array.isArray(arr) ? arr : []));
+  } catch (e) {
+    console.error('LocalStorage write error:', e);
+  }
+}
+
 function toDateId(date) {
   const y = date.getFullYear();
   const m = String(date.getMonth() + 1).padStart(2, '0');
@@ -315,16 +344,24 @@ function isTimeBlocked(date, time) {
 }
 
 async function loadBlockedDatesFromFirebase() {
+  if (!canUseFirestore()) {
+    blockedDateIds = new Set(readLocalArray(LOCAL_STORAGE_KEYS.blockedDates).map(v => String(v)));
+    return;
+  }
   try {
     const snapshot = await window.db.collection('blockedDates').get();
     blockedDateIds = new Set(snapshot.docs.map(doc => String(doc.id)));
   } catch (e) {
     console.error('Firebase blockedDates load error:', e);
-    blockedDateIds = new Set();
+    blockedDateIds = new Set(readLocalArray(LOCAL_STORAGE_KEYS.blockedDates).map(v => String(v)));
   }
 }
 
 async function loadBlockedTimesFromFirebase() {
+  if (!canUseFirestore()) {
+    blockedTimeIds = new Set(readLocalArray(LOCAL_STORAGE_KEYS.blockedTimes).map(v => String(v)).filter(Boolean));
+    return;
+  }
   try {
     const snapshot = await window.db.collection('blockedTimes').get();
     blockedTimeIds = new Set(
@@ -341,7 +378,7 @@ async function loadBlockedTimesFromFirebase() {
     );
   } catch (e) {
     console.error('Firebase blockedTimes load error:', e);
-    blockedTimeIds = new Set();
+    blockedTimeIds = new Set(readLocalArray(LOCAL_STORAGE_KEYS.blockedTimes).map(v => String(v)).filter(Boolean));
   }
 }
 
@@ -390,33 +427,45 @@ function renderBlockedTimesList() {
 
 async function addBlockedDate(dateId) {
   if (!dateId) return;
-  await window.db.collection('blockedDates').doc(String(dateId)).set({
-    dateId: String(dateId),
-    createdAt: Date.now()
-  });
+  if (canUseFirestore()) {
+    await window.db.collection('blockedDates').doc(String(dateId)).set({
+      dateId: String(dateId),
+      createdAt: Date.now()
+    });
+  }
   blockedDateIds.add(String(dateId));
+  writeLocalArray(LOCAL_STORAGE_KEYS.blockedDates, Array.from(blockedDateIds));
 }
 
 async function removeBlockedDate(dateId) {
   if (!dateId) return;
-  await window.db.collection('blockedDates').doc(String(dateId)).delete();
+  if (canUseFirestore()) {
+    await window.db.collection('blockedDates').doc(String(dateId)).delete();
+  }
   blockedDateIds.delete(String(dateId));
+  writeLocalArray(LOCAL_STORAGE_KEYS.blockedDates, Array.from(blockedDateIds));
 }
 
 async function addBlockedTime(dateId, time) {
   if (!dateId || !time) return;
-  await window.db.collection('blockedTimes').doc(blockedTimeDocId(dateId, time)).set({
-    dateId: String(dateId),
-    time: String(time),
-    createdAt: Date.now()
-  });
+  if (canUseFirestore()) {
+    await window.db.collection('blockedTimes').doc(blockedTimeDocId(dateId, time)).set({
+      dateId: String(dateId),
+      time: String(time),
+      createdAt: Date.now()
+    });
+  }
   blockedTimeIds.add(blockedTimeKey(dateId, time));
+  writeLocalArray(LOCAL_STORAGE_KEYS.blockedTimes, Array.from(blockedTimeIds));
 }
 
 async function removeBlockedTime(dateId, time) {
   if (!dateId || !time) return;
-  await window.db.collection('blockedTimes').doc(blockedTimeDocId(dateId, time)).delete();
+  if (canUseFirestore()) {
+    await window.db.collection('blockedTimes').doc(blockedTimeDocId(dateId, time)).delete();
+  }
   blockedTimeIds.delete(blockedTimeKey(dateId, time));
+  writeLocalArray(LOCAL_STORAGE_KEYS.blockedTimes, Array.from(blockedTimeIds));
 }
 
 // Initialize calendar
@@ -1136,21 +1185,39 @@ if (bookingForm) bookingForm.addEventListener('submit', async function(e) {
 let cachedBookings = [];
 
 async function saveBooking(booking) {
+  if (!canUseFirestore()) {
+    cachedBookings.push(booking);
+    cachedBookings.sort((a, b) => a.sortKey - b.sortKey);
+    writeLocalArray(LOCAL_STORAGE_KEYS.bookings, cachedBookings);
+    return;
+  }
   try {
     await window.db.collection('bookings').doc(String(booking.id)).set(booking);
     cachedBookings.push(booking);
     cachedBookings.sort((a, b) => a.sortKey - b.sortKey);
+    writeLocalArray(LOCAL_STORAGE_KEYS.bookings, cachedBookings);
   } catch (e) {
     console.error('Firebase save error:', e);
+    cachedBookings.push(booking);
+    cachedBookings.sort((a, b) => a.sortKey - b.sortKey);
+    writeLocalArray(LOCAL_STORAGE_KEYS.bookings, cachedBookings);
   }
 }
 
 async function savePendingBooking(booking) {
+  if (!canUseFirestore()) {
+    const pending = readLocalArray(LOCAL_STORAGE_KEYS.pendingBookings);
+    pending.push(booking);
+    writeLocalArray(LOCAL_STORAGE_KEYS.pendingBookings, pending);
+    return;
+  }
   try {
     await window.db.collection('pendingBookings').doc(String(booking.id)).set(booking);
   } catch (e) {
     console.error('Firebase save pending error:', e);
-    throw e;
+    const pending = readLocalArray(LOCAL_STORAGE_KEYS.pendingBookings);
+    pending.push(booking);
+    writeLocalArray(LOCAL_STORAGE_KEYS.pendingBookings, pending);
   }
 }
 
@@ -1163,20 +1230,34 @@ function loadBookings() {
 }
 
 async function loadBookingsFromFirebase() {
+  if (!canUseFirestore()) {
+    cachedBookings = readLocalArray(LOCAL_STORAGE_KEYS.bookings);
+    cachedBookings.sort((a, b) => (a.sortKey || 0) - (b.sortKey || 0));
+    return;
+  }
   try {
     const snapshot = await window.db.collection('bookings').get();
     cachedBookings = snapshot.docs.map(doc => doc.data());
     cachedBookings.sort((a, b) => a.sortKey - b.sortKey);
+    writeLocalArray(LOCAL_STORAGE_KEYS.bookings, cachedBookings);
   } catch (e) {
     console.error('Firebase load error:', e);
-    cachedBookings = [];
+    cachedBookings = readLocalArray(LOCAL_STORAGE_KEYS.bookings);
+    cachedBookings.sort((a, b) => (a.sortKey || 0) - (b.sortKey || 0));
   }
 }
 
 async function deleteBooking(id) {
+  if (!canUseFirestore()) {
+    cachedBookings = cachedBookings.filter(b => String(b.id) !== String(id));
+    writeLocalArray(LOCAL_STORAGE_KEYS.bookings, cachedBookings);
+    renderBookingsTable();
+    return;
+  }
   try {
     await window.db.collection('bookings').doc(String(id)).delete();
     cachedBookings = cachedBookings.filter(b => String(b.id) !== String(id));
+    writeLocalArray(LOCAL_STORAGE_KEYS.bookings, cachedBookings);
   } catch (e) {
     console.error('Firebase delete error:', e);
   }
@@ -1557,12 +1638,20 @@ document.addEventListener('DOMContentLoaded', async function() {
   const clearBtn = document.getElementById('clearBtn');
   if (clearBtn) clearBtn.addEventListener('click', async function() {
     if (confirm('Rensa alla bokningar? Detta kan inte ångras.')) {
+      if (!canUseFirestore()) {
+        cachedBookings = [];
+        writeLocalArray(LOCAL_STORAGE_KEYS.bookings, cachedBookings);
+        renderBookingsTable();
+        alert('Bokningar rensade');
+        return;
+      }
       try {
         const batch = window.db.batch();
         const snapshot = await window.db.collection('bookings').get();
         snapshot.docs.forEach(doc => batch.delete(doc.ref));
         await batch.commit();
         cachedBookings = [];
+        writeLocalArray(LOCAL_STORAGE_KEYS.bookings, cachedBookings);
       } catch (e) {
         console.error('Firebase clear error:', e);
       }
