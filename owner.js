@@ -1,5 +1,6 @@
 const OWNER_ACCESS_CONFIG = {
   codeHashSha256: 'eca285b5a4a15ad8fabcf65748d80fdcb774c1920623fe1ea4aa2a4f6d2a95e5',
+  fallbackPlainCode: 'Mido0762367753',
   maxAttempts: 5,
   lockoutMs: 10 * 60 * 1000,
   authSessionMs: 3 * 60 * 60 * 1000
@@ -86,14 +87,23 @@ function timingSafeEqual(a, b) {
 }
 
 async function sha256Hex(text) {
+  if (!window.crypto || !crypto.subtle || typeof crypto.subtle.digest !== 'function') {
+    throw new Error('WebCrypto unavailable');
+  }
   const data = new TextEncoder().encode(text);
   const digest = await crypto.subtle.digest('SHA-256', data);
   return Array.from(new Uint8Array(digest)).map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
 async function verifyOwnerCode(inputCode) {
-  const hash = await sha256Hex(String(inputCode ?? ''));
-  return timingSafeEqual(hash, OWNER_ACCESS_CONFIG.codeHashSha256);
+  const normalizedInput = String(inputCode ?? '');
+  try {
+    const hash = await sha256Hex(normalizedInput);
+    return timingSafeEqual(hash, OWNER_ACCESS_CONFIG.codeHashSha256);
+  } catch (e) {
+    console.warn('WebCrypto saknas, använder fallback-verifiering:', e);
+    return timingSafeEqual(normalizedInput, OWNER_ACCESS_CONFIG.fallbackPlainCode);
+  }
 }
 
 function getNum(key, fallback = 0) {
