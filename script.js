@@ -78,6 +78,55 @@ function timingSafeEqual(a, b) {
   return mismatch === 0;
 }
 
+function showOwnerLoginOverlay() {
+  return new Promise((resolve) => {
+    const existing = document.querySelector('.owner-login-overlay');
+    if (existing) existing.remove();
+
+    const overlay = document.createElement('div');
+    overlay.className = 'owner-login-overlay';
+    overlay.innerHTML = `
+      <div class="owner-login-card" role="dialog" aria-modal="true" aria-label="Ägarinloggning">
+        <img src="logo.png" alt="Prima Bilvård" class="owner-login-logo" />
+        <h2>Ägarinloggning</h2>
+        <p>Ange kod för att öppna adminpanelen</p>
+        <form class="owner-login-form">
+          <input type="password" class="owner-login-input" placeholder="Ägarkod" autocomplete="current-password" required />
+          <div class="owner-login-actions">
+            <button type="button" class="owner-login-cancel">Avbryt</button>
+            <button type="submit" class="owner-login-submit">Logga in</button>
+          </div>
+        </form>
+      </div>
+    `;
+
+    document.body.classList.add('owner-login-active');
+    document.body.appendChild(overlay);
+
+    const input = overlay.querySelector('.owner-login-input');
+    const cancelBtn = overlay.querySelector('.owner-login-cancel');
+    const form = overlay.querySelector('.owner-login-form');
+
+    const close = (value) => {
+      document.body.classList.remove('owner-login-active');
+      overlay.remove();
+      resolve(value);
+    };
+
+    cancelBtn.addEventListener('click', () => close(null));
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      close((input.value || '').trim());
+    });
+
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) close(null);
+    });
+
+    setTimeout(() => input.focus(), 40);
+  });
+}
+
 async function sha256Hex(text) {
   if (!window.crypto || !crypto.subtle || typeof crypto.subtle.digest !== 'function') {
     throw new Error('WebCrypto unavailable');
@@ -1429,7 +1478,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         return;
       }
 
-      const code = prompt('Ange ägar-kod för att visa bokningar:');
+      const code = await showOwnerLoginOverlay();
       if (code === null) return;
 
       const isValid = await verifyOwnerCode(code);
