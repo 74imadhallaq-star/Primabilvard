@@ -149,7 +149,7 @@ body {
 /* ===== HERO ===== */
 .hero {
   /* background image with overlay for professional appearance */
-  background: url('bil2.PNG') center center / cover no-repeat;
+  background: url('bil2.png') center center / cover no-repeat;
   color: var(--text-primary);
   text-align: center;
   min-height: 65vh;
