@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Betalning lyckades - Prima Bilvård</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #0A3D78;
+      --accent: #1E5AA8;
+      --bg-dark: #0B0B0B;
+      --bg-secondary: #1A1A1A;
+      --text-primary: #FFFFFF;
+      --text-secondary: #C7CCD1;
+      --border: #333333;
+      --success: #21b676;
+    }
+    * { box-sizing: border-box; font-family: 'Montserrat', sans-serif; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 20% 10%, rgba(30, 90, 168, 0.18), transparent 35%),
+        radial-gradient(circle at 80% 90%, rgba(33, 182, 118, 0.14), transparent 28%),
+        linear-gradient(165deg, #090909, #121826);
+      color: var(--text-primary);
+      display: grid;
+      place-items: center;
+      padding: 20px;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 620px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)), var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-top: 4px solid var(--success);
+      border-radius: 18px;
+      padding: 34px 26px;
+      text-align: center;
+      box-shadow: 0 24px 56px rgba(0,0,0,.52);
+      backdrop-filter: blur(3px);
+    }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid rgba(33, 182, 118, 0.45);
+      background: rgba(33, 182, 118, 0.12);
+      color: #d7ffef;
+      font-weight: 700;
+      font-size: 0.85rem;
+      padding: 7px 12px;
+      border-radius: 999px;
+      margin-bottom: 14px;
+    }
+
+    .icon {
+      font-size: 56px;
+      margin: 8px 0 10px;
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: 2rem;
+      letter-spacing: -0.4px;
+      font-family: 'Playfair Display', serif;
+    }
+
+    p {
+      margin: 8px 0;
+      color: var(--text-secondary);
+      line-height: 1.65;
+      font-size: 1rem;
+    }
+
+    .summary {
+      margin: 18px 0 0;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.02);
+      border-radius: 12px;
+      padding: 14px;
+      text-align: left;
+      color: #dde4ee;
+      font-size: 0.95rem;
+    }
+
+    .summary strong {
+      color: #ffffff;
+    }
+
+    .actions {
+      display: grid;
+      gap: 10px;
+      margin-top: 22px;
+    }
+
+    .btn {
+      display: inline-block;
+      text-decoration: none;
+      border-radius: 10px;
+      padding: 14px 16px;
+      font-weight: 700;
+      border: 2px solid transparent;
+      transition: .2s ease;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: white;
+      border-color: #9fb6d5;
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: white;
+      border-color: var(--border);
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 18px rgba(30, 90, 168, 0.24);
+    }
+
+    @media (max-width: 640px) {
+      .card {
+        padding: 26px 18px;
+        border-radius: 14px;
+      }
+
+      h1 {
+        font-size: 1.65rem;
+      }
+
+      p {
+        font-size: 0.95rem;
+      }
+
+      .btn {
+        padding: 13px 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <div class="status" id="statusBadge">✔ Betalning mottagen</div>
+    <div class="icon">✅</div>
+    <h1 id="successTitle">Tack! Betalningen gick igenom</h1>
+    <p id="successText1">Din betalning är registrerad hos Prima Bilvård.</p>
+    <p id="successText2">Vi kontaktar dig snart för att bekräfta bokningen och tiden.</p>
+
+    <div class="summary" id="summaryBox">
+      <strong>Nästa steg:</strong><br>
+      1. Vi granskar din bokning<br>
+      2. Du får bekräftelse via telefon eller e-post<br>
+      3. Vi ses på din bokade tid ✨
+    </div>
+
+    <div class="actions">
+      <a class="btn btn-primary" href="index.html#booking">Tillbaka till bokning</a>
+      <a class="btn btn-secondary" href="index.html">Till startsidan</a>
+    </div>
+  </main>
+
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyAD1eXQlseZnyCAT5hJPyDEf2BCHMQb1jI",
+      authDomain: "primabilvard-6c99e.firebaseapp.com",
+      projectId: "primabilvard-6c99e",
+      storageBucket: "primabilvard-6c99e.firebasestorage.app",
+      messagingSenderId: "989347315654",
+      appId: "1:989347315654:web:c35209e7f9a65fb2eb7cc7",
+      measurementId: "G-ZMW45RPSQ3"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    const SERVICE_LABELS = {
+      test: 'TEST',
+      basic: 'Utvändig Handtvätt',
+      'interior-wash': 'Invändig Tvätt',
+      premium: 'Komplett In- & Utvändig Tvätt',
+      inout: 'In- & Utvändig Tvätt Med Sätten',
+      interior: 'Hel Glans',
+      full: 'Fullservice Rekond'
+    };
+
+    const SEAT_ADDON_LABELS = {
+      '2': 'Tvätt av 2 säten',
+      '5': 'Tvätt av 5 säten'
+    };
+
+    function getServiceText(booking) {
+      const base = SERVICE_LABELS[booking.service] || booking.service || '-';
+      const extras = [];
+
+      if (booking.seatAddon && booking.seatAddon !== 'none') {
+        extras.push(SEAT_ADDON_LABELS[booking.seatAddon] || `Tillägg säten (${booking.seatAddon})`);
+      }
+
+      if (booking.asphaltAddon && booking.asphaltAddon !== 'none') {
+        extras.push('Asfaltrengöring');
+      }
+
+      if (booking.addonLabel && !extras.length) {
+        extras.push(booking.addonLabel);
+      }
+
+      return extras.length ? `${base} + ${extras.join(' + ')}` : base;
+    }
+
+    function renderBookingSummary(summaryBox, booking, heading = 'Bokning bekräftad:') {
+      const serviceText = getServiceText(booking);
+      const priceText = booking.price != null ? `${booking.price} kr` : '-';
+      summaryBox.innerHTML = `<strong>${heading}</strong><br>
+        Datum: ${booking.date || '-'}<br>
+        Tid: ${booking.time || '-'}<br>
+        Tjänst: ${serviceText}<br>
+        Storlek: ${booking.size || '-'}<br>
+        Pris: ${priceText}`;
+    }
+
+    async function tryLoadRecentBookingFallback() {
+      try {
+        const snapshot = await db.collection('bookings').orderBy('id', 'desc').limit(1).get();
+        if (snapshot.empty) return null;
+
+        const booking = snapshot.docs[0].data();
+        const bookingId = Number(booking.id);
+        const isRecent = Number.isFinite(bookingId) && Math.abs(Date.now() - bookingId) <= 2 * 60 * 60 * 1000;
+        return isRecent ? booking : null;
+      } catch (e) {
+        console.error('Kunde inte läsa fallback-bokning:', e);
+        return null;
+      }
+    }
+
+    function getCookie(name) {
+      const prefix = `${name}=`;
+      const parts = document.cookie.split(';').map(v => v.trim());
+      const found = parts.find(v => v.startsWith(prefix));
+      return found ? decodeURIComponent(found.slice(prefix.length)) : '';
+    }
+
+    function clearPendingCookie() {
+      document.cookie = 'pendingBookingId=; Path=/; Max-Age=0; SameSite=Lax';
+    }
+
+    async function finalizeBookingAfterPayment() {
+      const statusBadge = document.getElementById('statusBadge');
+      const successTitle = document.getElementById('successTitle');
+      const successText1 = document.getElementById('successText1');
+      const successText2 = document.getElementById('successText2');
+      const summaryBox = document.getElementById('summaryBox');
+
+      const pendingBookingId = getCookie('pendingBookingId');
+      if (!pendingBookingId) {
+        const fallbackBooking = await tryLoadRecentBookingFallback();
+        if (fallbackBooking) {
+          successTitle.textContent = 'Tack! Betalningen gick igenom';
+          successText1.textContent = 'Betalningen är registrerad.';
+          successText2.textContent = 'Här är din senaste bokningsinformation:';
+          renderBookingSummary(summaryBox, fallbackBooking, 'Bokning registrerad:');
+          return;
+        }
+
+        successTitle.textContent = 'Betalning klar';
+        successText1.textContent = 'Vi hittade ingen väntande bokning att slutföra automatiskt.';
+        successText2.textContent = 'Kontakta oss så verifierar vi betalningen i Stripe och bekräftar bokningen manuellt.';
+        summaryBox.innerHTML = '<strong>Info:</strong><br>Bokningsdetaljer kunde inte hämtas automatiskt.';
+        return;
+      }
+
+      try {
+        const pendingRef = db.collection('pendingBookings').doc(String(pendingBookingId));
+        const pendingSnap = await pendingRef.get();
+
+        if (!pendingSnap.exists) {
+          const existingBookingSnap = await db.collection('bookings').doc(String(pendingBookingId)).get();
+          if (existingBookingSnap.exists) {
+            const existingBooking = existingBookingSnap.data();
+            successTitle.textContent = 'Tack! Betalningen gick igenom';
+            successText1.textContent = 'Bokningen var redan registrerad.';
+            successText2.textContent = 'Här är dina bokningsdetaljer:';
+            renderBookingSummary(summaryBox, existingBooking, 'Bokning bekräftad:');
+            clearPendingCookie();
+            return;
+          }
+
+          successTitle.textContent = 'Betalning klar';
+          successText1.textContent = 'Ingen väntande bokning hittades för denna betalning.';
+          successText2.textContent = 'Kontakta oss så hjälper vi dig direkt.';
+          summaryBox.innerHTML = '<strong>Info:</strong><br>Bokningsdetaljer kunde inte hittas automatiskt.';
+          clearPendingCookie();
+          return;
+        }
+
+        const booking = pendingSnap.data();
+        const finalizedBooking = {
+          ...booking,
+          paymentStatus: 'Paid'
+        };
+
+        await db.collection('bookings').doc(String(finalizedBooking.id)).set(finalizedBooking);
+        await pendingRef.delete();
+
+        fetch('https://formspree.io/f/mgoydkqd', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify({
+            name: finalizedBooking.name,
+            email: finalizedBooking.email,
+            phone: finalizedBooking.phone,
+            registration: finalizedBooking.registration,
+            service: finalizedBooking.service,
+            seatAddon: finalizedBooking.seatAddon || 'none',
+            asphaltAddon: finalizedBooking.asphaltAddon || 'none',
+            size: finalizedBooking.size,
+            date: finalizedBooking.date,
+            time: finalizedBooking.time,
+            price: finalizedBooking.price + ' kr',
+            paymentStatus: 'Paid',
+            _replyto: finalizedBooking.email,
+            _subject: `Ny BETALD bokning från ${finalizedBooking.name}`
+          })
+        }).catch(err => console.error('Formspree error:', err));
+
+        clearPendingCookie();
+
+        renderBookingSummary(summaryBox, finalizedBooking, 'Bokning bekräftad:');
+      } catch (e) {
+        console.error('Fel vid bokningsslutförande:', e);
+        statusBadge.textContent = '⚠ Betalning mottagen';
+        successTitle.textContent = 'Betalning klar, men bokning kunde inte sparas automatiskt';
+        successText1.textContent = 'Du har inte blivit dubbeldebiterad.';
+        successText2.textContent = 'Kontakta oss så bekräftar vi bokningen manuellt direkt.';
+        summaryBox.innerHTML = '<strong>Tekniskt fel:</strong><br>Vi kunde inte spara bokningen i databasen just nu.';
+      }
+    }
+
+    finalizeBookingAfterPayment();
+  </script>
+</body>
+</html>
