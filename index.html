@@ -8,6 +8,9 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Cormorant+Garamond:wght@400;500;600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css?v=4">
+<script type="module" src="firebase-config.js"></script>
+<script src="https://www.gstatic.com/firebasejs/latest/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/latest/firebase-firestore.js"></script>
 </head>
 <body>
 
@@ -424,24 +427,6 @@
     </table>
   </div>
 </section>
-
-<!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-<script>
-  // *** KLISTRA IN DIN FIREBASE CONFIG HÄR ***
-  const firebaseConfig = {
-    apiKey: "AIzaSyAD1eXQlseZnyCAT5hJPyDEf2BCHMQb1jI",
-    authDomain: "primabilvard-6c99e.firebaseapp.com",
-    projectId: "primabilvard-6c99e",
-    storageBucket: "primabilvard-6c99e.firebasestorage.app",
-    messagingSenderId: "989347315654",
-    appId: "1:989347315654:web:c35209e7f9a65fb2eb7cc7",
-    measurementId: "G-ZMW45RPSQ3"
-  };
-  firebase.initializeApp(firebaseConfig);
-  window.db = firebase.firestore();
-</script>
 
 <script src="script.js?v=2"></script>
 </body>
