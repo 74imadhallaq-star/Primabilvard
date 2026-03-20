@@ -962,6 +962,89 @@ body {
   background: rgba(255,255,255,0.02);
 }
 
+/* Full-screen owner login overlay */
+body.owner-login-active {
+  overflow: hidden;
+}
+
+.owner-login-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: radial-gradient(circle at top, rgba(30, 90, 168, 0.2), rgba(0, 0, 0, 0.94));
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.owner-login-card {
+  width: min(420px, 92vw);
+  background: #111;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 24px 20px;
+  box-shadow: var(--shadow-luxury);
+  text-align: center;
+}
+
+.owner-login-logo {
+  width: 110px;
+  height: auto;
+  margin: 0 auto 10px auto;
+  display: block;
+}
+
+.owner-login-card h2 {
+  margin: 4px 0;
+  font-size: 1.35rem;
+  color: var(--text-primary);
+}
+
+.owner-login-card p {
+  margin: 0 0 14px 0;
+  color: var(--text-secondary);
+  font-size: 0.92rem;
+}
+
+.owner-login-input {
+  width: 100%;
+  border: 1px solid var(--border);
+  background: #0f0f0f;
+  color: var(--text-primary);
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 1rem;
+}
+
+.owner-login-actions {
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.owner-login-cancel,
+.owner-login-submit {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.owner-login-cancel {
+  background: #2f2f2f;
+  color: var(--text-primary);
+}
+
+.owner-login-submit {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
 /* ===== HAMBURGER MENU ===== */
 .hamburger {
   display: none;
@@ -1377,11 +1460,21 @@ body {
   .owner-section {
     padding: 14px !important;
     overflow-x: auto;
+    margin: 20px auto !important;
   }
 
   #bookingsTable {
     font-size: 0.8rem;
     min-width: 700px;
+  }
+
+  .owner-login-card {
+    width: min(420px, 96vw);
+    padding: 20px 16px;
+  }
+
+  .owner-login-logo {
+    width: 88px;
   }
 }
 
