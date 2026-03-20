@@ -318,9 +318,9 @@
   <p>&copy; 2026 Prima Bilvård. Alla rättigheter förbehållna.</p>
 </footer>
 
-<!-- Discreet owner link placed in footer area; low visibility -->
+<!-- Owner button (uses existing owner logic in script.js) -->
 <div style="max-width:1200px;margin:8px auto 40px auto;padding:0 20px;text-align:right;">
-  <a href="#" id="ownerLink" class="owner-link">Ägare</a>
+  <a href="#" id="ownerLink" class="owner-link" style="display:inline-block;padding:10px 14px;border:1px solid var(--border);border-radius:10px;background:var(--bg-secondary);">Ägare</a>
 </div>
 
 <!-- OWNER / ADMIN VIEW (hidden by default, client-side PIN protects access) -->
@@ -427,7 +427,7 @@
 
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-<script src="firebase-config.js?v=2"></script>
-<script src="script.js?v=3"></script>
+<script src="firebase-config.js?v=3"></script>
+<script src="script.js?v=4"></script>
 </body>
 </html>
