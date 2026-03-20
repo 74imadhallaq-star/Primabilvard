@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prima Bilvård - Ägare</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Cormorant+Garamond:wght@400;500;600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css?v=4">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-container">
+      <div class="nav-logo">
+        <img src="logo.png" alt="Prima Bilvård Logo" class="logo-img">
+        <span class="logo-text">Prima Bilvård</span>
+      </div>
+      <ul class="nav-menu" style="position:static;transform:none;background:transparent;box-shadow:none;border:none;display:flex;gap:12px;">
+        <li><a href="index.html" class="nav-link">← Till startsidan</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <section class="owner-section" style="display:block; max-width:1200px; margin:40px auto; padding:20px;">
+    <div class="owner-header" style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;">
+      <h2>Ägarpanel</h2>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <button id="exportBtn" class="submit-btn" style="padding:10px 16px;">Exportera CSV</button>
+        <button id="clearBtn" class="submit-btn" style="background:#aa3333;border-color:#ffdddd;padding:10px 16px;">Rensa alla</button>
+        <a href="index.html" class="submit-btn" style="display:inline-flex;align-items:center;justify-content:center;text-decoration:none;padding:10px 16px;background:#444;border-color:#666;">Stäng</a>
+      </div>
+    </div>
+
+    <p id="storageStatus" style="margin:8px 0 0;color:var(--text-secondary);font-size:0.9rem;"></p>
+
+    <div style="margin-top:18px;padding:14px;border:1px solid var(--border);border-radius:10px;background:var(--bg-secondary);">
+      <h3 style="margin:0 0 10px 0;color:var(--text-primary);font-size:1.05rem;">Lägg till manuell bokning (telefon/IRL)</h3>
+
+      <form id="ownerManualBookingForm" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px;">
+        <input id="ownerName" type="text" placeholder="Namn *" style="padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:#0f0f0f;color:var(--text-primary);" required />
+        <input id="ownerPhone" type="text" placeholder="Telefon *" style="padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:#0f0f0f;color:var(--text-primary);" required />
+        <input id="ownerEmail" type="email" placeholder="E-post (valfritt)" style="padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:#0f0f0f;color:var(--text-primary);" />
+        <input id="ownerReg" type="text" placeholder="Reg.nr (valfritt)" style="padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:#0f0f0f;color:var(--text-primary);" />
+
+        <select id="ownerService" style="padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:#0f0f0f;color:var(--text-primary);" required>
+          <option value="">Tjänst *</option>
+          <option value="basic">Utvändig Handtvätt</option>
+          <option value="interior-wash">Invändig Tvätt</option>
+          <option value="premium">Komplett In- & Utvändig Tvätt</option>
+          <option value="inout">In- & Utvändig Tvätt Med Sätten</option>
+          <option value="interior">Hel Glans</option>
+          <option value="full">Fullservice Rekond</option>
+        </select>
+
+        <select id="ownerSize" style="padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:#0f0f0f;color:var(--text-primary);" required>
+          <option value="">Storlek *</option>
+          <option value="small">Liten</option>
+          <option value="medium">Mellan</option>
+          <option value="large">Stor</option>
+        </select>
+
+        <input id="ownerDate" type="date" style="padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:#0f0f0f;color:var(--text-primary);" required />
+        <input id="ownerTime" type="time" step="1800" style="padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:#0f0f0f;color:var(--text-primary);" required />
+
+        <input id="ownerPrice" type="number" min="0" step="1" placeholder="Pris (valfritt)" style="padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:#0f0f0f;color:var(--text-primary);" />
+        <select id="ownerPaymentStatus" style="padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:#0f0f0f;color:var(--text-primary);">
+          <option value="Manuell (Telefon)">Manuell (Telefon)</option>
+          <option value="Paid">Paid</option>
+          <option value="Pending">Pending</option>
+        </select>
+
+        <button type="submit" class="submit-btn" style="grid-column:1/-1;width:auto;margin:0;padding:10px 14px;">Spara manuell bokning</button>
+      </form>
+
+      <hr style="margin:14px 0;border:none;border-top:1px solid var(--border);" />
+
+      <h3 style="margin:0 0 10px 0;color:var(--text-primary);font-size:1.05rem;">Kalender: Blockera datum</h3>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+        <input type="date" id="blockDateInput" style="padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:#0f0f0f;color:var(--text-primary);" />
+        <button id="addBlockedDateBtn" class="submit-btn" style="width:auto;margin:0;padding:10px 14px;">Blockera datum</button>
+        <button id="removeBlockedDateBtn" class="submit-btn" style="width:auto;margin:0;padding:10px 14px;background:#444;border-color:#666;">Ta bort blockering</button>
+      </div>
+      <div style="margin-top:10px;">
+        <strong style="color:var(--text-secondary);font-size:0.9rem;">Blockerade datum:</strong>
+        <ul id="blockedDatesList" style="margin:8px 0 0 18px;color:var(--text-primary);"></ul>
+      </div>
+
+      <hr style="margin:14px 0;border:none;border-top:1px solid var(--border);" />
+
+      <h3 style="margin:0 0 10px 0;color:var(--text-primary);font-size:1.05rem;">Kalender: Blockera tider</h3>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+        <input type="date" id="blockTimeDateInput" style="padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:#0f0f0f;color:var(--text-primary);" />
+        <input type="time" id="blockTimeInput" step="1800" style="padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:#0f0f0f;color:var(--text-primary);" />
+        <button id="addBlockedTimeBtn" class="submit-btn" style="width:auto;margin:0;padding:10px 14px;">Blockera tid</button>
+        <button id="removeBlockedTimeBtn" class="submit-btn" style="width:auto;margin:0;padding:10px 14px;background:#444;border-color:#666;">Ta bort tidsblockering</button>
+      </div>
+      <div style="margin-top:10px;">
+        <strong style="color:var(--text-secondary);font-size:0.9rem;">Blockerade tider:</strong>
+        <ul id="blockedTimesList" style="margin:8px 0 0 18px;color:var(--text-primary);"></ul>
+      </div>
+    </div>
+
+    <div style="margin-top:20px;overflow:auto;">
+      <table id="bookingsTable" style="width:100%;border-collapse:collapse;background:var(--bg-secondary);border:2px solid var(--border);min-width:980px;">
+        <thead>
+          <tr style="text-align:left;color:var(--text-secondary);">
+            <th style="padding:10px;border-bottom:1px solid var(--border);">Namn</th>
+            <th style="padding:10px;border-bottom:1px solid var(--border);">E-post</th>
+            <th style="padding:10px;border-bottom:1px solid var(--border);">Telefon</th>
+            <th style="padding:10px;border-bottom:1px solid var(--border);">Reg.nr</th>
+            <th style="padding:10px;border-bottom:1px solid var(--border);">Tjänst</th>
+            <th style="padding:10px;border-bottom:1px solid var(--border);">Storlek</th>
+            <th style="padding:10px;border-bottom:1px solid var(--border);">Datum</th>
+            <th style="padding:10px;border-bottom:1px solid var(--border);">Tid</th>
+            <th style="padding:10px;border-bottom:1px solid var(--border);">Betalning</th>
+            <th style="padding:10px;border-bottom:1px solid var(--border);">Åtgärder</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js?v=2"></script>
+<script src="owner.js?v=1"></script>
+</body>
+</html>
