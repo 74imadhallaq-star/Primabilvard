@@ -445,4 +445,415 @@
 
 <script src="script.js"></script>
 </body>
+</html>  <div class="hero-content">
+    <img src="logo.png" alt="Prima Bilvård Logo" class="hero-logo">
+    <h2 class="welcome-text">Välkommen till</h2>
+    <h1>Prima Bilvård</h1>
+    <p class="tagline">✨ Där Glans Möter Elegans ✨</p>
+    <p class="hero-description">Exklusiv bilvård för de som bryr sig om detaljer</p>
+    <button id="bookBtn" class="cta-button">Boka Din Tid Nu</button>
+  </div>
+</header>
+
+<!-- SERVICES -->
+<section id="services" class="services">
+  <h2>Våra Tjänster</h2>
+  <div class="services-grid">
+    <div class="service-card" data-service="basic" style="cursor: pointer;">
+      <h3>Utvändig Handtvätt</h3>
+      <p>Ge din bil nybilskänslan tillbaka. Vi använder kraftfullt högtryck för att få bort all lös smuts och salt, följt av en noggrann handtvätt som gör lacken skinande ren. I paketet ingår även grundlig fälgtvätt och putsning av rutorna utvändigt. Det trygga valet för dig som vill ha en bil som ser ut som ny igen.</p>
+      <p><strong>Tid: ca 20 minuter</strong></p>
+      <select class="card-size">
+        <option value="small">Liten - 199 kr</option>
+        <option value="medium">Mellan - 249 kr</option>
+        <option value="large">Stor - 279 kr</option>
+      </select>
+      <select class="card-size card-addon-asphalt">
+        <option value="none">Asfaltrengöring: Ingen extra</option>
+        <option value="yes">Asfaltrengöring (+250/+300/+350 kr, +30 min)</option>
+      </select>
+      <span class="price">Från 199 kr</span>
+    </div>
+    <div class="service-card" data-service="interior-wash" style="cursor: pointer;">
+      <h3>Invändig Tvätt</h3>
+      <p>Djuprengöring av bilens interiör. Vi dammsuger hela kupén, rengör alla ytor noggrant och putsar rutorna invändigt. Perfekt för att få bort damm, fläckar och skapa en fräsch miljö i bilen.</p>
+      <p><strong>Tid: ca 40 minuter</strong></p>
+      <select class="card-size">
+        <option value="small">Liten - 249 kr</option>
+        <option value="medium">Mellan - 279 kr</option>
+        <option value="large">Stor - 300 kr</option>
+      </select>
+      <span class="price">Från 249 kr</span>
+    </div>
+    <div class="service-card" data-service="premium" style="cursor: pointer;">
+      <h3>Komplett In- & Utvändig Tvätt</h3>
+      <p>Ge hela bilen nybilskänslan tillbaka. Vi kombinerar en grundlig handtvätt med högtryck på utsidan och en noggrann städning på insidan. Vi dammsuger hela kupén, putsar rutorna och gör rent fälgarna ordentligt & toppar av det med däckglans. Det perfekta valet för dig som vill ha en bil som känns både ren, fräsch och som ny igen, både utvändigt och invändigt.</p>
+      <p><strong>Tid: ca 100 minuter</strong></p>
+      <select class="card-size">
+        <option value="small">Liten - 399 kr</option>
+        <option value="medium">Mellan - 449 kr</option>
+        <option value="large">Stor - 479 kr</option>
+      </select>
+      <select class="card-size card-addon-asphalt">
+        <option value="none">Asfaltrengöring: Ingen extra</option>
+        <option value="yes">Asfaltrengöring (+250/+300/+350 kr, +30 min)</option>
+      </select>
+      <span class="price">Från 399 kr</span>
+    </div>
+    <div class="service-card" data-service="inout" style="cursor: pointer;">
+      <h3>In- & Utvändig Tvätt Med Sätten</h3>
+      <p>En komplett in- och utvändig behandling för dig som vill få bilen ordentligt uppfräschad. Vi tvättar utsidan noggrant, rengör kupén grundligt, dammsuger, putsar rutor och går igenom detaljer för ett rent och fräscht helhetsintryck.</p>
+      <p><strong>Tid: ca 4 timmar</strong></p>
+      <select class="card-size">
+        <option value="small">Liten - 1000 kr</option>
+        <option value="medium">Mellan - 1300 kr</option>
+        <option value="large">Stor - 1500 kr</option>
+      </select>
+      <select class="card-size card-addon-asphalt">
+        <option value="none">Asfaltrengöring: Ingen extra</option>
+        <option value="yes">Asfaltrengöring (+250/+300/+350 kr, +30 min)</option>
+      </select>
+      <span class="price">Från 1000 kr</span>
+    </div>
+    <div class="service-card" data-service="interior" style="cursor: pointer;">
+      <h3>Hel Glans</h3>
+      <p>Ge din bil en ordentlig uppfräschning med vårt Premiumpaket! Här ingår en noggrann handtvätt både in- och utvändigt, djupgående interiörrekonditionering, applicering av vax för extra skydd och glans samt en grundlig rengöring av fönster, dörrkarmar och trösklar. Perfekt för dig som vill att bilen ska se och kännas som ny – varje dag. Du kan även välja till klädseltvätt mot en extra kostnad för ett ännu fräschare resultat.</p>
+      <p><strong>Tid: ca 3 timmar</strong></p>
+      <select class="card-size">
+        <option value="small">Liten - 1500 kr</option>
+        <option value="medium">Mellan - 1700 kr</option>
+        <option value="large">Stor - 1900 kr</option>
+      </select>
+      <select class="card-size card-addon-seat">
+        <option value="none">Säten: Ingen extra</option>
+        <option value="2">Säten: 2 st (+399 kr, +2,5h)</option>
+        <option value="5">Säten: 5 st (+699 kr, +3,5h)</option>
+      </select>
+      <span class="price">Från 1500 kr</span>
+    </div>
+    <div class="service-card" data-service="full" style="cursor: pointer;">
+      <h3>Fullservice Rekond</h3>
+      <p>För dig som vill ge bilen det allra bästa erbjuder vi vårt Exklusivpaket. Paketet inkluderar fullständig handtvätt in- och utvändigt, avancerad polering för maximal glans och borttagning av djupare repor, samt professionellt lackskydd med keramisk coating eller högkvalitativt vax. Motortvätt och komplett interiörrekonditionering ingår också, vilket ger din bil en total förvandling från hjul till tak. Detta paket är perfekt för bilentusiaster, företagskunder med höga krav och bilhandlare som vill säkerställa att deras bilar är i toppskick. Du kan även välja till klädseltvätt mot en extra kostnad för en ännu mer komplett rekond.</p>
+      <p><strong>Tid: ca 3,5 timmar</strong></p>
+      <select class="card-size">
+        <option value="small">Liten - 2000 kr</option>
+        <option value="medium">Mellan - 2300 kr</option>
+        <option value="large">Stor - 2600 kr</option>
+      </select>
+      <select class="card-size card-addon-seat">
+        <option value="none">Säten: Ingen extra</option>
+        <option value="2">Säten: 2 st (+399 kr, +2,5h)</option>
+        <option value="5">Säten: 5 st (+699 kr, +3,5h)</option>
+      </select>
+      <span class="price">Från 2000 kr</span>
+    </div>
+  </div>
+</section>
+
+<!-- PORTFOLIO/GALLERY -->
+<section id="portfolio" class="portfolio">
+  <h2>Vårt Arbete</h2>
+  <p class="portfolio-subtitle">Se exempel på våra senaste projekt</p>
+  <div class="videos-grid">
+    <div class="video-card">
+      <div class="video-container">
+        <video controls autoplay muted loop preload="auto" playsinline>
+          <source src="video2.MOV" type="video/quicktime">
+          Din webbläsare stödjer inte videouppspelning.
+        </video>
+      </div>
+    </div>
+    <div class="video-card">
+      <div class="video-container">
+        <video controls autoplay muted loop preload="auto" playsinline>
+          <source src="video3.MOV" type="video/quicktime">
+          Din webbläsare stödjer inte videouppspelning.
+        </video>
+      </div>
+    </div>
+    <div class="video-card">
+      <div class="video-container">
+        <video controls autoplay muted loop preload="auto" playsinline>
+          <source src="video4.MOV" type="video/quicktime">
+          Din webbläsare stödjer inte videouppspelning.
+        </video>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BOOKING -->
+<section id="booking" class="booking">
+  <div class="booking-header">
+    <h2>Boka Din Tid</h2>
+    <a href="tel:0737542220" class="phone-booking-btn">📞 Boka via Telefon</a>
+  </div>
+  <div class="booking-container">
+    <div class="booking-form-section">
+      <h2>Boka Din Tid</h2>
+      <form id="bookingForm" class="booking-form">
+        <div class="form-group">
+          <label for="name">Namn</label>
+          <input type="text" id="name" placeholder="Ditt fullständiga namn" required>
+        </div>
+
+        <div class="form-group">
+          <label for="phone">Telefonnummer</label>
+          <input type="tel" id="phone" placeholder="073-754 22 20" required>
+        </div>
+
+        <div class="form-group">
+          <label for="email">E-post</label>
+          <input type="email" id="email" placeholder="din@email.se" required>
+        </div>
+
+        <div class="form-group">
+          <label for="service">Välj Tjänst</label>
+          <select id="service" required>
+            <option value="">-- Välj tjänst --</option>
+            <option value="basic">Utvändig Handtvätt</option>
+            <option value="interior-wash">Invändig Tvätt</option>
+            <option value="premium">Komplett In- & Utvändig Tvätt</option>
+            <option value="inout">In- & Utvändig Tvätt Med Sätten</option>
+            <option value="interior">HelGlans</option>
+            <option value="full">Fullservice Rekond</option>
+          </select>
+        </div>
+
+        <div class="form-group" id="seatAddonGroup">
+          <label>Extra tillbehör: Tvätt av säten</label>
+          <div class="addon-buttons" id="seatAddonButtons">
+            <button type="button" class="addon-btn active" data-addon="none">Ingen</button>
+            <button type="button" class="addon-btn" data-addon="2">2 säten (+399 kr, +2,5h)</button>
+            <button type="button" class="addon-btn" data-addon="5">5 säten (+699 kr, +3,5h)</button>
+          </div>
+          <p id="seatAddonHelp" class="addon-help">Välj Hel Glans eller Fullservice Rekond för att aktivera tillval.</p>
+        </div>
+
+        <div class="form-group" id="asphaltAddonGroup">
+          <label>Extra tillbehör: Asfaltrengöring</label>
+          <div class="addon-buttons" id="asphaltAddonButtons">
+            <button type="button" class="addon-btn active" data-addon="none">Ingen</button>
+            <button type="button" class="addon-btn" data-addon="yes">Lägg till asfaltrengöring (+30 min)</button>
+          </div>
+          <p id="asphaltAddonHelp" class="addon-help">Välj Utvändig Handtvätt, Komplett In- & Utvändig Tvätt eller In- & Utvändig Tvätt Med Sätten för att aktivera tillval.</p>
+        </div>
+
+        <div class="form-group">
+          <label for="size">Bilstorlek</label>
+          <select id="size" required>
+            <option value="">-- Välj storlek --</option>
+            <option value="small">Liten</option>
+            <option value="medium">Mellan</option>
+            <option value="large">Stor</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="registration">Registreringsnummer</label>
+          <input type="text" id="registration" placeholder="ABC 123" required>
+        </div>
+
+        <div class="payment-section">
+          <h3>Betalning</h3>
+          <div class="price-info">
+            <span>Pris:</span>
+            <span id="totalPrice">-</span>
+          </div>
+          <button type="submit" id="stripePayBtn" class="submit-btn" style="background:#5469d4;border-color:#5469d4;">Betala &amp; Bekräfta Bokning</button>
+          <p class="payment-note">* Betalning är obligatorisk för att bekräfta bokningen</p>
+          <p class="booking-policy-note"><strong>Obs:</strong> Vid extra smutsig bil kan en tilläggsavgift tillkomma efter bedömning på plats. Uteblivet besök eller avbokning sent kan medföra en avgift.</p>
+        </div>
+      </form>
+    </div>
+
+    <div class="calendar-section">
+      <h2>Lediga Tider</h2>
+      <p id="calendarHint" class="calendar-hint">Välj tjänst först för att se möjliga datum och tider.</p>
+      <div class="calendar-container">
+        <div class="calendar-header">
+          <button id="prevMonth" class="month-nav">&lt;</button>
+          <h3 id="monthYear"></h3>
+          <button id="nextMonth" class="month-nav">&gt;</button>
+        </div>
+        <div class="calendar-weekdays">
+          <div class="weekday">Mån</div>
+          <div class="weekday">Tis</div>
+          <div class="weekday">Ons</div>
+          <div class="weekday">Tor</div>
+          <div class="weekday">Fre</div>
+          <div class="weekday">Lör</div>
+          <div class="weekday">Sön</div>
+        </div>
+        <div id="calendarDays" class="calendar-days"></div>
+      </div>
+
+      <div id="timesSection" class="times-section" style="display: none;">
+        <h3>Lediga Tider för <span id="selectedDate"></span></h3>
+        <div id="timeSlots" class="time-slots"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact" class="contact">
+  <h2>Kontakt</h2>
+  <div class="contact-info">
+    <div class="contact-item">
+      <span class="icon">📞</span>
+      <p><strong>Telefon:</strong> 073-754 22 20</p>
+    </div>
+    <div class="contact-item">
+      <span class="icon">📍</span>
+      <p><strong>Adress:</strong> Karlsgatan 21, 291 95 Kristianstad</p>
+    </div>
+    <div class="contact-item">
+      <span class="icon">🕐</span>
+      <p><strong>Öppettider:</strong> Måndag-fredag 08:00–18:00, Lördag 10:00–16:00</p>
+    </div>
+    <div class="contact-item">
+      <span class="icon">📘</span>
+      <p><strong>Facebook:</strong></p>
+      <a href="https://www.facebook.com/p/Prima-Bilvård-100063472974096/?locale=sv_SE" target="_blank" rel="noopener noreferrer" class="contact-facebook-btn">Besök vår Facebook</a>
+    </div>
+    <div class="contact-item">
+      <span class="icon">📸</span>
+      <p><strong>Instagram:</strong></p>
+      <a href="https://www.instagram.com/shineuppcarwash?igsh=Y3RIZmJjYmQ3NzA1" target="_blank" rel="noopener noreferrer" class="contact-facebook-btn">Besök vår Instagram</a>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <p>&copy; 2026 Prima Bilvård. Alla rättigheter förbehållna.</p>
+</footer>
+
+<!-- Discreet owner link placed in footer area; low visibility -->
+<div style="max-width:1200px;margin:8px auto 40px auto;padding:0 20px;text-align:right;">
+  <a href="#" id="ownerLink" class="owner-link">Ägare</a>
+</div>
+
+<!-- OWNER / ADMIN VIEW (hidden by default, client-side PIN protects access) -->
+<section id="ownerSection" class="owner-section" style="display: none; max-width:1200px; margin:40px auto; padding:20px;">
+  <div class="owner-header" style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
+    <h2>Bokningar (Ägare)</h2>
+    <div style="display:flex;gap:10px;">
+      <button id="exportBtn" class="submit-btn" style="padding:10px 16px;">Exportera CSV</button>
+      <button id="clearBtn" class="submit-btn" style="background:#aa3333;border-color:#ffdddd;padding:10px 16px;">Rensa alla</button>
+      <button id="closeOwnerBtn" class="submit-btn" style="background:#444;border-color:#666;padding:10px 16px;">Stäng</button>
+    </div>
+  </div>
+
+  <div style="margin-top:18px;padding:14px;border:1px solid var(--border);border-radius:10px;background:var(--bg-secondary);">
+    <h3 style="margin:0 0 10px 0;color:var(--text-primary);font-size:1.05rem;">Lägg till manuell bokning (telefon/IRL)</h3>
+    <p style="margin:0 0 12px 0;color:var(--text-secondary);font-size:0.9rem;">Använd detta när du tar emot bokning via telefon eller på plats.</p>
+
+    <form id="ownerManualBookingForm" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px;">
+      <input id="ownerName" type="text" placeholder="Namn *" style="padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:#0f0f0f;color:var(--text-primary);" required />
+      <input id="ownerPhone" type="text" placeholder="Telefon *" style="padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:#0f0f0f;color:var(--text-primary);" required />
+      <input id="ownerEmail" type="email" placeholder="E-post (valfritt)" style="padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:#0f0f0f;color:var(--text-primary);" />
+      <input id="ownerReg" type="text" placeholder="Reg.nr (valfritt)" style="padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:#0f0f0f;color:var(--text-primary);" />
+
+      <select id="ownerService" style="padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:#0f0f0f;color:var(--text-primary);" required>
+        <option value="">Tjänst *</option>
+        <option value="basic">Utvändig Handtvätt</option>
+        <option value="interior-wash">Invändig Tvätt</option>
+        <option value="premium">Komplett In- & Utvändig Tvätt</option>
+        <option value="inout">In- & Utvändig Tvätt Med Sätten</option>
+        <option value="interior">Hel Glans</option>
+        <option value="full">Fullservice Rekond</option>
+      </select>
+
+      <select id="ownerSize" style="padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:#0f0f0f;color:var(--text-primary);" required>
+        <option value="">Storlek *</option>
+        <option value="small">Liten</option>
+        <option value="medium">Mellan</option>
+        <option value="large">Stor</option>
+      </select>
+
+      <input id="ownerDate" type="date" style="padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:#0f0f0f;color:var(--text-primary);" required />
+      <input id="ownerTime" type="time" step="1800" style="padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:#0f0f0f;color:var(--text-primary);" required />
+
+      <input id="ownerPrice" type="number" min="0" step="1" placeholder="Pris (valfritt)" style="padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:#0f0f0f;color:var(--text-primary);" />
+      <select id="ownerPaymentStatus" style="padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:#0f0f0f;color:var(--text-primary);">
+        <option value="Manuell (Telefon)">Manuell (Telefon)</option>
+        <option value="Paid">Paid</option>
+        <option value="Pending">Pending</option>
+      </select>
+
+      <button type="submit" class="submit-btn" style="grid-column:1/-1;width:auto;margin:0;padding:10px 14px;">Spara manuell bokning</button>
+    </form>
+
+    <hr style="margin:14px 0;border:none;border-top:1px solid var(--border);" />
+
+    <h3 style="margin:0 0 10px 0;color:var(--text-primary);font-size:1.05rem;">Kalender: Blockera datum</h3>
+    <p style="margin:0 0 12px 0;color:var(--text-secondary);font-size:0.9rem;">Välj ett datum för att göra det otillgängligt i bokningskalendern.</p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+      <input type="date" id="blockDateInput" style="padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:#0f0f0f;color:var(--text-primary);" />
+      <button id="addBlockedDateBtn" class="submit-btn" style="width:auto;margin:0;padding:10px 14px;">Blockera datum</button>
+      <button id="removeBlockedDateBtn" class="submit-btn" style="width:auto;margin:0;padding:10px 14px;background:#444;border-color:#666;">Ta bort blockering</button>
+    </div>
+    <div style="margin-top:10px;">
+      <strong style="color:var(--text-secondary);font-size:0.9rem;">Blockerade datum:</strong>
+      <ul id="blockedDatesList" style="margin:8px 0 0 18px;color:var(--text-primary);"></ul>
+    </div>
+
+    <hr style="margin:14px 0;border:none;border-top:1px solid var(--border);" />
+
+    <h3 style="margin:0 0 10px 0;color:var(--text-primary);font-size:1.05rem;">Kalender: Blockera tider</h3>
+    <p style="margin:0 0 12px 0;color:var(--text-secondary);font-size:0.9rem;">Välj datum och tid för att göra just den tiden otillgänglig.</p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+      <input type="date" id="blockTimeDateInput" style="padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:#0f0f0f;color:var(--text-primary);" />
+      <input type="time" id="blockTimeInput" step="1800" style="padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:#0f0f0f;color:var(--text-primary);" />
+      <button id="addBlockedTimeBtn" class="submit-btn" style="width:auto;margin:0;padding:10px 14px;">Blockera tid</button>
+      <button id="removeBlockedTimeBtn" class="submit-btn" style="width:auto;margin:0;padding:10px 14px;background:#444;border-color:#666;">Ta bort tidsblockering</button>
+    </div>
+    <div style="margin-top:10px;">
+      <strong style="color:var(--text-secondary);font-size:0.9rem;">Blockerade tider:</strong>
+      <ul id="blockedTimesList" style="margin:8px 0 0 18px;color:var(--text-primary);"></ul>
+    </div>
+  </div>
+
+  <div style="margin-top:20px;">
+    <table id="bookingsTable" style="width:100%;border-collapse:collapse;background:var(--bg-secondary);border:2px solid var(--border);">
+      <thead>
+        <tr style="text-align:left;color:var(--text-secondary);">
+          <th style="padding:10px;border-bottom:1px solid var(--border);">Namn</th>
+          <th style="padding:10px;border-bottom:1px solid var(--border);">E-post</th>
+          <th style="padding:10px;border-bottom:1px solid var(--border);">Telefon</th>
+          <th style="padding:10px;border-bottom:1px solid var(--border);">Reg.nr</th>
+          <th style="padding:10px;border-bottom:1px solid var(--border);">Tjänst</th>
+          <th style="padding:10px;border-bottom:1px solid var(--border);">Storlek</th>
+          <th style="padding:10px;border-bottom:1px solid var(--border);">Datum</th>
+          <th style="padding:10px;border-bottom:1px solid var(--border);">Tid</th>
+          <th style="padding:10px;border-bottom:1px solid var(--border);">Betalning</th>
+          <th style="padding:10px;border-bottom:1px solid var(--border);">Åtgärder</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</section>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<script>
+  // *** KLISTRA IN DIN FIREBASE CONFIG HÄR ***
+  const firebaseConfig = {
+    apiKey: "AIzaSyAD1eXQlseZnyCAT5hJPyDEf2BCHMQb1jI",
+    authDomain: "primabilvard-6c99e.firebaseapp.com",
+    projectId: "primabilvard-6c99e",
+    storageBucket: "primabilvard-6c99e.firebasestorage.app",
+    messagingSenderId: "989347315654",
+    appId: "1:989347315654:web:c35209e7f9a65fb2eb7cc7",
+    measurementId: "G-ZMW45RPSQ3"
+  };
+  firebase.initializeApp(firebaseConfig);
+  window.db = firebase.firestore();
+</script>
+
+<script src="script.js"></script>
+</body>
 </html>
