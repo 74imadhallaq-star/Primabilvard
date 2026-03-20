@@ -26,6 +26,7 @@
       <li><a href="#portfolio" class="nav-link">Vårt Arbete</a></li>
       <li><a href="#booking" class="nav-link">Boka</a></li>
       <li><a href="#contact" class="nav-link">Kontakt</a></li>
+      <li><a href="foretag.html" class="nav-link nav-link-foretag">🏢 För Företag</a></li>
     </ul>
   </div>
 </nav>
@@ -145,21 +146,27 @@
   <div class="videos-grid">
     <div class="video-card">
       <div class="video-container">
-        <iframe width="100%" height="280" src="https://www.youtube.com/embed/dQw4w9WgXcQ" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        <video controls autoplay muted loop preload="auto" playsinline>
+          <source src="video2.MOV" type="video/quicktime">
+          Din webbläsare stödjer inte videouppspelning.
+        </video>
       </div>
-      <h3>Grundtvätt - Före & Efter</h3>
     </div>
     <div class="video-card">
       <div class="video-container">
-        <iframe width="100%" height="280" src="https://www.youtube.com/embed/9bZkp7q19f0" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        <video controls autoplay muted loop preload="auto" playsinline>
+          <source src="video3.MOV" type="video/quicktime">
+          Din webbläsare stödjer inte videouppspelning.
+        </video>
       </div>
-      <h3>Premiumtvätt Demonstration</h3>
     </div>
     <div class="video-card">
       <div class="video-container">
-        <iframe width="100%" height="280" src="https://www.youtube.com/embed/jNQXAC9IVRw" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        <video controls autoplay muted loop preload="auto" playsinline>
+          <source src="video4.MOV" type="video/quicktime">
+          Din webbläsare stödjer inte videouppspelning.
+        </video>
       </div>
-      <h3>Fullständig Detaljering</h3>
     </div>
   </div>
 </section>
@@ -193,7 +200,6 @@
           <label for="service">Välj Tjänst</label>
           <select id="service" required>
             <option value="">-- Välj tjänst --</option>
-            <option value="test">TEST</option>
             <option value="basic">Utvändig Handtvätt</option>
             <option value="interior-wash">Invändig Tvätt</option>
             <option value="premium">Komplett In- & Utvändig Tvätt</option>
@@ -245,6 +251,7 @@
           </div>
           <button type="submit" id="stripePayBtn" class="submit-btn" style="background:#5469d4;border-color:#5469d4;">Betala &amp; Bekräfta Bokning</button>
           <p class="payment-note">* Betalning är obligatorisk för att bekräfta bokningen</p>
+          <p class="booking-policy-note"><strong>Obs:</strong> Vid extra smutsig bil kan en tilläggsavgift tillkomma efter bedömning på plats. Uteblivet besök eller avbokning sent kan medföra en avgift.</p>
         </div>
       </form>
     </div>
@@ -339,7 +346,6 @@
 
       <select id="ownerService" style="padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:#0f0f0f;color:var(--text-primary);" required>
         <option value="">Tjänst *</option>
-        <option value="test">TEST</option>
         <option value="basic">Utvändig Handtvätt</option>
         <option value="interior-wash">Invändig Tvätt</option>
         <option value="premium">Komplett In- & Utvändig Tvätt</option>
