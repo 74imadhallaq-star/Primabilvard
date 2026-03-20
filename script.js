@@ -88,7 +88,6 @@ async function verifyOwnerCode(inputCode) {
 }
 
 const DEFAULT_SERVICE_DURATIONS = {
-  'test': 15,
   'basic': 20,
   'interior-wash': 40,
   'premium': 100,
@@ -99,7 +98,6 @@ const DEFAULT_SERVICE_DURATIONS = {
 let serviceDurations = { ...DEFAULT_SERVICE_DURATIONS };
 
 const SERVICE_LABELS = {
-  'test': 'TEST',
   'basic': 'Utvändig Handtvätt',
   'interior-wash': 'Invändig Tvätt',
   'premium': 'Komplett In- & Utvändig Tvätt',
@@ -852,7 +850,6 @@ document.getElementById('bookBtn').addEventListener('click', () => {
 
 // Service prices by size
 const servicePrices = {
-  'test': { small: 1, medium: 1, large: 1 },
   'basic': { small: 199, medium: 249, large: 279 },
   'interior-wash': { small: 249, medium: 279, large: 300 },
   'premium': { small: 399, medium: 449, large: 479 },
@@ -863,10 +860,6 @@ const servicePrices = {
 
 // Stripe Payment Links per kombination (lägg till fler länkar här)
 const STRIPE_PAYMENT_LINKS = {
-  // TEST (tillfällig)
-  'test|small|none|none': 'https://buy.stripe.com/test_3cI00ldvYfwY3C55Vd0Ba01',
-  'test|medium|none|none': 'https://buy.stripe.com/test_3cI00ldvYfwY3C55Vd0Ba01',
-  'test|large|none|none': 'https://buy.stripe.com/test_3cI00ldvYfwY3C55Vd0Ba01',
   // Invändig Tvätt - Liten
   'interior-wash|small|none|none': 'https://buy.stripe.com/cNifZj0J20o421P35Zasg00',
   // Invändig Tvätt - Mellan
@@ -875,34 +868,76 @@ const STRIPE_PAYMENT_LINKS = {
   'interior-wash|large|none|none': 'https://buy.stripe.com/eVq6oJ3Veb2I9uh35Zasg02',
   // Utvändig Handtvätt - Liten
   'basic|small|none|none': 'https://buy.stripe.com/eVqdRbfDWc6MdKx6ibasg03',
+  // Utvändig Handtvätt - Liten + Asfaltrengöring
+  'basic|small|none|yes': 'https://buy.stripe.com/eVqdRbcrKfiY5e1cGzasg0i',
   // Utvändig Handtvätt - Mellan
   'basic|medium|none|none': 'https://buy.stripe.com/8x2cN71N6gn26i5dKDasg04',
+  // Utvändig Handtvätt - Mellan + Asfaltrengöring
+  'basic|medium|none|yes': 'https://buy.stripe.com/5kQdRbgI0fiY21P6ibasg0j',
   // Utvändig Handtvätt - Stor
   'basic|large|none|none': 'https://buy.stripe.com/14AdRb3Ve7Qw5e121Vasg05',
+  // Utvändig Handtvätt - Stor + Asfaltrengöring
+  'basic|large|none|yes': 'https://buy.stripe.com/3cI5kFfDW4EkdKx0XRasg0k',
   // Komplett In- & Utvändig Tvätt - Liten
   'premium|small|none|none': 'https://buy.stripe.com/fZu14pcrK1s8eOB8qjasg06',
+  // Komplett In- & Utvändig Tvätt - Liten + Asfaltrengöring
+  'premium|small|none|yes': 'https://buy.stripe.com/7sYbJ38bugn2dKx4a3asg0l',
   // Komplett In- & Utvändig Tvätt - Mellan
   'premium|medium|none|none': 'https://buy.stripe.com/6oUfZj8bu6Ms6i59unasg07',
+  // Komplett In- & Utvändig Tvätt - Mellan + Asfaltrengöring
+  'premium|medium|none|yes': 'https://buy.stripe.com/aFadRb8bu9YE8qd35Zasg0m',
   // Komplett In- & Utvändig Tvätt - Stor
   'premium|large|none|none': 'https://buy.stripe.com/5kQ8wRajC5IogWJgWPasg08',
+  // Komplett In- & Utvändig Tvätt - Stor + Asfaltrengöring
+  'premium|large|none|yes': 'https://buy.stripe.com/9B6dRbfDW5IogWJgWPasg0n',
   // In- & Utvändig Tvätt Med Sätten - Liten
   'inout|small|none|none': 'https://buy.stripe.com/eVqfZjfDW3Ag7m9dKDasg09',
+  // In- & Utvändig Tvätt Med Sätten - Liten + Asfaltrengöring
+  'inout|small|none|yes': 'https://buy.stripe.com/eVqcN78bu1s8dKx8qjasg0o',
   // In- & Utvändig Tvätt Med Sätten - Mellan
   'inout|medium|none|none': 'https://buy.stripe.com/cNi3cx0J20o4eOBfSLasg0a',
+  // In- & Utvändig Tvätt Med Sätten - Mellan + Asfaltrengöring
+  'inout|medium|none|yes': 'https://buy.stripe.com/00waEZ8buc6M0XLgWPasg0p',
   // In- & Utvändig Tvätt Med Sätten - Stor
   'inout|large|none|none': 'https://buy.stripe.com/aFa00l9fy3AgdKx21Vasg0b',
+  // In- & Utvändig Tvätt Med Sätten - Stor + Asfaltrengöring
+  'inout|large|none|yes': 'https://buy.stripe.com/3cIaEZfDW1s88qd4a3asg0q',
   // Hel Glans - Liten
   'interior|small|none|none': 'https://buy.stripe.com/3cIbJ3ajCgn26i56ibasg0c',
+  // Hel Glans - Liten + 2-Säten
+  'interior|small|2|none': 'https://buy.stripe.com/00wfZj1N62wcfSF0XRasg0r',
+  // Hel Glans - Liten + 5-Säten
+  'interior|small|5|none': 'https://buy.stripe.com/28E5kF9fy3Ag35T21Vasg0w',
   // Hel Glans - Mellan
   'interior|medium|none|none': 'https://buy.stripe.com/fZu9AV77q8UAgWJayrasg0d',
+  // Hel Glans - Mellan + 2-Säten
+  'interior|medium|2|none': 'https://buy.stripe.com/cNi14p2Ra2wcgWJ7mfasg0s',
+  // Hel Glans - Mellan + 5-Säten
+  'interior|medium|5|none': 'https://buy.stripe.com/9B69AVcrKc6M35T35Zasg0v',
   // Hel Glans - Stor
   'interior|large|none|none': 'https://buy.stripe.com/7sYbJ377q0o421PdKDasg0e',
+  // Hel Glans - Stor + 2-Säten
+  'interior|large|2|none': 'https://buy.stripe.com/dRm9AV77q4EkbCp21Vasg0t',
+  // Hel Glans - Stor + 5-Säten
+  'interior|large|5|none': 'https://buy.stripe.com/8x2cN7dvOgn235T8qjasg0u',
   // Fullservice Rekond - Liten
   'full|small|none|none': 'https://buy.stripe.com/7sYaEZgI09YEcGtgWPasg0f',
+  // Fullservice Rekond - Liten + 2-Säten
+  'full|small|2|none': 'https://buy.stripe.com/aFafZjcrK5IobCp8qjasg0x',
+  // Fullservice Rekond - Liten + 5-Säten
+  'full|small|5|none': 'https://buy.stripe.com/fZu3cxajC0o40XLdKDasg0C',
   // Fullservice Rekond - Mellan
   'full|medium|none|none': 'https://buy.stripe.com/9B64gBezS7Qw49X5e7asg0g',
+  // Fullservice Rekond - Mellan + 2-Säten
+  'full|medium|2|none': 'https://buy.stripe.com/28E6oJ77q7QwfSF8qjasg0y',
+  // Fullservice Rekond - Mellan + 5-Säten
+  'full|medium|5|none': 'https://buy.stripe.com/fZu00lfDW4Ek6i5dKDasg0B',
   // Fullservice Rekond - Stor
-  'full|large|none|none': 'https://buy.stripe.com/dRmfZj3VefiY49X8qjasg0h'
+    'full|large|none|none': 'https://buy.stripe.com/dRmfZj3VefiY49X8qjasg0h',
+    // Fullservice Rekond - Stor + 2-Säten
+  'full|large|2|none': 'https://buy.stripe.com/dRmeVf9fy0o4fSFeOHasg0z',
+  // Fullservice Rekond - Stor + 5-Säten
+  'full|large|5|none': 'https://buy.stripe.com/00wdRb9fy7QwaylbCvasg0A'
 };
 
 function buildStripeLinkKey(service, size, seatAddonType, asphaltAddonType) {
@@ -1490,39 +1525,4 @@ document.addEventListener('DOMContentLoaded', async function() {
 
         if (selectedDate && toDateId(selectedDate) === dateId) {
           showTimeSlots(selectedDate);
-        }
-
-        alert('Tidsblockering borttagen.');
-      } catch (e) {
-        console.error('Kunde inte ta bort tidsblockering:', e);
-        alert('Kunde inte ta bort tidsblockering just nu.');
-      }
-    });
-  }
-
-  const exportBtn = document.getElementById('exportBtn');
-  if (exportBtn) exportBtn.addEventListener('click', exportCSV);
-
-  const clearBtn = document.getElementById('clearBtn');
-  if (clearBtn) clearBtn.addEventListener('click', async function() {
-    if (confirm('Rensa alla bokningar? Detta kan inte ångras.')) {
-      try {
-        const batch = window.db.batch();
-        const snapshot = await window.db.collection('bookings').get();
-        snapshot.docs.forEach(doc => batch.delete(doc.ref));
-        await batch.commit();
-        cachedBookings = [];
-      } catch (e) {
-        console.error('Firebase clear error:', e);
-      }
-      renderBookingsTable();
-      alert('Bokningar rensade');
-    }
-  });
-
-  const closeOwnerBtn = document.getElementById('closeOwnerBtn');
-  if (closeOwnerBtn) closeOwnerBtn.addEventListener('click', function() {
-    const ownerSection = document.getElementById('ownerSection');
-    if (ownerSection) ownerSection.style.display = 'none';
-  });
-});
+   
