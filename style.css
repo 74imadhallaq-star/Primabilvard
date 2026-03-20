@@ -126,10 +126,30 @@ body {
   text-shadow: 0 0 10px rgba(26, 93, 168, 0.3);
 }
 
+/* För Företag pill button in navbar */
+.nav-link-foretag {
+  background: linear-gradient(135deg, var(--primary), #1E5AA8) !important;
+  color: #ffffff !important;
+  padding: 8px 18px !important;
+  border-radius: 7px !important;
+  border: 1px solid rgba(255,255,255,0.15) !important;
+  box-shadow: 0 4px 14px rgba(26, 90, 168, 0.35) !important;
+  letter-spacing: 0.4px !important;
+  transition: all 0.3s ease !important;
+}
+
+.nav-link-foretag:hover {
+  background: linear-gradient(135deg, #1E5AA8, #2870cc) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 22px rgba(26, 90, 168, 0.55) !important;
+  color: #ffffff !important;
+  text-shadow: none !important;
+}
+
 /* ===== HERO ===== */
 .hero {
   /* background image with overlay for professional appearance */
-  background: url('bil2.png') center center / cover no-repeat;
+  background: url('bil2.PNG') center center / cover no-repeat;
   color: var(--text-primary);
   text-align: center;
   min-height: 65vh;
@@ -815,6 +835,15 @@ body {
   height: 100%;
 }
 
+.video-container video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 .video-card h3 {
   padding: 20px;
   color: var(--text-primary);
@@ -1297,6 +1326,11 @@ body {
     font-size: 1.1rem;
   }
 
+  .booking-policy-note {
+    font-size: 0.88rem;
+    padding: 10px 12px;
+  }
+
   /* --- CONTACT --- */
   .contact {
     margin: 42px auto;
@@ -1499,6 +1533,21 @@ body {
   font-size: 0.9rem;
   margin: 10px 0 0 0;
   font-style: italic;
+}
+
+.booking-policy-note {
+  margin-top: 12px;
+  padding: 12px 14px;
+  border: 1px solid rgba(255, 193, 7, 0.45);
+  background: rgba(255, 193, 7, 0.12);
+  border-radius: 10px;
+  color: #ffe8b3;
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+
+.booking-policy-note strong {
+  color: #ffd166;
 }
 
 /* ===== OWNER / ADMIN VIEW ===== */
