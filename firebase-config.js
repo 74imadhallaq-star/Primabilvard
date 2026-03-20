@@ -1,16 +1,13 @@
-// Firebase Configuration
+// Firebase config for primabilvard-6c99e
+// Uses compat SDK because script.js is written with db.collection(...)
 const firebaseConfig = {
-  apiKey: "AIzaSyB8qL4JGzV6KZjNhGqI_jVhVrh3XyZ5K4w",
+  apiKey: "AIzaSyAD1eXQlseZnyCAT5hJPyDEf2BCHMQb1jI",
   authDomain: "primabilvard-6c99e.firebaseapp.com",
   projectId: "primabilvard-6c99e",
-  storageBucket: "primabilvard-6c99e.appspot.com",
-  messagingSenderId: "574698393227",
-  appId: "1:574698393227:web:8a5f6c1e2b9d4e3f1a2b3c"
+  storageBucket: "primabilvard-6c99e.firebasestorage.app",
+  messagingSenderId: "989347315654",
+  appId: "1:989347315654:web:c35209e7f9a65fb2eb7cc7"
 };
 
-// Initialize Firebase
-import { initializeApp } from "https://www.gstatic.com/firebasejs/latest/firebase-app.js";
-import { getFirestore } from "https://www.gstatic.com/firebasejs/latest/firebase-firestore.js";
-
-const app = initializeApp(firebaseConfig);
-window.db = getFirestore(app);
+firebase.initializeApp(firebaseConfig);
+window.db = firebase.firestore();
