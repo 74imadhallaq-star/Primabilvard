@@ -1345,6 +1345,8 @@ document.addEventListener('DOMContentLoaded', async function() {
         ownerAccessState.failedAttempts = 0;
         ownerAccessState.authenticatedUntil = Date.now() + OWNER_ACCESS_CONFIG.authSessionMs;
 
+        alert('✓ Inloggning lyckad!');
+
         const ownerSection = document.getElementById('ownerSection');
         if (ownerSection) {
           ownerSection.style.display = 'block';
@@ -1357,12 +1359,12 @@ document.addEventListener('DOMContentLoaded', async function() {
         if (ownerAccessState.failedAttempts >= OWNER_ACCESS_CONFIG.maxAttempts) {
           ownerAccessState.failedAttempts = 0;
           ownerAccessState.lockedUntil = Date.now() + OWNER_ACCESS_CONFIG.lockoutMs;
-          alert('För många felaktiga försök. Åtkomst är tillfälligt låst.');
+          alert('✗ För många felaktiga försök. Åtkomst är tillfälligt låst i 10 minuter.');
           return;
         }
 
         const remaining = OWNER_ACCESS_CONFIG.maxAttempts - ownerAccessState.failedAttempts;
-        alert(`Fel kod. ${remaining} försök kvar.`);
+        alert(`✗ Felaktig kod. ${remaining} försök kvar.`);
       }
     });
   }
