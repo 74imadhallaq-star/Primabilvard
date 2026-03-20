@@ -599,18 +599,24 @@ function selectTime(time, element) {
 }
 
 // Previous month
-document.getElementById('prevMonth').addEventListener('click', () => {
-  currentDate.setMonth(currentDate.getMonth() - 1);
-  renderCalendar();
-  updateMonthYear();
-});
+const prevMonthBtn = document.getElementById('prevMonth');
+if (prevMonthBtn) {
+  prevMonthBtn.addEventListener('click', () => {
+    currentDate.setMonth(currentDate.getMonth() - 1);
+    renderCalendar();
+    updateMonthYear();
+  });
+}
 
 // Next month
-document.getElementById('nextMonth').addEventListener('click', () => {
-  currentDate.setMonth(currentDate.getMonth() + 1);
-  renderCalendar();
-  updateMonthYear();
-});
+const nextMonthBtn = document.getElementById('nextMonth');
+if (nextMonthBtn) {
+  nextMonthBtn.addEventListener('click', () => {
+    currentDate.setMonth(currentDate.getMonth() + 1);
+    renderCalendar();
+    updateMonthYear();
+  });
+}
 
 // convert HH:MM to minutes past midnight
 function slotToMinutes(time) {
@@ -844,9 +850,13 @@ function handleServiceChange() {
 }
 
 // Scroll to services section
-document.getElementById('bookBtn').addEventListener('click', () => {
-  document.getElementById('services').scrollIntoView({ behavior: 'smooth' });
-});
+const bookBtn = document.getElementById('bookBtn');
+if (bookBtn) {
+  bookBtn.addEventListener('click', () => {
+    const servicesSection = document.getElementById('services');
+    if (servicesSection) servicesSection.scrollIntoView({ behavior: 'smooth' });
+  });
+}
 
 // Service prices by size
 const servicePrices = {
@@ -1018,8 +1028,11 @@ function updatePriceDisplay() {
   updateStripePayButton();
 }
 
-document.getElementById('service').addEventListener('change', handleServiceChange);
-document.getElementById('size').addEventListener('change', updatePriceDisplay);
+const serviceSelect = document.getElementById('service');
+if (serviceSelect) serviceSelect.addEventListener('change', handleServiceChange);
+
+const sizeSelectMain = document.getElementById('size');
+if (sizeSelectMain) sizeSelectMain.addEventListener('change', updatePriceDisplay);
 document.querySelectorAll('#seatAddonButtons .addon-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('#seatAddonButtons .addon-btn').forEach(b => b.classList.remove('active'));
@@ -1037,7 +1050,8 @@ document.querySelectorAll('#asphaltAddonButtons .addon-btn').forEach(btn => {
 });
 
 // Form submission
-document.getElementById('bookingForm').addEventListener('submit', async function(e) {
+const bookingForm = document.getElementById('bookingForm');
+if (bookingForm) bookingForm.addEventListener('submit', async function(e) {
   e.preventDefault();
   
   const name = document.getElementById('name').value;
@@ -1525,4 +1539,39 @@ document.addEventListener('DOMContentLoaded', async function() {
 
         if (selectedDate && toDateId(selectedDate) === dateId) {
           showTimeSlots(selectedDate);
-   
+        }
+
+        alert('Tidsblockering borttagen.');
+      } catch (e) {
+        console.error('Kunde inte ta bort tidsblockering:', e);
+        alert('Kunde inte ta bort tidsblockering just nu.');
+      }
+    });
+  }
+
+  const exportBtn = document.getElementById('exportBtn');
+  if (exportBtn) exportBtn.addEventListener('click', exportCSV);
+
+  const clearBtn = document.getElementById('clearBtn');
+  if (clearBtn) clearBtn.addEventListener('click', async function() {
+    if (confirm('Rensa alla bokningar? Detta kan inte ångras.')) {
+      try {
+        const batch = window.db.batch();
+        const snapshot = await window.db.collection('bookings').get();
+        snapshot.docs.forEach(doc => batch.delete(doc.ref));
+        await batch.commit();
+        cachedBookings = [];
+      } catch (e) {
+        console.error('Firebase clear error:', e);
+      }
+      renderBookingsTable();
+      alert('Bokningar rensade');
+    }
+  });
+
+  const closeOwnerBtn = document.getElementById('closeOwnerBtn');
+  if (closeOwnerBtn) closeOwnerBtn.addEventListener('click', function() {
+    const ownerSection = document.getElementById('ownerSection');
+    if (ownerSection) ownerSection.style.display = 'none';
+  });
+});
