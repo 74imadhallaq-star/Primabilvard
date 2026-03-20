@@ -320,7 +320,7 @@
 
 <!-- Owner button (uses existing owner logic in script.js) -->
 <div style="max-width:1200px;margin:8px auto 40px auto;padding:0 20px;text-align:right;">
-  <a href="#" id="ownerLink" class="owner-link" style="display:inline-block;padding:10px 14px;border:1px solid var(--border);border-radius:10px;background:var(--bg-secondary);">Ägare</a>
+  <a href="owner.html?v=2" id="ownerPageLink" class="owner-link" style="display:inline-block;padding:10px 14px;border:1px solid var(--border);border-radius:10px;background:var(--bg-secondary);" onclick="window.location.href='owner.html?v=2'; return false;">Ägare</a>
 </div>
 
 <!-- OWNER / ADMIN VIEW (hidden by default, client-side PIN protects access) -->
@@ -427,7 +427,16 @@
 
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-<script src="firebase-config.js?v=3"></script>
-<script src="script.js?v=4"></script>
+<script src="firebase-config.js?v=4"></script>
+<script src="script.js?v=7"></script>
+<script>
+  (function() {
+    const ownerBtn = document.getElementById('ownerPageLink');
+    if (!ownerBtn) return;
+    ownerBtn.addEventListener('click', function() {
+      window.location.href = 'owner.html?v=2';
+    });
+  })();
+</script>
 </body>
 </html>
