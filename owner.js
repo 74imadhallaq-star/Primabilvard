@@ -1,22 +1,4 @@
-const OWNER_ACCESS_CONFIG = {
-  codeHashSha256: 'eca285b5a4a15ad8fabcf65748d80fdcb774c1920623fe1ea4aa2a4f6d2a95e5',
-  fallbackPlainCode: 'Mido0762367753',
-  maxAttempts: 5,
-  lockoutMs: 10 * 60 * 1000,
-  authSessionMs: 3 * 60 * 60 * 1000
-};
-
-const OWNER_KEYS = {
-  attempts: 'primabilvard_owner_failedAttempts',
-  lockedUntil: 'primabilvard_owner_lockedUntil',
-  authUntil: 'primabilvard_owner_authenticatedUntil'
-};
-
-const LOCAL_STORAGE_KEYS = {
-  bookings: 'primabilvard_bookings',
-  blockedDates: 'primabilvard_blockedDates',
-  blockedTimes: 'primabilvard_blockedTimes'
-};
+const OWNER_LOGIN_REDIRECT = 'index.html';
 
 const SERVICE_LABELS = {
   'basic': 'Utvändig Handtvätt',
@@ -44,18 +26,8 @@ function canUseFirestore() {
   return !!(window.db && typeof window.db.collection === 'function');
 }
 
-function readLocalArray(key) {
-  try {
-    const raw = localStorage.getItem(key);
-    const parsed = raw ? JSON.parse(raw) : [];
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
-  }
-}
-
-function writeLocalArray(key, arr) {
-  localStorage.setItem(key, JSON.stringify(Array.isArray(arr) ? arr : []));
+function canUseAuth() {
+  return !!(window.auth && typeof window.auth.signInWithEmailAndPassword === 'function');
 }
 
 function escapeHtml(str) {
@@ -74,45 +46,14 @@ function getStatusNode() {
 function updateStorageStatus() {
   const node = getStatusNode();
   if (!node) return;
-  node.textContent = canUseFirestore()
-    ? 'Datakälla: Firebase (online)'
-    : 'Datakälla: Lokal lagring i denna webbläsare (offline fallback)';
-}
-
-function timingSafeEqual(a, b) {
-  if (!a || !b || a.length !== b.length) return false;
-  let mismatch = 0;
-  for (let i = 0; i < a.length; i++) mismatch |= a.charCodeAt(i) ^ b.charCodeAt(i);
-  return mismatch === 0;
-}
-
-async function sha256Hex(text) {
-  if (!window.crypto || !crypto.subtle || typeof crypto.subtle.digest !== 'function') {
-    throw new Error('WebCrypto unavailable');
+  const userEmail = window.auth && window.auth.currentUser ? window.auth.currentUser.email : '';
+  if (!canUseAuth() || !canUseFirestore()) {
+    node.textContent = 'Firebase backend saknas eller är inte korrekt konfigurerad.';
+    return;
   }
-  const data = new TextEncoder().encode(text);
-  const digest = await crypto.subtle.digest('SHA-256', data);
-  return Array.from(new Uint8Array(digest)).map(b => b.toString(16).padStart(2, '0')).join('');
-}
-
-async function verifyOwnerCode(inputCode) {
-  const normalizedInput = String(inputCode ?? '');
-  try {
-    const hash = await sha256Hex(normalizedInput);
-    return timingSafeEqual(hash, OWNER_ACCESS_CONFIG.codeHashSha256);
-  } catch (e) {
-    console.warn('WebCrypto saknas, använder fallback-verifiering:', e);
-    return timingSafeEqual(normalizedInput, OWNER_ACCESS_CONFIG.fallbackPlainCode);
-  }
-}
-
-function getNum(key, fallback = 0) {
-  const val = Number(localStorage.getItem(key));
-  return Number.isFinite(val) ? val : fallback;
-}
-
-function setNum(key, value) {
-  localStorage.setItem(key, String(value));
+  node.textContent = userEmail
+    ? `Inloggad som ${userEmail} • Datakälla: Firebase`
+    : 'Datakälla: Firebase';
 }
 
 function showOwnerLoginOverlay() {
@@ -126,9 +67,10 @@ function showOwnerLoginOverlay() {
       <div class="owner-login-card" role="dialog" aria-modal="true" aria-label="Ägarinloggning">
         <img src="logo.png" alt="Prima Bilvård" class="owner-login-logo" />
         <h2>Ägarinloggning</h2>
-        <p>Ange kod för att fortsätta</p>
+        <p>Logga in med din Firebase e-post och ditt lösenord</p>
         <form class="owner-login-form">
-          <input type="password" class="owner-login-input" placeholder="Ägarkod" autocomplete="current-password" required />
+          <input type="email" class="owner-login-input owner-login-email" placeholder="E-post" autocomplete="username" required />
+          <input type="password" class="owner-login-input owner-login-password" placeholder="Lösenord" autocomplete="current-password" required style="margin-top:10px;" />
           <div class="owner-login-actions">
             <button type="button" class="owner-login-cancel">Avbryt</button>
             <button type="submit" class="owner-login-submit">Logga in</button>
@@ -140,7 +82,8 @@ function showOwnerLoginOverlay() {
     document.body.classList.add('owner-login-active');
     document.body.appendChild(overlay);
 
-    const input = overlay.querySelector('.owner-login-input');
+    const emailInput = overlay.querySelector('.owner-login-email');
+    const passwordInput = overlay.querySelector('.owner-login-password');
     const cancelBtn = overlay.querySelector('.owner-login-cancel');
     const form = overlay.querySelector('.owner-login-form');
 
@@ -153,58 +96,74 @@ function showOwnerLoginOverlay() {
     cancelBtn.addEventListener('click', () => close(null));
     form.addEventListener('submit', (e) => {
       e.preventDefault();
-      close((input.value || '').trim());
+      close({
+        email: (emailInput.value || '').trim(),
+        password: passwordInput.value || ''
+      });
     });
 
     overlay.addEventListener('click', (e) => {
       if (e.target === overlay) close(null);
     });
 
-    setTimeout(() => input.focus(), 40);
+    setTimeout(() => emailInput.focus(), 40);
   });
 }
 
+function getFirebaseAuthErrorMessage(error) {
+  switch (error && error.code) {
+    case 'auth/invalid-email':
+      return 'E-postadressen är ogiltig.';
+    case 'auth/user-not-found':
+    case 'auth/wrong-password':
+    case 'auth/invalid-credential':
+      return 'Fel e-post eller lösenord.';
+    case 'auth/too-many-requests':
+      return 'För många försök. Vänta en stund och försök igen.';
+    case 'auth/network-request-failed':
+      return 'Nätverksfel. Kontrollera uppkopplingen och försök igen.';
+    default:
+      return 'Kunde inte logga in just nu.';
+  }
+}
+
 async function ensureOwnerAccess() {
-  const now = Date.now();
-  const authUntil = getNum(OWNER_KEYS.authUntil, 0);
-  if (authUntil > now) return true;
-
-  const lockedUntil = getNum(OWNER_KEYS.lockedUntil, 0);
-  if (lockedUntil > now) {
-    const secondsLeft = Math.ceil((lockedUntil - now) / 1000);
-    alert(`För många försök. Vänta ${secondsLeft} sekunder.`);
-    window.location.href = 'index.html';
+  if (!canUseAuth() || !canUseFirestore()) {
+    alert('Firebase Auth eller Firestore är inte korrekt laddat på sidan.');
+    window.location.href = OWNER_LOGIN_REDIRECT;
     return false;
   }
 
-  const code = await showOwnerLoginOverlay();
-  if (code === null) {
-    window.location.href = 'index.html';
-    return false;
-  }
-
-  const isValid = await verifyOwnerCode(code);
-  if (isValid) {
-    setNum(OWNER_KEYS.attempts, 0);
-    setNum(OWNER_KEYS.authUntil, Date.now() + OWNER_ACCESS_CONFIG.authSessionMs);
-    alert('✓ Inloggning lyckad!');
+  if (window.auth.currentUser) {
     return true;
   }
 
-  let failedAttempts = getNum(OWNER_KEYS.attempts, 0) + 1;
-  if (failedAttempts >= OWNER_ACCESS_CONFIG.maxAttempts) {
-    failedAttempts = 0;
-    setNum(OWNER_KEYS.attempts, failedAttempts);
-    setNum(OWNER_KEYS.lockedUntil, Date.now() + OWNER_ACCESS_CONFIG.lockoutMs);
-    alert('✗ För många felaktiga försök. Åtkomst är låst i 10 minuter.');
-  } else {
-    setNum(OWNER_KEYS.attempts, failedAttempts);
-    const remaining = OWNER_ACCESS_CONFIG.maxAttempts - failedAttempts;
-    alert(`✗ Felaktig kod. ${remaining} försök kvar.`);
-  }
+  while (true) {
+    const credentials = await showOwnerLoginOverlay();
+    if (credentials === null) {
+      window.location.href = OWNER_LOGIN_REDIRECT;
+      return false;
+    }
 
-  window.location.href = 'index.html';
-  return false;
+    if (!credentials.email || !credentials.password) {
+      alert('Fyll i både e-post och lösenord.');
+      continue;
+    }
+
+    try {
+      await window.auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+      await window.auth.signInWithEmailAndPassword(credentials.email, credentials.password);
+      alert('✓ Inloggning lyckad!');
+      return true;
+    } catch (error) {
+      console.error('Firebase owner auth error:', error);
+      const retry = confirm(`${getFirebaseAuthErrorMessage(error)}\n\nTryck OK för att försöka igen eller Avbryt för att gå tillbaka.`);
+      if (!retry) {
+        window.location.href = OWNER_LOGIN_REDIRECT;
+        return false;
+      }
+    }
+  }
 }
 
 function blockedTimeDocId(dateId, time) {
@@ -222,24 +181,16 @@ function dateIdToDisplay(dateId) {
 }
 
 async function loadBlockedDates() {
-  if (!canUseFirestore()) {
-    blockedDateIds = new Set(readLocalArray(LOCAL_STORAGE_KEYS.blockedDates).map(v => String(v)));
-    return;
-  }
   try {
     const snapshot = await window.db.collection('blockedDates').get();
     blockedDateIds = new Set(snapshot.docs.map(doc => String(doc.id)));
-    writeLocalArray(LOCAL_STORAGE_KEYS.blockedDates, Array.from(blockedDateIds));
-  } catch {
-    blockedDateIds = new Set(readLocalArray(LOCAL_STORAGE_KEYS.blockedDates).map(v => String(v)));
+  } catch (error) {
+    console.error('Firebase blockedDates load error:', error);
+    blockedDateIds = new Set();
   }
 }
 
 async function loadBlockedTimes() {
-  if (!canUseFirestore()) {
-    blockedTimeIds = new Set(readLocalArray(LOCAL_STORAGE_KEYS.blockedTimes).map(v => String(v)).filter(Boolean));
-    return;
-  }
   try {
     const snapshot = await window.db.collection('blockedTimes').get();
     blockedTimeIds = new Set(
@@ -250,52 +201,34 @@ async function loadBlockedTimes() {
         return dateId && time ? blockedTimeKey(dateId, time) : '';
       }).filter(Boolean)
     );
-    writeLocalArray(LOCAL_STORAGE_KEYS.blockedTimes, Array.from(blockedTimeIds));
-  } catch {
-    blockedTimeIds = new Set(readLocalArray(LOCAL_STORAGE_KEYS.blockedTimes).map(v => String(v)).filter(Boolean));
+  } catch (error) {
+    console.error('Firebase blockedTimes load error:', error);
+    blockedTimeIds = new Set();
   }
 }
 
 async function loadBookings() {
-  if (!canUseFirestore()) {
-    cachedBookings = readLocalArray(LOCAL_STORAGE_KEYS.bookings);
-    cachedBookings.sort((a, b) => (a.sortKey || 0) - (b.sortKey || 0));
-    return;
-  }
   try {
     const snapshot = await window.db.collection('bookings').get();
     cachedBookings = snapshot.docs.map(doc => doc.data());
     cachedBookings.sort((a, b) => (a.sortKey || 0) - (b.sortKey || 0));
-    writeLocalArray(LOCAL_STORAGE_KEYS.bookings, cachedBookings);
-  } catch {
-    cachedBookings = readLocalArray(LOCAL_STORAGE_KEYS.bookings);
-    cachedBookings.sort((a, b) => (a.sortKey || 0) - (b.sortKey || 0));
+  } catch (error) {
+    console.error('Firebase bookings load error:', error);
+    cachedBookings = [];
   }
 }
 
 async function saveBooking(booking) {
-  if (canUseFirestore()) {
-    try {
-      await window.db.collection('bookings').doc(String(booking.id)).set(booking);
-    } catch (e) {
-      console.error('Firebase save booking error:', e);
-    }
-  }
+  if (!canUseFirestore()) throw new Error('Firestore unavailable');
+  await window.db.collection('bookings').doc(String(booking.id)).set(booking);
   cachedBookings.push(booking);
   cachedBookings.sort((a, b) => (a.sortKey || 0) - (b.sortKey || 0));
-  writeLocalArray(LOCAL_STORAGE_KEYS.bookings, cachedBookings);
 }
 
 async function deleteBooking(id) {
-  if (canUseFirestore()) {
-    try {
-      await window.db.collection('bookings').doc(String(id)).delete();
-    } catch (e) {
-      console.error('Firebase delete booking error:', e);
-    }
-  }
+  if (!canUseFirestore()) throw new Error('Firestore unavailable');
+  await window.db.collection('bookings').doc(String(id)).delete();
   cachedBookings = cachedBookings.filter(b => String(b.id) !== String(id));
-  writeLocalArray(LOCAL_STORAGE_KEYS.bookings, cachedBookings);
   renderBookingsTable();
 }
 
@@ -366,38 +299,30 @@ function renderBlockedTimesList() {
 
 async function addBlockedDate(dateId) {
   if (!dateId) return;
-  if (canUseFirestore()) {
-    await window.db.collection('blockedDates').doc(String(dateId)).set({ dateId: String(dateId), createdAt: Date.now() });
-  }
+  if (!canUseFirestore()) throw new Error('Firestore unavailable');
+  await window.db.collection('blockedDates').doc(String(dateId)).set({ dateId: String(dateId), createdAt: Date.now() });
   blockedDateIds.add(String(dateId));
-  writeLocalArray(LOCAL_STORAGE_KEYS.blockedDates, Array.from(blockedDateIds));
 }
 
 async function removeBlockedDate(dateId) {
   if (!dateId) return;
-  if (canUseFirestore()) {
-    await window.db.collection('blockedDates').doc(String(dateId)).delete();
-  }
+  if (!canUseFirestore()) throw new Error('Firestore unavailable');
+  await window.db.collection('blockedDates').doc(String(dateId)).delete();
   blockedDateIds.delete(String(dateId));
-  writeLocalArray(LOCAL_STORAGE_KEYS.blockedDates, Array.from(blockedDateIds));
 }
 
 async function addBlockedTime(dateId, time) {
   if (!dateId || !time) return;
-  if (canUseFirestore()) {
-    await window.db.collection('blockedTimes').doc(blockedTimeDocId(dateId, time)).set({ dateId: String(dateId), time: String(time), createdAt: Date.now() });
-  }
+  if (!canUseFirestore()) throw new Error('Firestore unavailable');
+  await window.db.collection('blockedTimes').doc(blockedTimeDocId(dateId, time)).set({ dateId: String(dateId), time: String(time), createdAt: Date.now() });
   blockedTimeIds.add(blockedTimeKey(dateId, time));
-  writeLocalArray(LOCAL_STORAGE_KEYS.blockedTimes, Array.from(blockedTimeIds));
 }
 
 async function removeBlockedTime(dateId, time) {
   if (!dateId || !time) return;
-  if (canUseFirestore()) {
-    await window.db.collection('blockedTimes').doc(blockedTimeDocId(dateId, time)).delete();
-  }
+  if (!canUseFirestore()) throw new Error('Firestore unavailable');
+  await window.db.collection('blockedTimes').doc(blockedTimeDocId(dateId, time)).delete();
   blockedTimeIds.delete(blockedTimeKey(dateId, time));
-  writeLocalArray(LOCAL_STORAGE_KEYS.blockedTimes, Array.from(blockedTimeIds));
 }
 
 function exportCSV() {
@@ -511,23 +436,32 @@ document.addEventListener('DOMContentLoaded', async () => {
   const exportBtn = document.getElementById('exportBtn');
   if (exportBtn) exportBtn.addEventListener('click', exportCSV);
 
+  const signOutBtn = document.getElementById('signOutBtn');
+  if (signOutBtn) signOutBtn.addEventListener('click', async () => {
+    try {
+      if (window.auth) await window.auth.signOut();
+    } catch (error) {
+      console.error('Firebase sign-out error:', error);
+    }
+    window.location.href = OWNER_LOGIN_REDIRECT;
+  });
+
   const clearBtn = document.getElementById('clearBtn');
   if (clearBtn) clearBtn.addEventListener('click', async () => {
     if (!confirm('Rensa alla bokningar?')) return;
 
-    if (canUseFirestore()) {
-      try {
-        const batch = window.db.batch();
-        const snapshot = await window.db.collection('bookings').get();
-        snapshot.docs.forEach(doc => batch.delete(doc.ref));
-        await batch.commit();
-      } catch (e) {
-        console.error('Firebase clear error:', e);
-      }
+    try {
+      const batch = window.db.batch();
+      const snapshot = await window.db.collection('bookings').get();
+      snapshot.docs.forEach(doc => batch.delete(doc.ref));
+      await batch.commit();
+    } catch (e) {
+      console.error('Firebase clear error:', e);
+      alert('Kunde inte rensa bokningar just nu.');
+      return;
     }
 
     cachedBookings = [];
-    writeLocalArray(LOCAL_STORAGE_KEYS.bookings, cachedBookings);
     renderBookingsTable();
     alert('Bokningar rensade');
   });
