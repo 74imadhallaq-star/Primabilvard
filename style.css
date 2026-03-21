@@ -971,8 +971,7 @@ body.owner-login-active {
   position: fixed;
   inset: 0;
   z-index: 9999;
-  background: radial-gradient(circle at top, rgba(30, 90, 168, 0.2), rgba(0, 0, 0, 0.94));
-  backdrop-filter: blur(3px);
+  background: #050505;
   display: flex;
   align-items: center;
   justify-content: center;
