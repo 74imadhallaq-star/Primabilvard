@@ -1390,6 +1390,9 @@ function getServiceLabel(service, seatAddonType = 'none', asphaltAddonType = 'no
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', async function() {
+  document.body.classList.remove('owner-login-active');
+  document.querySelectorAll('.owner-login-overlay').forEach(el => el.remove());
+
   // Reset scroll to top
   window.scrollTo(0, 0);
   // Load bookings + blocked dates from Firebase so calendar availability is correct
