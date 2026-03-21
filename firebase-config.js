@@ -10,4 +10,5 @@ const firebaseConfig = {
 };
 
 firebase.initializeApp(firebaseConfig);
+window.auth = typeof firebase.auth === 'function' ? firebase.auth() : null;
 window.db = firebase.firestore();
