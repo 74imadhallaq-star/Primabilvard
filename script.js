@@ -1137,6 +1137,25 @@ function updatePriceDisplay() {
   updateStripePayButton();
 }
 
+function syncMobilePaymentSection() {
+  const paymentSection = document.getElementById('paymentSection');
+  const paymentHome = document.getElementById('paymentSectionHome');
+  const mobilePaymentMount = document.getElementById('mobilePaymentMount');
+
+  if (!paymentSection || !paymentHome || !mobilePaymentMount) return;
+
+  if (window.matchMedia('(max-width: 768px)').matches) {
+    if (paymentSection.parentElement !== mobilePaymentMount) {
+      mobilePaymentMount.appendChild(paymentSection);
+    }
+    return;
+  }
+
+  if (paymentSection.parentElement !== paymentHome.parentElement) {
+    paymentHome.parentElement.insertBefore(paymentSection, paymentHome.nextSibling);
+  }
+}
+
 const serviceSelect = document.getElementById('service');
 if (serviceSelect) serviceSelect.addEventListener('change', handleServiceChange);
 
@@ -1392,6 +1411,9 @@ function getServiceLabel(service, seatAddonType = 'none', asphaltAddonType = 'no
 document.addEventListener('DOMContentLoaded', async function() {
   document.body.classList.remove('owner-login-active');
   document.querySelectorAll('.owner-login-overlay').forEach(el => el.remove());
+
+  syncMobilePaymentSection();
+  window.addEventListener('resize', syncMobilePaymentSection);
 
   // Reset scroll to top
   window.scrollTo(0, 0);
