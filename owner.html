@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Cormorant+Garamond:wght@400;500;600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=5">
+<link rel="stylesheet" href="style.css?v=7">
 </head>
 <body>
   <nav class="navbar">
@@ -16,13 +16,13 @@
         <img src="logo.png" alt="Prima Bilvård Logo" class="logo-img">
         <span class="logo-text">Prima Bilvård</span>
       </div>
-      <ul class="nav-menu" style="position:static;transform:none;background:transparent;box-shadow:none;border:none;display:flex;gap:12px;">
-        <li><a href="index.html" class="nav-link">← Till startsidan</a></li>
-      </ul>
+      <div style="display:flex;gap:12px;align-items:center;">
+        <a href="index.html" class="nav-link" style="text-decoration:none;color:var(--text-secondary);font-weight:600;">← Till startsidan</a>
+      </div>
     </div>
   </nav>
 
-  <section class="owner-section" style="display:block; max-width:1200px; margin:40px auto; padding:20px;">
+  <section class="owner-section" style="display:none; max-width:1200px; margin:40px auto; padding:20px;">
     <div class="owner-header" style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;">
       <h2>Ägarpanel</h2>
       <div style="display:flex;gap:10px;flex-wrap:wrap;">
@@ -125,6 +125,6 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 <script src="firebase-config.js?v=4"></script>
-<script src="owner.js?v=3"></script>
+<script src="owner.js?v=5"></script>
 </body>
 </html>
