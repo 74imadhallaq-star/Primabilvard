@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Cormorant+Garamond:wght@400;500;600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=5">
+<link rel="stylesheet" href="style.css?v=6">
 </head>
 <body>
 
@@ -320,7 +320,7 @@
 
 <!-- Owner button (uses existing owner logic in script.js) -->
 <div style="max-width:1200px;margin:8px auto 40px auto;padding:0 20px;text-align:right;">
-  <a href="owner.html?v=3" id="ownerPageLink" class="owner-link" style="display:inline-block;padding:10px 14px;border:1px solid var(--border);border-radius:10px;background:var(--bg-secondary);" onclick="window.location.href='owner.html?v=3'; return false;">Ägare</a>
+  <a href="owner.html?v=5" id="ownerPageLink" class="owner-link" style="display:inline-block;padding:10px 14px;border:1px solid var(--border);border-radius:10px;background:var(--bg-secondary);" onclick="window.location.href='owner.html?v=5'; return false;">Ägare</a>
 </div>
 
 <!-- OWNER / ADMIN VIEW (hidden by default, client-side PIN protects access) -->
@@ -428,13 +428,13 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 <script src="firebase-config.js?v=4"></script>
-<script src="script.js?v=8"></script>
+<script src="script.js?v=9"></script>
 <script>
   (function() {
     const ownerBtn = document.getElementById('ownerPageLink');
     if (!ownerBtn) return;
     ownerBtn.addEventListener('click', function() {
-      window.location.href = 'owner.html?v=3';
+      window.location.href = 'owner.html?v=5';
     });
   })();
 </script>
