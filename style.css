@@ -1394,6 +1394,10 @@ body.owner-login-active {
     border-radius: 8px;
   }
 
+  #mobilePaymentMount .payment-section {
+    margin-top: 18px;
+  }
+
   /* --- PAYMENT --- */
   .payment-section {
     padding: 16px;
