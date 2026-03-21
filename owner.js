@@ -419,8 +419,14 @@ function exportCSV() {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
+  document.body.classList.remove('owner-login-active');
+  document.querySelectorAll('.owner-login-overlay').forEach(el => el.remove());
+
   const ok = await ensureOwnerAccess();
   if (!ok) return;
+
+  const ownerSection = document.querySelector('.owner-section');
+  if (ownerSection) ownerSection.style.display = 'block';
 
   updateStorageStatus();
   await loadBookings();
