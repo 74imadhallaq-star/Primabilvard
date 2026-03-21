@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Cormorant+Garamond:wght@400;500;600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=6">
+<link rel="stylesheet" href="style.css?v=8">
 </head>
 <body>
 
@@ -243,13 +243,14 @@
           <input type="text" id="registration" placeholder="ABC 123" required>
         </div>
 
-        <div class="payment-section">
+        <div id="paymentSectionHome"></div>
+        <div class="payment-section" id="paymentSection">
           <h3>Betalning</h3>
           <div class="price-info">
             <span>Pris:</span>
             <span id="totalPrice">-</span>
           </div>
-          <button type="submit" id="stripePayBtn" class="submit-btn" style="background:#5469d4;border-color:#5469d4;">Betala &amp; Bekräfta Bokning</button>
+          <button type="submit" form="bookingForm" id="stripePayBtn" class="submit-btn" style="background:#5469d4;border-color:#5469d4;">Betala &amp; Bekräfta Bokning</button>
           <p class="payment-note">* Betalning är obligatorisk för att bekräfta bokningen</p>
           <p class="booking-policy-note"><strong>Obs:</strong> Vid extra smutsig bil kan en tilläggsavgift tillkomma efter bedömning på plats. Uteblivet besök eller avbokning sent kan medföra en avgift.</p>
         </div>
@@ -281,6 +282,8 @@
         <h3>Lediga Tider för <span id="selectedDate"></span></h3>
         <div id="timeSlots" class="time-slots"></div>
       </div>
+
+      <div id="mobilePaymentMount"></div>
     </div>
   </div>
 </section>
@@ -428,7 +431,7 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 <script src="firebase-config.js?v=4"></script>
-<script src="script.js?v=9"></script>
+<script src="script.js?v=10"></script>
 <script>
   (function() {
     const ownerBtn = document.getElementById('ownerPageLink');
