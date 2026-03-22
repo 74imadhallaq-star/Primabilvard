@@ -213,7 +213,7 @@ async function loadBookings() {
 
     const snapshot = await window.db.collection('bookings').get();
     cachedBookings = snapshot.docs.map(doc => doc.data());
-    cachedBookings.sort((a, b) => (a.sortKey || 0) - (b.sortKey || 0));
+    cachedBookings.sort((a, b) => (b.sortKey || 0) - (a.sortKey || 0));
   } catch (error) {
     console.error('Firebase bookings load error:', error);
     cachedBookings = [];
@@ -228,7 +228,7 @@ async function saveBooking(booking) {
 
   await window.db.collection('bookings').doc(String(booking.id)).set(booking);
   cachedBookings.push(booking);
-  cachedBookings.sort((a, b) => (a.sortKey || 0) - (b.sortKey || 0));
+  cachedBookings.sort((a, b) => (b.sortKey || 0) - (a.sortKey || 0));
 }
 
 async function deleteBooking(id) {
