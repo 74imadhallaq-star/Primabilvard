@@ -1074,8 +1074,26 @@ function getStripePaymentLink(service, size, seatAddonType, asphaltAddonType) {
 
 function updateStripePayButton() {
   const btn = document.getElementById('stripePayBtn');
-  const testBtn = document.getElementById('stripeTestBtn');
+  let testBtn = document.getElementById('stripeTestBtn');
   if (!btn) return;
+
+  if (!testBtn && btn.parentElement) {
+    testBtn = document.createElement('a');
+    testBtn.id = 'stripeTestBtn';
+    testBtn.className = 'submit-btn';
+    testBtn.target = '_blank';
+    testBtn.rel = 'noopener noreferrer';
+    testBtn.textContent = 'Kör testbetalning';
+    testBtn.style.display = 'inline-flex';
+    testBtn.style.alignItems = 'center';
+    testBtn.style.justifyContent = 'center';
+    testBtn.style.marginTop = '10px';
+    testBtn.style.background = '#2d9b53';
+    testBtn.style.borderColor = '#8dd9a9';
+    testBtn.style.color = '#fff';
+    testBtn.style.textDecoration = 'none';
+    btn.insertAdjacentElement('afterend', testBtn);
+  }
 
   if (testBtn) {
     testBtn.href = STRIPE_TEST_PAYMENT_LINK;
