@@ -255,61 +255,22 @@
       document.cookie = 'pendingBookingId=; Path=/; Max-Age=0; SameSite=Lax';
     }
 
-    const LOCAL_STORAGE_KEYS = {
-      bookings: 'primabilvard_bookings',
-      pendingBookings: 'primabilvard_pendingBookings'
-    };
-
-    function readLocalArray(key) {
-      try {
-        const raw = localStorage.getItem(key);
-        const parsed = raw ? JSON.parse(raw) : [];
-        return Array.isArray(parsed) ? parsed : [];
-      } catch {
-        return [];
-      }
-    }
-
-    function writeLocalArray(key, arr) {
-      try {
-        localStorage.setItem(key, JSON.stringify(Array.isArray(arr) ? arr : []));
-      } catch (e) {
-        console.error('LocalStorage write error:', e);
-      }
-    }
-
-    function getPendingBookingFromLocal(bookingId) {
-      if (!bookingId) return null;
-      const list = readLocalArray(LOCAL_STORAGE_KEYS.pendingBookings);
-      return list.find(b => String(b && b.id) === String(bookingId)) || null;
-    }
-
-    function removePendingBookingFromLocal(bookingId) {
-      if (!bookingId) return;
-      const list = readLocalArray(LOCAL_STORAGE_KEYS.pendingBookings)
-        .filter(b => String(b && b.id) !== String(bookingId));
-      writeLocalArray(LOCAL_STORAGE_KEYS.pendingBookings, list);
-    }
-
-    function upsertFinalBookingToLocal(booking) {
-      if (!booking || booking.id == null) return;
-      const id = String(booking.id);
-      const list = readLocalArray(LOCAL_STORAGE_KEYS.bookings);
-      const withoutCurrent = list.filter(b => String(b && b.id) !== id);
-      withoutCurrent.push(booking);
-      withoutCurrent.sort((a, b) => (a.sortKey || 0) - (b.sortKey || 0));
-      writeLocalArray(LOCAL_STORAGE_KEYS.bookings, withoutCurrent);
-    }
-
-    async function finalizeBookingRecord(booking) {
+    async function finalizeBookingRecord(booking, pendingRef = null) {
       const finalizedBooking = {
         ...booking,
         paymentStatus: 'Paid'
       };
 
-      await db.collection('bookings').doc(String(finalizedBooking.id)).set(finalizedBooking);
-      upsertFinalBookingToLocal(finalizedBooking);
-      removePendingBookingFromLocal(finalizedBooking.id);
+      if (pendingRef) {
+        const batch = db.batch();
+        const bookingRef = db.collection('bookings').doc(String(finalizedBooking.id));
+        batch.set(bookingRef, finalizedBooking, { merge: true });
+        batch.delete(pendingRef);
+        await batch.commit();
+      } else {
+        await db.collection('bookings').doc(String(finalizedBooking.id)).set(finalizedBooking, { merge: true });
+      }
+
       clearPendingCookie();
 
       fetch('https://formspree.io/f/mgoydkqd', {
@@ -369,24 +330,9 @@
         const pendingSnap = await pendingRef.get();
 
         if (!pendingSnap.exists) {
-          const localPendingBooking = getPendingBookingFromLocal(pendingBookingId);
-          if (localPendingBooking) {
-            const finalizedFromLocal = await finalizeBookingRecord(localPendingBooking);
-
-            successTitle.textContent = 'Tack! Betalningen gick igenom';
-            successText1.textContent = 'Din bokning är registrerad.';
-            successText2.textContent = `Bekräftelse för ${finalizedFromLocal.name || 'dig'}:`;
-            renderBookingSummary(summaryBox, finalizedFromLocal, 'Bokning bekräftad:');
-            return;
-          }
-        }
-
-        if (!pendingSnap.exists) {
           const existingBookingSnap = await db.collection('bookings').doc(String(pendingBookingId)).get();
           if (existingBookingSnap.exists) {
             const existingBooking = existingBookingSnap.data();
-            upsertFinalBookingToLocal(existingBooking);
-            removePendingBookingFromLocal(pendingBookingId);
             successTitle.textContent = 'Tack! Betalningen gick igenom';
             successText1.textContent = 'Bokningen var redan registrerad.';
             successText2.textContent = `Här är bokningsdetaljerna för ${existingBooking.name || 'dig'}:`;
@@ -404,8 +350,7 @@
         }
 
         const booking = pendingSnap.data();
-        const finalizedBooking = await finalizeBookingRecord(booking);
-        await pendingRef.delete();
+        const finalizedBooking = await finalizeBookingRecord(booking, pendingRef);
 
         successText2.textContent = `Här är bokningsdetaljerna för ${finalizedBooking.name || 'dig'}:`;
 
