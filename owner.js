@@ -1,6 +1,7 @@
 const OWNER_LOGIN_REDIRECT = 'index.html';
 
 const SERVICE_LABELS = {
+  'test': 'TEST',
   'basic': 'Utvändig Handtvätt',
   'interior-wash': 'Invändig Tvätt',
   'premium': 'Komplett In- & Utvändig Tvätt',
@@ -10,6 +11,7 @@ const SERVICE_LABELS = {
 };
 
 const servicePrices = {
+  'test': { small: 1, medium: 1, large: 1 },
   'basic': { small: 199, medium: 249, large: 279 },
   'interior-wash': { small: 249, medium: 279, large: 300 },
   'premium': { small: 399, medium: 449, large: 479 },
