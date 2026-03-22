@@ -352,8 +352,6 @@ const LOCAL_STORAGE_KEYS = {
   blockedTimes: 'primabilvard_blockedTimes'
 };
 
-window.PRIMA_LOCAL_STORAGE_KEYS = LOCAL_STORAGE_KEYS;
-
 function canUseFirestore() {
   return !!(window.db && typeof window.db.collection === 'function');
 }
@@ -1061,6 +1059,9 @@ const STRIPE_PAYMENT_LINKS = {
   'full|large|5|none': 'https://buy.stripe.com/00wdRb9fy7QwaylbCvasg0A'
 };
 
+// Testlänk för snabb verifiering av betalningsflöde
+const STRIPE_TEST_PAYMENT_LINK = 'https://buy.stripe.com/cNifZj0J20o421P35Zasg00';
+
 function buildStripeLinkKey(service, size, seatAddonType, asphaltAddonType) {
   return `${service}|${size}|${seatAddonType || 'none'}|${asphaltAddonType || 'none'}`;
 }
@@ -1073,7 +1074,13 @@ function getStripePaymentLink(service, size, seatAddonType, asphaltAddonType) {
 
 function updateStripePayButton() {
   const btn = document.getElementById('stripePayBtn');
+  const testBtn = document.getElementById('stripeTestBtn');
   if (!btn) return;
+
+  if (testBtn) {
+    testBtn.href = STRIPE_TEST_PAYMENT_LINK;
+    testBtn.style.display = 'inline-flex';
+  }
 
   const service = document.getElementById('service').value;
   const size = document.getElementById('size').value;
@@ -1286,16 +1293,13 @@ async function saveBooking(booking) {
 }
 
 async function savePendingBooking(booking) {
-  const pending = readLocalArray(LOCAL_STORAGE_KEYS.pendingBookings);
-  pending.push(booking);
-  writeLocalArray(LOCAL_STORAGE_KEYS.pendingBookings, pending);
-
-  if (!canUseFirestore()) return;
+  if (!canUseFirestore()) throw new Error('Firestore unavailable');
 
   try {
     await window.db.collection('pendingBookings').doc(String(booking.id)).set(booking);
   } catch (e) {
     console.error('Firebase save pending error:', e);
+    throw e;
   }
 }
 
