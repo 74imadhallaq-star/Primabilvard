@@ -148,6 +148,7 @@ async function verifyOwnerCode(inputCode) {
 }
 
 const DEFAULT_SERVICE_DURATIONS = {
+  'test': 30,
   'basic': 20,
   'interior-wash': 40,
   'premium': 100,
@@ -158,6 +159,7 @@ const DEFAULT_SERVICE_DURATIONS = {
 let serviceDurations = { ...DEFAULT_SERVICE_DURATIONS };
 
 const SERVICE_LABELS = {
+  'test': 'TEST',
   'basic': 'Utvändig Handtvätt',
   'interior-wash': 'Invändig Tvätt',
   'premium': 'Komplett In- & Utvändig Tvätt',
@@ -287,6 +289,7 @@ function setAsphaltAddonSelection(addonType = 'none') {
 function bookService(serviceId, chosenSize, chosenSeatAddon = 'none', chosenAsphaltAddon = 'none') {
   // Välj tjänst i dropdown
   const serviceMap = {
+    'test': 'test',
     'basic': 'basic',
     'interior-wash': 'interior-wash',
     'premium': 'premium',
@@ -969,6 +972,7 @@ if (bookBtn) {
 
 // Service prices by size
 const servicePrices = {
+  'test': { small: 1, medium: 1, large: 1 },
   'basic': { small: 199, medium: 249, large: 279 },
   'interior-wash': { small: 249, medium: 279, large: 300 },
   'premium': { small: 399, medium: 449, large: 479 },
@@ -979,6 +983,10 @@ const servicePrices = {
 
 // Stripe Payment Links per kombination (lägg till fler länkar här)
 const STRIPE_PAYMENT_LINKS = {
+  // TEST - alla storlekar
+  'test|small|none|none': 'https://buy.stripe.com/test_3cI00ldvYfwY3C55Vd0Ba01',
+  'test|medium|none|none': 'https://buy.stripe.com/test_3cI00ldvYfwY3C55Vd0Ba01',
+  'test|large|none|none': 'https://buy.stripe.com/test_3cI00ldvYfwY3C55Vd0Ba01',
   // Invändig Tvätt - Liten
   'interior-wash|small|none|none': 'https://buy.stripe.com/cNifZj0J20o421P35Zasg00',
   // Invändig Tvätt - Mellan
@@ -1059,9 +1067,6 @@ const STRIPE_PAYMENT_LINKS = {
   'full|large|5|none': 'https://buy.stripe.com/00wdRb9fy7QwaylbCvasg0A'
 };
 
-// Testlänk för snabb verifiering av betalningsflöde
-const STRIPE_TEST_PAYMENT_LINK = 'https://buy.stripe.com/cNifZj0J20o421P35Zasg00';
-
 function buildStripeLinkKey(service, size, seatAddonType, asphaltAddonType) {
   return `${service}|${size}|${seatAddonType || 'none'}|${asphaltAddonType || 'none'}`;
 }
@@ -1074,31 +1079,7 @@ function getStripePaymentLink(service, size, seatAddonType, asphaltAddonType) {
 
 function updateStripePayButton() {
   const btn = document.getElementById('stripePayBtn');
-  let testBtn = document.getElementById('stripeTestBtn');
   if (!btn) return;
-
-  if (!testBtn && btn.parentElement) {
-    testBtn = document.createElement('a');
-    testBtn.id = 'stripeTestBtn';
-    testBtn.className = 'submit-btn';
-    testBtn.target = '_blank';
-    testBtn.rel = 'noopener noreferrer';
-    testBtn.textContent = 'Kör testbetalning';
-    testBtn.style.display = 'inline-flex';
-    testBtn.style.alignItems = 'center';
-    testBtn.style.justifyContent = 'center';
-    testBtn.style.marginTop = '10px';
-    testBtn.style.background = '#2d9b53';
-    testBtn.style.borderColor = '#8dd9a9';
-    testBtn.style.color = '#fff';
-    testBtn.style.textDecoration = 'none';
-    btn.insertAdjacentElement('afterend', testBtn);
-  }
-
-  if (testBtn) {
-    testBtn.href = STRIPE_TEST_PAYMENT_LINK;
-    testBtn.style.display = 'inline-flex';
-  }
 
   const service = document.getElementById('service').value;
   const size = document.getElementById('size').value;
