@@ -48,6 +48,17 @@
 <section id="services" class="services">
   <h2>Våra Tjänster</h2>
   <div class="services-grid">
+    <div class="service-card" data-service="test" style="cursor: pointer;">
+      <h3>TEST</h3>
+      <p>Testtjänst för att verifiera betalningsflödet end-to-end.</p>
+      <p><strong>Tid: ca 30 minuter</strong></p>
+      <select class="card-size">
+        <option value="small">Liten - 1 kr</option>
+        <option value="medium">Mellan - 1 kr</option>
+        <option value="large">Stor - 1 kr</option>
+      </select>
+      <span class="price">Från 1 kr</span>
+    </div>
     <div class="service-card" data-service="basic" style="cursor: pointer;">
       <h3>Utvändig Handtvätt</h3>
       <p>Ge din bil nybilskänslan tillbaka. Vi använder kraftfullt högtryck för att få bort all lös smuts och salt, följt av en noggrann handtvätt som gör lacken skinande ren. I paketet ingår även grundlig fälgtvätt och putsning av rutorna utvändigt. Det trygga valet för dig som vill ha en bil som ser ut som ny igen.</p>
@@ -200,6 +211,7 @@
           <label for="service">Välj Tjänst</label>
           <select id="service" required>
             <option value="">-- Välj tjänst --</option>
+            <option value="test">TEST</option>
             <option value="basic">Utvändig Handtvätt</option>
             <option value="interior-wash">Invändig Tvätt</option>
             <option value="premium">Komplett In- & Utvändig Tvätt</option>
@@ -251,7 +263,6 @@
             <span id="totalPrice">-</span>
           </div>
           <button type="submit" form="bookingForm" id="stripePayBtn" class="submit-btn" style="background:#5469d4;border-color:#5469d4;">Betala &amp; Bekräfta Bokning</button>
-          <a id="stripeTestBtn" class="submit-btn" href="https://buy.stripe.com/cNifZj0J20o421P35Zasg00" style="display:inline-flex;align-items:center;justify-content:center;margin-top:10px;background:#2d9b53;border-color:#8dd9a9;color:#fff;text-decoration:none;" target="_blank" rel="noopener noreferrer">Kör testbetalning</a>
           <p class="payment-note">* Betalning är obligatorisk för att bekräfta bokningen</p>
           <p class="booking-policy-note"><strong>Obs:</strong> Vid extra smutsig bil kan en tilläggsavgift tillkomma efter bedömning på plats. Uteblivet besök eller avbokning sent kan medföra en avgift.</p>
         </div>
@@ -350,6 +361,7 @@
 
       <select id="ownerService" style="padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:#0f0f0f;color:var(--text-primary);" required>
         <option value="">Tjänst *</option>
+        <option value="test">TEST</option>
         <option value="basic">Utvändig Handtvätt</option>
         <option value="interior-wash">Invändig Tvätt</option>
         <option value="premium">Komplett In- & Utvändig Tvätt</option>
@@ -432,7 +444,7 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 <script src="firebase-config.js?v=4"></script>
-<script src="script.js?v=11"></script>
+<script src="script.js?v=12"></script>
 <script>
   (function() {
     const ownerBtn = document.getElementById('ownerPageLink');
