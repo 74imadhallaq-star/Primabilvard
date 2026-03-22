@@ -1266,19 +1266,19 @@ let cachedBookings = [];
 async function saveBooking(booking) {
   if (!canUseFirestore()) {
     cachedBookings.push(booking);
-    cachedBookings.sort((a, b) => a.sortKey - b.sortKey);
+    cachedBookings.sort((a, b) => (b.sortKey || 0) - (a.sortKey || 0));
     writeLocalArray(LOCAL_STORAGE_KEYS.bookings, cachedBookings);
     return;
   }
   try {
     await window.db.collection('bookings').doc(String(booking.id)).set(booking);
     cachedBookings.push(booking);
-    cachedBookings.sort((a, b) => a.sortKey - b.sortKey);
+    cachedBookings.sort((a, b) => (b.sortKey || 0) - (a.sortKey || 0));
     writeLocalArray(LOCAL_STORAGE_KEYS.bookings, cachedBookings);
   } catch (e) {
     console.error('Firebase save error:', e);
     cachedBookings.push(booking);
-    cachedBookings.sort((a, b) => a.sortKey - b.sortKey);
+    cachedBookings.sort((a, b) => (b.sortKey || 0) - (a.sortKey || 0));
     writeLocalArray(LOCAL_STORAGE_KEYS.bookings, cachedBookings);
   }
 }
@@ -1305,18 +1305,18 @@ function loadBookings() {
 async function loadBookingsFromFirebase() {
   if (!canUseFirestore()) {
     cachedBookings = readLocalArray(LOCAL_STORAGE_KEYS.bookings);
-    cachedBookings.sort((a, b) => (a.sortKey || 0) - (b.sortKey || 0));
+    cachedBookings.sort((a, b) => (b.sortKey || 0) - (a.sortKey || 0));
     return;
   }
   try {
     const snapshot = await window.db.collection('bookings').get();
     cachedBookings = snapshot.docs.map(doc => doc.data());
-    cachedBookings.sort((a, b) => a.sortKey - b.sortKey);
+    cachedBookings.sort((a, b) => (b.sortKey || 0) - (a.sortKey || 0));
     writeLocalArray(LOCAL_STORAGE_KEYS.bookings, cachedBookings);
   } catch (e) {
     console.error('Firebase load error:', e);
     cachedBookings = readLocalArray(LOCAL_STORAGE_KEYS.bookings);
-    cachedBookings.sort((a, b) => (a.sortKey || 0) - (b.sortKey || 0));
+    cachedBookings.sort((a, b) => (b.sortKey || 0) - (a.sortKey || 0));
   }
 }
 
