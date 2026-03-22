@@ -352,6 +352,8 @@ const LOCAL_STORAGE_KEYS = {
   blockedTimes: 'primabilvard_blockedTimes'
 };
 
+window.PRIMA_LOCAL_STORAGE_KEYS = LOCAL_STORAGE_KEYS;
+
 function canUseFirestore() {
   return !!(window.db && typeof window.db.collection === 'function');
 }
@@ -1284,19 +1286,16 @@ async function saveBooking(booking) {
 }
 
 async function savePendingBooking(booking) {
-  if (!canUseFirestore()) {
-    const pending = readLocalArray(LOCAL_STORAGE_KEYS.pendingBookings);
-    pending.push(booking);
-    writeLocalArray(LOCAL_STORAGE_KEYS.pendingBookings, pending);
-    return;
-  }
+  const pending = readLocalArray(LOCAL_STORAGE_KEYS.pendingBookings);
+  pending.push(booking);
+  writeLocalArray(LOCAL_STORAGE_KEYS.pendingBookings, pending);
+
+  if (!canUseFirestore()) return;
+
   try {
     await window.db.collection('pendingBookings').doc(String(booking.id)).set(booking);
   } catch (e) {
     console.error('Firebase save pending error:', e);
-    const pending = readLocalArray(LOCAL_STORAGE_KEYS.pendingBookings);
-    pending.push(booking);
-    writeLocalArray(LOCAL_STORAGE_KEYS.pendingBookings, pending);
   }
 }
 
