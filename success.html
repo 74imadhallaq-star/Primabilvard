@@ -261,14 +261,16 @@
         paymentStatus: 'Paid'
       };
 
+      // 1) Spara alltid slutlig bokning först
+      await db.collection('bookings').doc(String(finalizedBooking.id)).set(finalizedBooking, { merge: true });
+
+      // 2) Försök ta bort pending (best effort)
       if (pendingRef) {
-        const batch = db.batch();
-        const bookingRef = db.collection('bookings').doc(String(finalizedBooking.id));
-        batch.set(bookingRef, finalizedBooking, { merge: true });
-        batch.delete(pendingRef);
-        await batch.commit();
-      } else {
-        await db.collection('bookings').doc(String(finalizedBooking.id)).set(finalizedBooking, { merge: true });
+        try {
+          await pendingRef.delete();
+        } catch (deleteErr) {
+          console.warn('Kunde inte ta bort pending booking direkt:', deleteErr);
+        }
       }
 
       clearPendingCookie();
@@ -357,6 +359,28 @@
         renderBookingSummary(summaryBox, finalizedBooking, 'Bokning bekräftad:');
       } catch (e) {
         console.error('Fel vid bokningsslutförande:', e);
+
+        // Om bokningen redan hann sparas i bookings ska kunden få en bekräftelse,
+        // inte ett tekniskt felmeddelande.
+        try {
+          const existingBookingSnap = pendingBookingId
+            ? await db.collection('bookings').doc(String(pendingBookingId)).get()
+            : null;
+
+          if (existingBookingSnap && existingBookingSnap.exists) {
+            const existingBooking = existingBookingSnap.data();
+            clearPendingCookie();
+            statusBadge.textContent = '✔ Betalning mottagen';
+            successTitle.textContent = 'Tack! Betalningen gick igenom';
+            successText1.textContent = 'Din bokning är registrerad.';
+            successText2.textContent = `Här är bokningsdetaljerna för ${existingBooking.name || 'dig'}:`;
+            renderBookingSummary(summaryBox, existingBooking, 'Bokning bekräftad:');
+            return;
+          }
+        } catch (fallbackErr) {
+          console.error('Fallback-kontroll av bookings misslyckades:', fallbackErr);
+        }
+
         statusBadge.textContent = '⚠ Betalning mottagen';
         successTitle.textContent = 'Betalning klar, men bokning kunde inte sparas automatiskt';
         successText1.textContent = 'Du har inte blivit dubbeldebiterad.';
