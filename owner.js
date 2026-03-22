@@ -22,12 +22,34 @@ let cachedBookings = [];
 let blockedDateIds = new Set();
 let blockedTimeIds = new Set();
 
+const LOCAL_STORAGE_KEYS = {
+  bookings: 'primabilvard_bookings'
+};
+
 function canUseFirestore() {
   return !!(window.db && typeof window.db.collection === 'function');
 }
 
 function canUseAuth() {
   return !!(window.auth && typeof window.auth.signInWithEmailAndPassword === 'function');
+}
+
+function readLocalArray(key) {
+  try {
+    const raw = localStorage.getItem(key);
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function writeLocalArray(key, arr) {
+  try {
+    localStorage.setItem(key, JSON.stringify(Array.isArray(arr) ? arr : []));
+  } catch (error) {
+    console.error('Local storage write error:', error);
+  }
 }
 
 function escapeHtml(str) {
@@ -208,27 +230,52 @@ async function loadBlockedTimes() {
 }
 
 async function loadBookings() {
+  const fallbackLocal = () => {
+    cachedBookings = readLocalArray(LOCAL_STORAGE_KEYS.bookings);
+    cachedBookings.sort((a, b) => (a.sortKey || 0) - (b.sortKey || 0));
+  };
+
   try {
+    if (!canUseFirestore()) {
+      fallbackLocal();
+      return;
+    }
+
     const snapshot = await window.db.collection('bookings').get();
     cachedBookings = snapshot.docs.map(doc => doc.data());
     cachedBookings.sort((a, b) => (a.sortKey || 0) - (b.sortKey || 0));
+    writeLocalArray(LOCAL_STORAGE_KEYS.bookings, cachedBookings);
   } catch (error) {
     console.error('Firebase bookings load error:', error);
-    cachedBookings = [];
+    fallbackLocal();
   }
 }
 
 async function saveBooking(booking) {
-  if (!canUseFirestore()) throw new Error('Firestore unavailable');
+  if (!canUseFirestore()) {
+    cachedBookings.push(booking);
+    cachedBookings.sort((a, b) => (a.sortKey || 0) - (b.sortKey || 0));
+    writeLocalArray(LOCAL_STORAGE_KEYS.bookings, cachedBookings);
+    return;
+  }
+
   await window.db.collection('bookings').doc(String(booking.id)).set(booking);
   cachedBookings.push(booking);
   cachedBookings.sort((a, b) => (a.sortKey || 0) - (b.sortKey || 0));
+  writeLocalArray(LOCAL_STORAGE_KEYS.bookings, cachedBookings);
 }
 
 async function deleteBooking(id) {
-  if (!canUseFirestore()) throw new Error('Firestore unavailable');
+  if (!canUseFirestore()) {
+    cachedBookings = cachedBookings.filter(b => String(b.id) !== String(id));
+    writeLocalArray(LOCAL_STORAGE_KEYS.bookings, cachedBookings);
+    renderBookingsTable();
+    return;
+  }
+
   await window.db.collection('bookings').doc(String(id)).delete();
   cachedBookings = cachedBookings.filter(b => String(b.id) !== String(id));
+  writeLocalArray(LOCAL_STORAGE_KEYS.bookings, cachedBookings);
   renderBookingsTable();
 }
 
