@@ -264,15 +264,6 @@
       // 1) Spara alltid slutlig bokning först
       await db.collection('bookings').doc(String(finalizedBooking.id)).set(finalizedBooking, { merge: true });
 
-      // 2) Försök ta bort pending (best effort)
-      if (pendingRef) {
-        try {
-          await pendingRef.delete();
-        } catch (deleteErr) {
-          console.warn('Kunde inte ta bort pending booking direkt:', deleteErr);
-        }
-      }
-
       clearPendingCookie();
 
       fetch('https://formspree.io/f/mgoydkqd', {
