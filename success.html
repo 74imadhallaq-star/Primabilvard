@@ -7,16 +7,6 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
-
-  <!-- Google Ads tag -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=AW-18338450528"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'AW-18338450528');
-  </script>
-
   <style>
     :root {
       --primary: #0A3D78;
@@ -310,6 +300,30 @@
       const successText2 = document.getElementById('successText2');
       const summaryBox = document.getElementById('summaryBox');
 
+      // Stripe's webhook, not the browser, verifies and marks a booking as paid.
+      try {
+        const pendingBooking = JSON.parse(sessionStorage.getItem('pendingBooking') || 'null');
+        if (pendingBooking) {
+          clearPendingCookie();
+          sessionStorage.removeItem('pendingBooking');
+          statusBadge.textContent = 'Betalning behandlas';
+          successTitle.textContent = 'Tack for din betalning';
+          successText1.textContent = 'Vi verifierar betalningen och registrerar din bokning automatiskt.';
+          successText2.textContent = `Bokningsdetaljer for ${pendingBooking.name || 'dig'}:`;
+          renderBookingSummary(summaryBox, pendingBooking, 'Bokning mottagen:');
+          return;
+        }
+      } catch (error) {
+        console.error('Kunde inte lasa lokal bokningssammanfattning:', error);
+      }
+
+      statusBadge.textContent = 'Betalning behandlas';
+      successTitle.textContent = 'Tack for din betalning';
+      successText1.textContent = 'Vi verifierar betalningen och registrerar din bokning automatiskt.';
+      successText2.textContent = 'Kontakta oss om du inte har fatt en bekraftelse inom kort.';
+      summaryBox.innerHTML = '<strong>Bokning mottagen</strong><br>Betalningen verifieras sakert pa serversidan.';
+      return;
+
       const pendingBookingId = getCookie('pendingBookingId');
       if (!pendingBookingId) {
         const fallbackBooking = await tryLoadRecentBookingFallback();
@@ -391,16 +405,6 @@
     }
 
     finalizeBookingAfterPayment();
-  </script>
-
-  <!-- Google Ads conversion event -->
-  <script>
-    gtag('event', 'conversion', {
-      'send_to': 'AW-18338450528/bRQSCNK1h9ccEOCYuqhE',
-      'value': 1.0,
-      'currency': 'SEK',
-      'transaction_id': ''
-    });
   </script>
 </body>
 </html>
