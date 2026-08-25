@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Cormorant+Garamond:wght@400;500;600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=8">
+<link rel="stylesheet" href="style.css?v=10">
 </head>
 <body>
 
@@ -22,8 +22,8 @@
       <span></span><span></span><span></span>
     </button>
     <ul class="nav-menu" id="navMenu">
-      <li><a href="#services" class="nav-link">Tjänster</a></li>
-      <li><a href="#portfolio" class="nav-link">Vårt Arbete</a></li>
+      <li><a href="#services" class="nav-link nav-link-service" data-tab="car-wash">🚗 Bilvård</a></li>
+      <li><a href="#services" class="nav-link nav-link-service" data-tab="car-service">🔧 Bilservice</a></li>
       <li><a href="#booking" class="nav-link">Boka</a></li>
       <li><a href="#contact" class="nav-link">Kontakt</a></li>
       <li><a href="foretag.html" class="nav-link nav-link-foretag">🏢 För Företag</a></li>
@@ -47,8 +47,28 @@
 <!-- SERVICES -->
 <section id="services" class="services">
   <h2>Våra Tjänster</h2>
-  <div class="services-grid">
-    <div class="service-card" data-service="basic" style="cursor: pointer;">
+  
+  <!-- TABS -->
+  <div class="service-tabs">
+    <button class="tab-btn active" data-tab="car-wash">🚗 Bilvård</button>
+    <button class="tab-btn" data-tab="car-service">🔧 Bilservice</button>
+  </div>
+
+  <!-- BILVÅRD TAB CONTENT -->
+  <div class="tab-content active" id="car-wash">
+  <div class="service-categories car-wash-categories">
+    <div class="service-category-card accordion-item" data-category="wash-basic">
+      <div class="accordion-header">
+        <div class="category-icon">🚿</div>
+        <div>
+          <h3>Tvätt &amp; Rengöring</h3>
+          <p class="category-description">Noggrann handtvätt för en ren och fräsch bil</p>
+        </div>
+        <span class="accordion-arrow">▼</span>
+      </div>
+      <div class="accordion-content">
+      <div class="service-items">
+    <div class="service-card service-item" data-service="basic" style="cursor: pointer;">
       <h3>Utvändig Handtvätt</h3>
       <p>Ge din bil nybilskänslan tillbaka. Vi använder kraftfullt högtryck för att få bort all lös smuts och salt, följt av en noggrann handtvätt som gör lacken skinande ren. I paketet ingår även grundlig fälgtvätt och putsning av rutorna utvändigt. Det trygga valet för dig som vill ha en bil som ser ut som ny igen.</p>
       <p><strong>Tid: ca 20 minuter</strong></p>
@@ -63,7 +83,7 @@
       </select>
       <span class="price">Från 199 kr</span>
     </div>
-    <div class="service-card" data-service="interior-wash" style="cursor: pointer;">
+    <div class="service-card service-item" data-service="interior-wash" style="cursor: pointer;">
       <h3>Invändig Tvätt</h3>
       <p>Djuprengöring av bilens interiör. Vi dammsuger hela kupén, rengör alla ytor noggrant och putsar rutorna invändigt. Perfekt för att få bort damm, fläckar och skapa en fräsch miljö i bilen.</p>
       <p><strong>Tid: ca 40 minuter</strong></p>
@@ -74,7 +94,7 @@
       </select>
       <span class="price">Från 249 kr</span>
     </div>
-    <div class="service-card" data-service="premium" style="cursor: pointer;">
+    <div class="service-card service-item" data-service="premium" style="cursor: pointer;">
       <h3>Komplett In- & Utvändig Tvätt</h3>
       <p>Ge hela bilen nybilskänslan tillbaka. Vi kombinerar en grundlig handtvätt med högtryck på utsidan och en noggrann städning på insidan. Vi dammsuger hela kupén, putsar rutorna och gör rent fälgarna ordentligt & toppar av det med däckglans. Det perfekta valet för dig som vill ha en bil som känns både ren, fräsch och som ny igen, både utvändigt och invändigt.</p>
       <p><strong>Tid: ca 100 minuter</strong></p>
@@ -89,7 +109,22 @@
       </select>
       <span class="price">Från 399 kr</span>
     </div>
-    <div class="service-card" data-service="inout" style="cursor: pointer;">
+      </div>
+      </div>
+    </div>
+
+    <div class="service-category-card accordion-item" data-category="wash-complete">
+      <div class="accordion-header">
+        <div class="category-icon">✨</div>
+        <div>
+          <h3>Komplett Bilvård &amp; Rekond</h3>
+          <p class="category-description">Fördjupad behandling, glans och komplett rekonditionering</p>
+        </div>
+        <span class="accordion-arrow">▼</span>
+      </div>
+      <div class="accordion-content">
+      <div class="service-items">
+    <div class="service-card service-item" data-service="inout" style="cursor: pointer;">
       <h3>In- & Utvändig Tvätt Med Sätten</h3>
       <p>En komplett in- och utvändig behandling för dig som vill få bilen ordentligt uppfräschad. Vi tvättar utsidan noggrant, rengör kupén grundligt, dammsuger, putsar rutor och går igenom detaljer för ett rent och fräscht helhetsintryck.</p>
       <p><strong>Tid: ca 4 timmar</strong></p>
@@ -104,7 +139,7 @@
       </select>
       <span class="price">Från 1000 kr</span>
     </div>
-    <div class="service-card" data-service="interior" style="cursor: pointer;">
+    <div class="service-card service-item" data-service="interior" style="cursor: pointer;">
       <h3>Hel Glans</h3>
       <p>Ge din bil en ordentlig uppfräschning med vårt Premiumpaket! Här ingår en noggrann handtvätt både in- och utvändigt, djupgående interiörrekonditionering, applicering av vax för extra skydd och glans samt en grundlig rengöring av fönster, dörrkarmar och trösklar. Perfekt för dig som vill att bilen ska se och kännas som ny – varje dag. Du kan även välja till klädseltvätt mot en extra kostnad för ett ännu fräschare resultat.</p>
       <p><strong>Tid: ca 3 timmar</strong></p>
@@ -120,9 +155,9 @@
       </select>
       <span class="price">Från 1500 kr</span>
     </div>
-    <div class="service-card" data-service="full" style="cursor: pointer;">
+    <div class="service-card service-item" data-service="full" style="cursor: pointer;">
       <h3>Fullservice Rekond</h3>
-      <p>Ge din bil en komplett rekonditionering med vårt Fullservice Rekond. Paketet inkluderar noggrann handtvätt invändigt och utvändigt, professionell polering, lackskydd med keramisk coating eller högkvalitativt vax, motortvätt samt en komplett interiörrengöring. Resultatet är en bil som känns fräsch, välvårdad och skyddad. Perfekt för bilägare, företagskunder och bilhandlare som ställer höga krav på kvalitet. Klädseltvätt kan läggas till som ett tillval för en ännu mer komplett rekonditionering.</p>
+      <p>För dig som vill ge bilen det allra bästa erbjuder vi vårt Exklusivpaket. Paketet inkluderar fullständig handtvätt in- och utvändigt, avancerad polering för maximal glans och borttagning av djupare repor, samt professionellt lackskydd med keramisk coating eller högkvalitativt vax. Motortvätt och komplett interiörrekonditionering ingår också, vilket ger din bil en total förvandling från hjul till tak. Detta paket är perfekt för bilentusiaster, företagskunder med höga krav och bilhandlare som vill säkerställa att deras bilar är i toppskick. Du kan även välja till klädseltvätt mot en extra kostnad för en ännu mer komplett rekond.</p>
       <p><strong>Tid: ca 3,5 timmar</strong></p>
       <select class="card-size">
         <option value="small">Liten - 2000 kr</option>
@@ -136,48 +171,628 @@
       </select>
       <span class="price">Från 2000 kr</span>
     </div>
+      </div>
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <!-- BILSERVICE TAB CONTENT -->
+  <div class="tab-content" id="car-service">
+  <div class="service-categories">
+    
+    <!-- Däckservice -->
+    <div class="service-category-card accordion-item" data-category="tires">
+      <div class="accordion-header">
+        <div class="category-icon">🛞</div>
+        <div>
+          <h3>Däckservice</h3>
+          <p class="category-description">Komplett däckhantering för säker körning året runt</p>
+        </div>
+        <span class="accordion-arrow">▼</span>
+      </div>
+      <div class="accordion-content">
+      <div class="service-items">
+        <div class="service-item" data-service="tire-change">
+          <div class="service-item-header">
+            <h4>Däckbyte</h4>
+            <span class="service-price">Från 500 kr</span>
+          </div>
+          <p>Snabb och professionell däckmontering. Vi byter från sommar- till vinterdäck eller tvärtom. Inklusive balansering och kontroll av lufttryck.</p>
+          <ul class="service-features">
+            <li>✓ Montering på befintliga fälgar</li>
+            <li>✓ Balansering av alla hjul</li>
+            <li>✓ Lufttryckskontroll</li>
+            <li>✓ Visuell kontroll av däck</li>
+          </ul>
+          <div class="service-timing">⏱️ Tid: ca 30 minuter</div>
+        </div>
+        <div class="service-item" data-service="tire-storage">
+          <div class="service-item-header">
+            <h4>Däckhotell</h4>
+            <span class="service-price">Från 750 kr/säsong</span>
+          </div>
+          <p>Säker förvaring av dina däck i klimatkontrollerat utrymme. Vi tvättar, märker och lagrar dina däck professionellt.</p>
+          <ul class="service-features">
+            <li>✓ Tvättning före förvaring</li>
+            <li>✓ Klimatkontrollerat lager</li>
+            <li>✓ Försäkrad förvaring</li>
+            <li>✓ Tvätt inkluderad</li>
+          </ul>
+          <div class="service-timing">⏱️ Inkluderar in- och utlämning</div>
+        </div>
+        <div class="service-item" data-service="tire-repair">
+          <div class="service-item-header">
+            <h4>Däckreparation</h4>
+            <span class="service-price">Från 200 kr</span>
+          </div>
+          <p>Snabb och säker lagning av punkterade däck. Vi använder professionella metoder för långvarig hållbarhet.</p>
+          <ul class="service-features">
+            <li>✓ Hellagning enligt standard</li>
+            <li>✓ Balansering efter lagning</li>
+            <li>✓ Säkerhetskontroll</li>
+            <li>✓ Garanterad kvalitet</li>
+          </ul>
+          <div class="service-timing">⏱️ Tid: ca 20 minuter</div>
+        </div>
+      </div>
+      </div>
+    </div>
+
+    <!-- Fullservice -->
+    <div class="service-category-card accordion-item" data-category="full-service">
+      <div class="accordion-header">
+        <div class="category-icon">⚙️</div>
+        <div>
+          <h3>Fullservice</h3>
+          <p class="category-description">Komplett service för optimal prestanda</p>
+        </div>
+        <span class="accordion-arrow">▼</span>
+      </div>
+      <div class="accordion-content">
+      <div class="service-items">
+        <div class="service-item" data-service="basic-service">
+          <div class="service-item-header">
+            <h4>Basservice</h4>
+            <span class="service-price">Från 1 800 kr</span>
+          </div>
+          <p>Grundläggande underhåll enligt tillverkarens rekommendationer. Håller din bil i toppskick.</p>
+          <ul class="service-features">
+            <li>✓ Oljebyte (syntetisk olja)</li>
+            <li>✓ Oljefilter</li>
+            <li>✓ Luftfilter</li>
+            <li>✓ Multikontroll 30 punkter</li>
+            <li>✓ Vätskenivåer (påfyllning ingår)</li>
+            <li>✓ Däcktryckskontroll</li>
+          </ul>
+          <div class="service-timing">⏱️ Tid: ca 1 timme</div>
+        </div>
+        <div class="service-item" data-service="major-service">
+          <div class="service-item-header">
+            <h4>Storservice</h4>
+            <span class="service-price">Från 3 500 kr</span>
+          </div>
+          <p>Omfattande service för bilar med högre körsträcka eller vid rekommenderat serviceintervall.</p>
+          <ul class="service-features">
+            <li>✓ Allt från Basservice</li>
+            <li>✓ Byte av kupéfilter</li>
+            <li>✓ Byte av bränslefilter</li>
+            <li>✓ Bromsvätskebyte</li>
+            <li>✓ Kontroll av bromssystem</li>
+            <li>✓ Kontroll av drivlina</li>
+            <li>✓ Komplett undersida kontroll</li>
+          </ul>
+          <div class="service-timing">⏱️ Tid: ca 2-3 timmar</div>
+        </div>
+        <div class="service-item" data-service="brake-service">
+          <div class="service-item-header">
+            <h4>Bromsservice</h4>
+            <span class="service-price">Från 1 200 kr</span>
+          </div>
+          <p>Komplett kontroll och service av bromssystemet för maximal säkerhet.</p>
+          <ul class="service-features">
+            <li>✓ Byte av bromsbelägg fram/bak</li>
+            <li>✓ Kontroll av bromsskivor</li>
+            <li>✓ Rengöring av bromsok</li>
+            <li>✓ Smörjning av slidpinnar</li>
+            <li>✓ Test av bromsfunktion</li>
+          </ul>
+          <div class="service-timing">⏱️ Tid: ca 1,5 timmar</div>
+        </div>
+      </div>
+      </div>
+    </div>
+
+    <!-- Besiktning -->
+    <div class="service-category-card accordion-item" data-category="inspection">
+      <div class="accordion-header">
+        <div class="category-icon">📋</div>
+        <div>
+          <h3>Besiktning & Förberedelse</h3>
+          <p class="category-description">Vi förbereder din bil för att klara besiktningen</p>
+        </div>
+        <span class="accordion-arrow">▼</span>
+      </div>
+      <div class="accordion-content">
+      <div class="service-items">
+        <div class="service-item" data-service="pre-inspection">
+          <div class="service-item-header">
+            <h4>Förbered Besiktning</h4>
+            <span class="service-price">Från 1 000 kr</span>
+          </div>
+          <p>Grundlig kontroll innan besiktning så du slipper ogiltig besiktning. Vi går igenom alla kritiska punkter.</p>
+          <ul class="service-features">
+            <li>✓ Kontroll av belysning</li>
+            <li>✓ Bromsfunktion & handbromstester</li>
+            <li>✓ Hjulupphängning & styrning</li>
+            <li>✓ Däck & fälgar</li>
+            <li>✓ Avgassystem kontroll</li>
+            <li>✓ Byte av mindre glödlampor ingår</li>
+          </ul>
+          <div class="service-timing">⏱️ Tid: ca 45 minuter</div>
+        </div>
+        <div class="service-item" data-service="inspection-fix">
+          <div class="service-item-header">
+            <h4>Åtgärda Besiktningsanmärkningar</h4>
+            <span class="service-price">Pris efter offert</span>
+          </div>
+          <p>Fick du anmärkningar? Vi åtgärdar felen snabbt och professionellt så du kan återbesikta utan problem. Vi hanterar allt från enkla lampbyten till komplexa systemproblem.</p>
+          <ul class="service-features">
+            <li>✓ Byte av glödlampor & LED-enheter</li>
+            <li>✓ Justering av strålkastare</li>
+            <li>✓ Reparation av avgassystem</li>
+            <li>✓ Bromsrör & bromssystem</li>
+            <li>✓ ABS-system & varningslampor</li>
+            <li>✓ Airbag-lampor & säkerhetssystem</li>
+            <li>✓ Hjulinställning & styrning</li>
+            <li>✓ Hjulupphängning & drivknutar</li>
+          </ul>
+          <div class="service-timing">⏱️ Tid: varierar efter åtgärd</div>
+          <div style="margin-top:14px;padding:12px 16px;background:rgba(26,93,168,0.15);border:1px solid rgba(26,93,168,0.4);border-radius:8px;font-size:0.92rem;">
+            📞 <strong>Ring oss:</strong> <a href="tel:0737542220" style="color:#5b9bd5;">073-754 22 20</a> &nbsp;|&nbsp;
+            ✉️ <strong>Maila:</strong> <a href="mailto:foretag@primabilvard.com" style="color:#5b9bd5;">foretag@primabilvard.com</a>
+          </div>
+        </div>
+      </div>
+      </div>
+    </div>
+
+    <!-- Felsökning -->
+    <div class="service-category-card accordion-item" data-category="diagnostics">
+      <div class="accordion-header">
+        <div class="category-icon">🔍</div>
+        <div>
+          <h3>Felsökning & Diagnos</h3>
+          <p class="category-description">Avancerad diagnos för att hitta och åtgärda problem</p>
+        </div>
+        <span class="accordion-arrow">▼</span>
+      </div>
+      <div class="accordion-content">
+      <div class="service-items">
+        <div class="service-item" data-service="computer-diagnosis">
+          <div class="service-item-header">
+            <h4>Datordiagnos</h4>
+            <span class="service-price">Från 600 kr</span>
+          </div>
+          <p>Professionell avläsning av felkoder med avancerad diagnosutrustning. Vi ger dig en klar rapport.</p>
+          <ul class="service-features">
+            <li>✓ Avläsning av alla system</li>
+            <li>✓ Felbeskrivning på svenska</li>
+            <li>✓ Raderande av felkoder</li>
+            <li>✓ Skriftlig rapport</li>
+            <li>✓ Rekommendationer för åtgärd</li>
+          </ul>
+          <div class="service-timing">⏱️ Tid: ca 30 minuter</div>
+        </div>
+        <div class="service-item" data-service="electrical-diagnosis">
+          <div class="service-item-header">
+            <h4>Eldiagnos</h4>
+            <span class="service-price">Från 900 kr</span>
+          </div>
+          <p>Felsökning av elektriska problem – från batteritest till komplexa elsystem.</p>
+          <ul class="service-features">
+            <li>✓ Batteritest & laddningskontroll</li>
+            <li>✓ Kontroll av elsystem</li>
+            <li>✓ Säkringskontroll</li>
+            <li>✓ Strömförbrukningstest</li>
+            <li>✓ Lokalisering av elfel</li>
+          </ul>
+          <div class="service-timing">⏱️ Tid: ca 1 timme</div>
+        </div>
+        <div class="service-item" data-service="engine-diagnosis">
+          <div class="service-item-header">
+            <h4>Motordiagnos</h4>
+            <span class="service-price">Från 1 200 kr</span>
+          </div>
+          <p>Djupgående analys av motorns prestanda och eventuella problem.</p>
+          <ul class="service-features">
+            <li>✓ Kompressionstest</li>
+            <li>✓ Avgasgasanalys</li>
+            <li>✓ Provkörning & analys</li>
+            <li>✓ Kontroll av motormätare</li>
+            <li>✓ Rekommendation för åtgärd</li>
+          </ul>
+          <div class="service-timing">⏱️ Tid: ca 1,5 timmar</div>
+        </div>
+      </div>
+      </div>
+    </div>
+
+  </div>
+  
+  <div class="service-cta">
+    <h3>Redo att boka?</h3>
+    <p>Vi tar hand om din bil med professionalism och noggrannhet</p>
+    <p style="margin-top:10px;font-size:1rem;color:#5b9bd5;">✅ <strong>Garanti på allt vårt arbete</strong></p>
+    <button class="cta-button" onclick="document.getElementById('booking').scrollIntoView({behavior: 'smooth'});">Boka Nu</button>
+  </div>
   </div>
 </section>
 
-<!-- PORTFOLIO/GALLERY -->
-<section id="portfolio" class="portfolio">
-  <h2>Vårt Arbete</h2>
-  <p class="portfolio-subtitle">Se exempel på våra senaste projekt</p>
-  <div class="videos-grid">
-    <div class="video-card">
-      <div class="video-container">
-        <video controls autoplay muted loop preload="auto" playsinline>
-          <source src="video2.MOV" type="video/quicktime">
-          Din webbläsare stödjer inte videouppspelning.
-        </video>
-      </div>
-    </div>
-    <div class="video-card">
-      <div class="video-container">
-        <video controls autoplay muted loop preload="auto" playsinline>
-          <source src="video3.MOV" type="video/quicktime">
-          Din webbläsare stödjer inte videouppspelning.
-        </video>
-      </div>
-    </div>
-    <div class="video-card">
-      <div class="video-container">
-        <video controls autoplay muted loop preload="auto" playsinline>
-          <source src="video4.MOV" type="video/quicktime">
-          Din webbläsare stödjer inte videouppspelning.
-        </video>
-      </div>
-    </div>
-  </div>
-</section>
 
 <!-- BOOKING -->
 <section id="booking" class="booking">
   <div class="booking-header">
-    <h2>Boka Din Tid</h2>
+    <h2>Boka Din Tjänst</h2>
     <a href="tel:0737542220" class="phone-booking-btn">📞 Boka via Telefon</a>
   </div>
-  <div class="booking-container">
+  
+  <!-- Booking Wizard -->
+  <div class="booking-wizard">
+    <!-- Progress Steps -->
+    <div class="wizard-progress">
+      <div class="wizard-step active" data-step="1">
+        <div class="step-circle">1</div>
+        <div class="step-label">Välj Tjänst</div>
+      </div>
+      <div class="wizard-step" data-step="2">
+        <div class="step-circle">2</div>
+        <div class="step-label">Detaljer</div>
+      </div>
+      <div class="wizard-step" data-step="3">
+        <div class="step-circle">3</div>
+        <div class="step-label">Datum & Tid</div>
+      </div>
+      <div class="wizard-step" data-step="4">
+        <div class="step-circle">4</div>
+        <div class="step-label">Dina Uppgifter</div>
+      </div>
+      <div class="wizard-step" data-step="5">
+        <div class="step-circle">5</div>
+        <div class="step-label">Bekräfta</div>
+      </div>
+    </div>
+
+    <!-- Step Content -->
+    <div class="wizard-content">
+      
+      <!-- Step 1: Choose Service -->
+      <div class="wizard-panel active" data-panel="1">
+        <h3>Välj den tjänst du behöver</h3>
+        <div class="service-selector">
+          <div class="service-category-selector">
+            <button type="button" class="category-btn active" data-category="wash">🚗 Bilvård</button>
+            <button type="button" class="category-btn" data-category="service">🔧 Bilservice</button>
+          </div>
+          <!-- Inspection-fix contact panel (shown when inspection-fix is selected) -->
+          <div id="wizardInspectionFixPanel" style="display:none;margin-top:20px;padding:24px;background:rgba(26,93,168,0.12);border:1px solid rgba(26,93,168,0.4);border-radius:12px;">
+            <h4 style="margin:0 0 12px 0;color:#5b9bd5;">📋 Åtgärda Besiktningsanmärkningar</h4>
+            <p style="margin:0 0 16px 0;color:var(--text-secondary);">Denna tjänst kräver en individuell offert. Kontakta oss så hjälper vi dig snabbt!</p>
+            <div style="display:flex;flex-wrap:wrap;gap:12px;">
+              <a href="tel:0737542220" style="display:inline-flex;align-items:center;gap:8px;padding:12px 20px;background:#1a5da8;color:#fff;border-radius:10px;text-decoration:none;font-weight:600;">📞 Ring oss: 073-754 22 20</a>
+              <a href="mailto:foretag@primabilvard.com" style="display:inline-flex;align-items:center;gap:8px;padding:12px 20px;background:#0a3d78;color:#fff;border-radius:10px;text-decoration:none;font-weight:600;">✉️ foretag@primabilvard.com</a>
+            </div>
+          </div>
+          
+          <div class="service-options" id="serviceOptionsWash">
+            <div class="service-option" data-service="basic">
+              <div class="service-option-icon">💧</div>
+              <h4>Utvändig Handtvätt</h4>
+              <p>Snabb och effektiv utvändig tvätt</p>
+              <span class="service-option-price">Från 199 kr</span>
+            </div>
+            <div class="service-option" data-service="interior-wash">
+              <div class="service-option-icon">🧹</div>
+              <h4>Invändig Tvätt</h4>
+              <p>Djuprengöring av interiören</p>
+              <span class="service-option-price">Från 249 kr</span>
+            </div>
+            <div class="service-option" data-service="premium">
+              <div class="service-option-icon">✨</div>
+              <h4>Komplett In- & Utvändig</h4>
+              <p>Total rengöring in och ut</p>
+              <span class="service-option-price">Från 399 kr</span>
+            </div>
+            <div class="service-option" data-service="inout">
+              <div class="service-option-icon">🪑</div>
+              <h4>In- & Utvändig Med Säten</h4>
+              <p>Inkl. sätstädning</p>
+              <span class="service-option-price">Från 1000 kr</span>
+            </div>
+            <div class="service-option" data-service="interior">
+              <div class="service-option-icon">💎</div>
+              <h4>Hel Glans</h4>
+              <p>Premium rekonditionering</p>
+              <span class="service-option-price">Från 1500 kr</span>
+            </div>
+            <div class="service-option" data-service="full">
+              <div class="service-option-icon">👑</div>
+              <h4>Fullservice Rekond</h4>
+              <p>Exklusiv totalbehandling</p>
+              <span class="service-option-price">Från 2000 kr</span>
+            </div>
+          </div>
+
+          <div class="service-options" id="serviceOptionsService" style="display:none;">
+            <div class="service-option" data-service="tire-change">
+              <div class="service-option-icon">🛞</div>
+              <h4>Däckbyte</h4>
+              <p>Snabb däckmontering</p>
+              <span class="service-option-price">Från 500 kr</span>
+            </div>
+            <div class="service-option" data-service="tire-storage">
+              <div class="service-option-icon">📦</div>
+              <h4>Däckhotell</h4>
+              <p>Säker förvaring</p>
+              <span class="service-option-price">Från 750 kr/säsong</span>
+            </div>
+            <div class="service-option" data-service="tire-repair">
+              <div class="service-option-icon">🔧</div>
+              <h4>Däckreparation</h4>
+              <p>Lagning av punktering</p>
+              <span class="service-option-price">Från 200 kr</span>
+            </div>
+            <div class="service-option" data-service="basic-service">
+              <div class="service-option-icon">⚙️</div>
+              <h4>Basservice</h4>
+              <p>Oljebyte & kontroll</p>
+              <span class="service-option-price">Från 1800 kr</span>
+            </div>
+            <div class="service-option" data-service="major-service">
+              <div class="service-option-icon">🔩</div>
+              <h4>Storservice</h4>
+              <p>Komplett genomgång</p>
+              <span class="service-option-price">Från 3500 kr</span>
+            </div>
+            <div class="service-option" data-service="brake-service">
+              <div class="service-option-icon">🛑</div>
+              <h4>Bromsservice</h4>
+              <p>Bromsar & säkerhet</p>
+              <span class="service-option-price">Från 1200 kr</span>
+            </div>
+            <div class="service-option" data-service="pre-inspection">
+              <div class="service-option-icon">📋</div>
+              <h4>Förbered Besiktning</h4>
+              <p>Kontroll inför besiktning</p>
+              <span class="service-option-price">Från 1 000 kr</span>
+            </div>
+            <div class="service-option" data-service="computer-diagnosis">
+              <div class="service-option-icon">💻</div>
+              <h4>Datordiagnos</h4>
+              <p>Avläsning av felkoder</p>
+              <span class="service-option-price">Från 600 kr</span>
+            </div>
+            <div class="service-option" data-service="electrical-diagnosis">
+              <div class="service-option-icon">⚡</div>
+              <h4>Eldiagnos</h4>
+              <p>Elsystemkontroll</p>
+              <span class="service-option-price">Från 900 kr</span>
+            </div>
+            <div class="service-option" data-service="engine-diagnosis">
+              <div class="service-option-icon">🔍</div>
+              <h4>Motordiagnos</h4>
+              <p>Motoranalys</p>
+              <span class="service-option-price">Från 1200 kr</span>
+            </div>
+            <div class="service-option" data-service="inspection-fix">
+              <div class="service-option-icon">📋</div>
+              <h4>Åtgärda Besiktning</h4>
+              <p>Ring oss för offert</p>
+              <span class="service-option-price">Pris efter offert</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2: Details -->
+      <div class="wizard-panel" data-panel="2">
+        <h3>Ange detaljer för din bokning</h3>
+        <div class="wizard-form">
+          <div class="form-section" id="wizardSizeSection">
+            <label>Bilstorlek *</label>
+            <div class="size-selector">
+              <div class="size-option" data-size="small">
+                <div class="size-icon">🚗</div>
+                <div class="size-label">Liten</div>
+                <div class="size-examples">Polo, Yaris, Fiesta</div>
+              </div>
+              <div class="size-option" data-size="medium">
+                <div class="size-icon">🚙</div>
+                <div class="size-label">Mellan</div>
+                <div class="size-examples">Golf, Passat, V70</div>
+              </div>
+              <div class="size-option" data-size="large">
+                <div class="size-icon">🚐</div>
+                <div class="size-label">Stor</div>
+                <div class="size-examples">XC90, Caravelle, SUV</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section" id="wizardSeatAddon" style="display:none;">
+            <label>Tvätt av säten (tillval)</label>
+            <div class="addon-selector">
+              <div class="addon-option active" data-addon="none">
+                <span>Ingen</span>
+              </div>
+              <div class="addon-option" data-addon="2">
+                <span>2 säten</span>
+                <small>+399 kr</small>
+              </div>
+              <div class="addon-option" data-addon="5">
+                <span>5 säten</span>
+                <small>+699 kr</small>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section" id="wizardAsphaltAddon" style="display:none;">
+            <label>Asfaltrengöring (tillval)</label>
+            <div class="addon-selector">
+              <div class="addon-option active" data-addon="none">
+                <span>Ingen</span>
+              </div>
+              <div class="addon-option" data-addon="yes">
+                <span>Lägg till</span>
+                <small>+30 min</small>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <label for="wizardRegistration">Registreringsnummer *</label>
+            <input type="text" id="wizardRegistration" placeholder="ABC 123" required>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3: Date & Time -->
+      <div class="wizard-panel" data-panel="3">
+        <h3>Välj datum och tid</h3>
+        <div class="datetime-selector">
+          <div class="calendar-container">
+            <div class="calendar-header">
+              <button type="button" id="wizardPrevMonth" class="month-nav">&lt;</button>
+              <h3 id="wizardMonthYear"></h3>
+              <button type="button" id="wizardNextMonth" class="month-nav">&gt;</button>
+            </div>
+            <div class="calendar-weekdays">
+              <div class="weekday">Mån</div>
+              <div class="weekday">Tis</div>
+              <div class="weekday">Ons</div>
+              <div class="weekday">Tor</div>
+              <div class="weekday">Fre</div>
+              <div class="weekday">Lör</div>
+              <div class="weekday">Sön</div>
+            </div>
+            <div id="wizardCalendarDays" class="calendar-days"></div>
+          </div>
+
+          <div id="wizardTimesSection" class="times-section" style="display: none;">
+            <h4>Lediga Tider för <span id="wizardSelectedDate"></span></h4>
+            <div id="wizardTimeSlots" class="time-slots"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 4: Contact Info -->
+      <div class="wizard-panel" data-panel="4">
+        <h3>Dina kontaktuppgifter</h3>
+        <div class="wizard-form">
+          <div class="form-section">
+            <label for="wizardName">Namn *</label>
+            <input type="text" id="wizardName" placeholder="Ditt fullständiga namn" required>
+          </div>
+          <div class="form-section">
+            <label for="wizardPhone">Telefonnummer *</label>
+            <input type="tel" id="wizardPhone" placeholder="073-754 22 20" required>
+          </div>
+          <div class="form-section">
+            <label for="wizardEmail">E-post *</label>
+            <input type="email" id="wizardEmail" placeholder="din@email.se" required>
+          </div>
+          <!-- Hemhämtning (only shown for bilservice bookings) -->
+          <div class="form-section" id="wizardPickupSection" style="display:none;">
+            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
+              <input type="checkbox" id="wizardPickupCheckbox" style="width:18px;height:18px;cursor:pointer;">
+              <span>Hemhämtning av bilen 🚗 <small style="color:var(--text-secondary);">(vi hämtar bilen hos dig)</small></span>
+            </label>
+          </div>
+          <div class="form-section" id="wizardPickupAddressSection" style="display:none;">
+            <label for="wizardPickupAddress">Adress för hämtning *</label>
+            <input type="text" id="wizardPickupAddress" placeholder="Gatuadress, postnummer och stad">
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 5: Confirmation -->
+      <div class="wizard-panel" data-panel="5">
+        <h3>Bekräfta din bokning</h3>
+        <div class="booking-summary">
+          <div class="summary-section">
+            <h4>📋 Bokningsdetaljer</h4>
+            <div class="summary-row">
+              <span>Tjänst:</span>
+              <strong id="summaryService">-</strong>
+            </div>
+            <div class="summary-row">
+              <span>Bilstorlek:</span>
+              <strong id="summarySize">-</strong>
+            </div>
+            <div class="summary-row" id="summaryAddonRow" style="display:none;">
+              <span>Tillval:</span>
+              <strong id="summaryAddons">-</strong>
+            </div>
+            <div class="summary-row">
+              <span>Registreringsnummer:</span>
+              <strong id="summaryReg">-</strong>
+            </div>
+          </div>
+
+          <div class="summary-section">
+            <h4>📅 Datum & Tid</h4>
+            <div class="summary-row">
+              <span>Datum:</span>
+              <strong id="summaryDate">-</strong>
+            </div>
+            <div class="summary-row">
+              <span>Tid:</span>
+              <strong id="summaryTime">-</strong>
+            </div>
+            <div class="summary-row">
+              <span>Beräknad tid:</span>
+              <strong id="summaryDuration">-</strong>
+            </div>
+          </div>
+
+          <div class="summary-section">
+            <h4>👤 Kontakt</h4>
+            <div class="summary-row">
+              <span>Namn:</span>
+              <strong id="summaryName">-</strong>
+            </div>
+            <div class="summary-row">
+              <span>Telefon:</span>
+              <strong id="summaryPhone">-</strong>
+            </div>
+            <div class="summary-row">
+              <span>E-post:</span>
+              <strong id="summaryEmail">-</strong>
+            </div>
+          </div>
+
+          <div class="summary-section summary-total">
+            <div class="summary-row">
+              <span class="total-label">Totalt pris:</span>
+              <strong class="total-price" id="summaryTotal">-</strong>
+            </div>
+          </div>
+
+          <div id="wizardPaymentSection" class="payment-section"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation Buttons -->
+    <div class="wizard-navigation">
+      <button type="button" class="wizard-btn wizard-btn-secondary" id="wizardPrevBtn" style="display:none;">← Tillbaka</button>
+      <button type="button" class="wizard-btn wizard-btn-primary" id="wizardNextBtn">Nästa →</button>
+      <button type="button" class="wizard-btn wizard-btn-success" id="wizardSubmitBtn" style="display:none;">Betala & Bekräfta</button>
+    </div>
+  </div>
+
+  <!-- Old Form (Hidden, kept for compatibility) -->
+  <div class="booking-container" style="display:none;">
     <div class="booking-form-section">
       <h2>Boka Din Tid</h2>
       <form id="bookingForm" class="booking-form">
@@ -200,12 +815,33 @@
           <label for="service">Välj Tjänst</label>
           <select id="service" required>
             <option value="">-- Välj tjänst --</option>
-            <option value="basic">Utvändig Handtvätt</option>
-            <option value="interior-wash">Invändig Tvätt</option>
-            <option value="premium">Komplett In- & Utvändig Tvätt</option>
-            <option value="inout">In- & Utvändig Tvätt Med Sätten</option>
-            <option value="interior">HelGlans</option>
-            <option value="full">Fullservice Rekond</option>
+            <optgroup label="🚗 Bilvård">
+              <option value="basic">Utvändig Handtvätt</option>
+              <option value="interior-wash">Invändig Tvätt</option>
+              <option value="premium">Komplett In- & Utvändig Tvätt</option>
+              <option value="inout">In- & Utvändig Tvätt Med Sätten</option>
+              <option value="interior">HelGlans</option>
+              <option value="full">Fullservice Rekond</option>
+            </optgroup>
+            <optgroup label="🛞 Däckservice">
+              <option value="tire-change">Däckbyte</option>
+              <option value="tire-storage">Däckhotell</option>
+              <option value="tire-repair">Däckreparation</option>
+            </optgroup>
+            <optgroup label="⚙️ Fullservice">
+              <option value="basic-service">Basservice</option>
+              <option value="major-service">Storservice</option>
+              <option value="brake-service">Bromsservice</option>
+            </optgroup>
+            <optgroup label="📋 Besiktning">
+              <option value="pre-inspection">Förbered Besiktning</option>
+              <option value="inspection-fix">Åtgärda Besiktningsanmärkningar</option>
+            </optgroup>
+            <optgroup label="🔍 Felsökning & Diagnos">
+              <option value="computer-diagnosis">Datordiagnos</option>
+              <option value="electrical-diagnosis">Eldiagnos</option>
+              <option value="engine-diagnosis">Motordiagnos</option>
+            </optgroup>
           </select>
         </div>
 
@@ -297,6 +933,10 @@
       <p><strong>Telefon:</strong> 073-754 22 20</p>
     </div>
     <div class="contact-item">
+      <span class="icon">✉️</span>
+      <p><strong>E-post:</strong> <a href="mailto:foretag@primabilvard.com" style="color:inherit;">foretag@primabilvard.com</a></p>
+    </div>
+    <div class="contact-item">
       <span class="icon">📍</span>
       <p><strong>Adress:</strong> Karlsgatan 21, 291 95 Kristianstad</p>
     </div>
@@ -327,119 +967,301 @@
 </div>
 
 <!-- OWNER / ADMIN VIEW (hidden by default, client-side PIN protects access) -->
-<section id="ownerSection" class="owner-section" style="display: none; max-width:1200px; margin:40px auto; padding:20px;">
-  <div class="owner-header" style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
-    <h2>Bokningar (Ägare)</h2>
-    <div style="display:flex;gap:10px;">
-      <button id="exportBtn" class="submit-btn" style="padding:10px 16px;">Exportera CSV</button>
-      <button id="clearBtn" class="submit-btn" style="background:#aa3333;border-color:#ffdddd;padding:10px 16px;">Rensa alla</button>
-      <button id="closeOwnerBtn" class="submit-btn" style="background:#444;border-color:#666;padding:10px 16px;">Stäng</button>
+<section id="ownerSection" class="owner-section" style="display: none; max-width:1400px; margin:40px auto; padding:20px;">
+  <div style="background:linear-gradient(135deg, #1a5da8 0%, #0a3d78 100%);border-radius:16px;padding:30px;margin-bottom:30px;box-shadow:0 8px 32px rgba(0,0,0,0.3);">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:20px;">
+      <div>
+        <h2 style="margin:0 0 8px 0;color:#ffffff;font-size:2.2rem;font-weight:800;">📊 Admin Dashboard</h2>
+        <p style="margin:0;color:#b8d4f1;font-size:1rem;">Hantera bokningar, kalender och inställningar</p>
+      </div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;">
+        <button id="exportBtn" class="submit-btn" style="padding:12px 20px;background:#ffffff;color:#1a5da8;border:none;font-weight:600;box-shadow:0 4px 12px rgba(0,0,0,0.2);">📥 Exportera</button>
+        <button id="clearBtn" class="submit-btn" style="padding:12px 20px;background:#dc3545;border:none;font-weight:600;box-shadow:0 4px 12px rgba(0,0,0,0.2);">🗑️ Rensa</button>
+        <button id="closeOwnerBtn" class="submit-btn" style="padding:12px 20px;background:rgba(0,0,0,0.3);border:none;font-weight:600;box-shadow:0 4px 12px rgba(0,0,0,0.2);">✕ Stäng</button>
+      </div>
     </div>
   </div>
 
-  <div style="margin-top:18px;padding:14px;border:1px solid var(--border);border-radius:10px;background:var(--bg-secondary);">
-    <h3 style="margin:0 0 10px 0;color:var(--text-primary);font-size:1.05rem;">Lägg till manuell bokning (telefon/IRL)</h3>
-    <p style="margin:0 0 12px 0;color:var(--text-secondary);font-size:0.9rem;">Använd detta när du tar emot bokning via telefon eller på plats.</p>
+  <div style="background:#0f0f0f;border-radius:16px;padding:30px;margin-bottom:30px;border:1px solid var(--border);box-shadow:0 4px 20px rgba(0,0,0,0.2);">
+    <h3 style="margin:0 0 10px 0;color:var(--text-primary);font-size:1.5rem;font-weight:700;">➕ Lägg till manuell bokning</h3>
+    <p style="margin:0 0 20px 0;color:var(--text-secondary);font-size:0.95rem;">För telefon- eller personliga bokningar</p>
+    <form id="ownerManualBookingForm" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;">
+      <input id="ownerName" type="text" placeholder="Namn *" style="padding:12px 16px;border-radius:10px;border:2px solid var(--border);background:#1a1a1a;color:var(--text-primary);font-size:0.95rem;" required />
+      <input id="ownerPhone" type="text" placeholder="Telefon *" style="padding:12px 16px;border-radius:10px;border:2px solid var(--border);background:#1a1a1a;color:var(--text-primary);font-size:0.95rem;" required />
+      <input id="ownerEmail" type="email" placeholder="E-post (valfritt)" style="padding:12px 16px;border-radius:10px;border:2px solid var(--border);background:#1a1a1a;color:var(--text-primary);font-size:0.95rem;" />
+      <input id="ownerReg" type="text" placeholder="Reg.nr (valfritt)" style="padding:12px 16px;border-radius:10px;border:2px solid var(--border);background:#1a1a1a;color:var(--text-primary);font-size:0.95rem;" />
 
-    <form id="ownerManualBookingForm" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px;">
-      <input id="ownerName" type="text" placeholder="Namn *" style="padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:#0f0f0f;color:var(--text-primary);" required />
-      <input id="ownerPhone" type="text" placeholder="Telefon *" style="padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:#0f0f0f;color:var(--text-primary);" required />
-      <input id="ownerEmail" type="email" placeholder="E-post (valfritt)" style="padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:#0f0f0f;color:var(--text-primary);" />
-      <input id="ownerReg" type="text" placeholder="Reg.nr (valfritt)" style="padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:#0f0f0f;color:var(--text-primary);" />
-
-      <select id="ownerService" style="padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:#0f0f0f;color:var(--text-primary);" required>
-        <option value="">Tjänst *</option>
-        <option value="basic">Utvändig Handtvätt</option>
-        <option value="interior-wash">Invändig Tvätt</option>
-        <option value="premium">Komplett In- & Utvändig Tvätt</option>
-        <option value="inout">In- & Utvändig Tvätt Med Sätten</option>
-        <option value="interior">Hel Glans</option>
-        <option value="full">Fullservice Rekond</option>
+      <select id="ownerService" style="padding:12px 16px;border-radius:10px;border:2px solid var(--border);background:#1a1a1a;color:var(--text-primary);font-size:0.95rem;font-weight:600;cursor:pointer;" required>
+        <option value="">Välj Tjänst *</option>
+        <optgroup label="🚗 Bilvård">
+          <option value="basic">Utvändig Handtvätt</option>
+          <option value="interior-wash">Invändig Tvätt</option>
+          <option value="premium">Komplett In- &amp; Utvändig Tvätt</option>
+          <option value="inout">In- &amp; Utvändig Tvätt Med Sätten</option>
+          <option value="interior">Hel Glans</option>
+          <option value="full">Fullservice Rekond</option>
+        </optgroup>
+        <optgroup label="🛞 Däckservice">
+          <option value="tire-change">Däckbyte</option>
+          <option value="tire-storage">Däckhotell</option>
+          <option value="tire-repair">Däckreparation</option>
+        </optgroup>
+        <optgroup label="⚙️ Fullservice">
+          <option value="basic-service">Basservice</option>
+          <option value="major-service">Storservice</option>
+          <option value="brake-service">Bromsservice</option>
+        </optgroup>
+        <optgroup label="📋 Besiktning">
+          <option value="pre-inspection">Förbered Besiktning</option>
+          <option value="inspection-fix">Åtgärda Besiktningsanmärkningar</option>
+        </optgroup>
+        <optgroup label="🔍 Felsökning">
+          <option value="computer-diagnosis">Datordiagnos</option>
+          <option value="electrical-diagnosis">Eldiagnos</option>
+          <option value="engine-diagnosis">Motordiagnos</option>
+          <option value="ac-service">AC-Service</option>
+        </optgroup>
       </select>
 
-      <select id="ownerSize" style="padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:#0f0f0f;color:var(--text-primary);" required>
+      <select id="ownerSize" style="padding:12px 16px;border-radius:10px;border:2px solid var(--border);background:#1a1a1a;color:var(--text-primary);font-size:0.95rem;font-weight:600;cursor:pointer;" required>
         <option value="">Storlek *</option>
         <option value="small">Liten</option>
         <option value="medium">Mellan</option>
         <option value="large">Stor</option>
       </select>
 
-      <input id="ownerDate" type="date" style="padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:#0f0f0f;color:var(--text-primary);" required />
-      <input id="ownerTime" type="time" step="1800" style="padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:#0f0f0f;color:var(--text-primary);" required />
+      <input id="ownerDate" type="date" style="padding:12px 16px;border-radius:10px;border:2px solid var(--border);background:#1a1a1a;color:var(--text-primary);font-size:0.95rem;" required />
+      <input id="ownerTime" type="time" step="1800" style="padding:12px 16px;border-radius:10px;border:2px solid var(--border);background:#1a1a1a;color:var(--text-primary);font-size:0.95rem;" required />
 
-      <input id="ownerPrice" type="number" min="0" step="1" placeholder="Pris (valfritt)" style="padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:#0f0f0f;color:var(--text-primary);" />
-      <select id="ownerPaymentStatus" style="padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:#0f0f0f;color:var(--text-primary);">
-        <option value="Manuell (Telefon)">Manuell (Telefon)</option>
-        <option value="Paid">Paid</option>
-        <option value="Pending">Pending</option>
+      <input id="ownerPrice" type="number" min="0" step="1" placeholder="Pris (valfritt)" style="padding:12px 16px;border-radius:10px;border:2px solid var(--border);background:#1a1a1a;color:var(--text-primary);font-size:0.95rem;" />
+      <select id="ownerPaymentStatus" style="padding:12px 16px;border-radius:10px;border:2px solid var(--border);background:#1a1a1a;color:var(--text-primary);font-size:0.95rem;font-weight:600;cursor:pointer;">
+        <option value="Manuell (Telefon)">📞 Manuell</option>
+        <option value="Paid">✅ Betald</option>
+        <option value="Pending">⏳ Väntande</option>
       </select>
 
-      <button type="submit" class="submit-btn" style="grid-column:1/-1;width:auto;margin:0;padding:10px 14px;">Spara manuell bokning</button>
+      <button type="submit" class="submit-btn" style="grid-column:1/-1;padding:14px 20px;font-size:1rem;font-weight:700;background:linear-gradient(135deg, #1a5da8, #0a3d78);border:none;border-radius:10px;">💾 Spara Bokning</button>
     </form>
+  </div>
 
-    <hr style="margin:14px 0;border:none;border-top:1px solid var(--border);" />
-
-    <h3 style="margin:0 0 10px 0;color:var(--text-primary);font-size:1.05rem;">Kalender: Blockera datum</h3>
-    <p style="margin:0 0 12px 0;color:var(--text-secondary);font-size:0.9rem;">Välj ett datum för att göra det otillgängligt i bokningskalendern.</p>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
-      <input type="date" id="blockDateInput" style="padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:#0f0f0f;color:var(--text-primary);" />
-      <button id="addBlockedDateBtn" class="submit-btn" style="width:auto;margin:0;padding:10px 14px;">Blockera datum</button>
-      <button id="removeBlockedDateBtn" class="submit-btn" style="width:auto;margin:0;padding:10px 14px;background:#444;border-color:#666;">Ta bort blockering</button>
+  <div style="background:#0f0f0f;border-radius:16px;padding:30px;margin-bottom:30px;border:1px solid var(--border);box-shadow:0 4px 20px rgba(0,0,0,0.2);">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:15px;">
+      <h3 onclick="(function(){var c=document.getElementById('bookingsContent');var i=document.getElementById('bookingsChevron');var open=c.style.maxHeight!=='0px';c.style.maxHeight=open?'0px':'3000px';c.style.opacity=open?'0':'1';i.style.transform=open?'rotate(-90deg)':'rotate(0deg)';})()" style="margin:0;color:var(--text-primary);font-size:1.6rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:10px;user-select:none;">
+        <span id="bookingsChevron" style="display:inline-block;transition:transform 0.3s;">▼</span>
+        📋 Bokningar
+      </h3>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;">
+        <select id="bookingTypeFilter" style="padding:10px 16px;border-radius:10px;border:2px solid var(--border);background:#1a1a1a;color:var(--text-primary);font-weight:600;cursor:pointer;">
+          <option value="all">📦 Alla Bokningar</option>
+          <option value="wash">🧼 Endast Tvätt</option>
+          <option value="service">🔧 Endast Service</option>
+        </select>
+        <select id="bookingStatusFilter" style="padding:10px 16px;border-radius:10px;border:2px solid var(--border);background:#1a1a1a;color:var(--text-primary);font-weight:600;cursor:pointer;">
+          <option value="all">Alla Status</option>
+          <option value="Paid">✅ Betalda</option>
+          <option value="Pending">⏳ Väntande</option>
+          <option value="Manuell (Telefon)">📞 Manuella</option>
+        </select>
+      </div>
     </div>
-    <div style="margin-top:10px;">
-      <strong style="color:var(--text-secondary);font-size:0.9rem;">Blockerade datum:</strong>
-      <ul id="blockedDatesList" style="margin:8px 0 0 18px;color:var(--text-primary);"></ul>
-    </div>
-
-    <hr style="margin:14px 0;border:none;border-top:1px solid var(--border);" />
-
-    <h3 style="margin:0 0 10px 0;color:var(--text-primary);font-size:1.05rem;">Kalender: Blockera tider</h3>
-    <p style="margin:0 0 12px 0;color:var(--text-secondary);font-size:0.9rem;">Välj datum och tid för att göra just den tiden otillgänglig.</p>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
-      <input type="date" id="blockTimeDateInput" style="padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:#0f0f0f;color:var(--text-primary);" />
-      <input type="time" id="blockTimeInput" step="1800" style="padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:#0f0f0f;color:var(--text-primary);" />
-      <button id="addBlockedTimeBtn" class="submit-btn" style="width:auto;margin:0;padding:10px 14px;">Blockera tid</button>
-      <button id="removeBlockedTimeBtn" class="submit-btn" style="width:auto;margin:0;padding:10px 14px;background:#444;border-color:#666;">Ta bort tidsblockering</button>
-    </div>
-    <div style="margin-top:10px;">
-      <strong style="color:var(--text-secondary);font-size:0.9rem;">Blockerade tider:</strong>
-      <ul id="blockedTimesList" style="margin:8px 0 0 18px;color:var(--text-primary);"></ul>
+    <div id="bookingsContent" style="overflow:hidden;max-height:3000px;opacity:1;transition:max-height 0.4s ease,opacity 0.3s ease;margin-top:20px;">
+      <div style="overflow-x:auto;border-radius:12px;border:1px solid var(--border);">
+        <table id="bookingsTable" style="width:100%;border-collapse:collapse;background:var(--bg-secondary);">
+          <thead>
+            <tr style="background:#0a0a0a;">
+              <th style="padding:14px;border-bottom:2px solid var(--border);color:var(--text-primary);font-weight:700;text-align:left;">Namn</th>
+              <th style="padding:14px;border-bottom:2px solid var(--border);color:var(--text-primary);font-weight:700;text-align:left;">E-post</th>
+              <th style="padding:14px;border-bottom:2px solid var(--border);color:var(--text-primary);font-weight:700;text-align:left;">Telefon</th>
+              <th style="padding:14px;border-bottom:2px solid var(--border);color:var(--text-primary);font-weight:700;text-align:left;">Reg.nr</th>
+              <th style="padding:14px;border-bottom:2px solid var(--border);color:var(--text-primary);font-weight:700;text-align:left;">Tjänst</th>
+              <th style="padding:14px;border-bottom:2px solid var(--border);color:var(--text-primary);font-weight:700;text-align:left;">Storlek</th>
+              <th style="padding:14px;border-bottom:2px solid var(--border);color:var(--text-primary);font-weight:700;text-align:left;">Datum</th>
+              <th style="padding:14px;border-bottom:2px solid var(--border);color:var(--text-primary);font-weight:700;text-align:left;">Tid</th>
+              <th style="padding:14px;border-bottom:2px solid var(--border);color:var(--text-primary);font-weight:700;text-align:left;">Betalning</th>
+              <th style="padding:14px;border-bottom:2px solid var(--border);color:var(--text-primary);font-weight:700;text-align:left;">Hemhämtning</th>
+              <th style="padding:14px;border-bottom:2px solid var(--border);color:var(--text-primary);font-weight:700;text-align:center;">Åtgärder</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
     </div>
   </div>
 
-  <div style="margin-top:20px;">
-    <table id="bookingsTable" style="width:100%;border-collapse:collapse;background:var(--bg-secondary);border:2px solid var(--border);">
-      <thead>
-        <tr style="text-align:left;color:var(--text-secondary);">
-          <th style="padding:10px;border-bottom:1px solid var(--border);">Namn</th>
-          <th style="padding:10px;border-bottom:1px solid var(--border);">E-post</th>
-          <th style="padding:10px;border-bottom:1px solid var(--border);">Telefon</th>
-          <th style="padding:10px;border-bottom:1px solid var(--border);">Reg.nr</th>
-          <th style="padding:10px;border-bottom:1px solid var(--border);">Tjänst</th>
-          <th style="padding:10px;border-bottom:1px solid var(--border);">Storlek</th>
-          <th style="padding:10px;border-bottom:1px solid var(--border);">Datum</th>
-          <th style="padding:10px;border-bottom:1px solid var(--border);">Tid</th>
-          <th style="padding:10px;border-bottom:1px solid var(--border);">Betalning</th>
-          <th style="padding:10px;border-bottom:1px solid var(--border);">Åtgärder</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
+  <!-- Kalenderhantering -->
+  <div style="background:#0f0f0f;border-radius:16px;padding:30px;margin-bottom:30px;border:1px solid var(--border);box-shadow:0 4px 20px rgba(0,0,0,0.2);">
+    <h3 style="margin:0 0 20px 0;color:var(--text-primary);font-size:1.5rem;font-weight:700;">📅 Kalenderhantering</h3>
+    
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:25px;">
+      <!-- Blockera Datum -->
+      <div style="padding:20px;background:#1a1a1a;border-radius:12px;border:1px solid var(--border);">
+        <h4 style="margin:0 0 12px 0;color:var(--text-primary);font-size:1.1rem;font-weight:700;">🚫 Blockera Datum</h4>
+        <p style="margin:0 0 15px 0;color:var(--text-secondary);font-size:0.9rem;">Gör hela dagar otillgängliga</p>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <input type="date" id="blockDateInput" style="padding:12px;border-radius:8px;border:2px solid var(--border);background:#0f0f0f;color:var(--text-primary);font-size:0.95rem;" />
+          <div style="display:flex;gap:8px;">
+            <button id="addBlockedDateBtn" class="submit-btn" style="flex:1;padding:10px;font-size:0.9rem;font-weight:600;">✓ Blockera</button>
+            <button id="removeBlockedDateBtn" class="submit-btn" style="flex:1;padding:10px;background:#dc3545;border:none;font-size:0.9rem;font-weight:600;">✕ Ta bort</button>
+          </div>
+        </div>
+        <div style="margin-top:15px;padding:12px;background:#0f0f0f;border-radius:8px;max-height:150px;overflow-y:auto;">
+          <strong style="color:var(--text-secondary);font-size:0.9rem;">Blockerade:</strong>
+          <ul id="blockedDatesList" style="margin:8px 0 0 18px;color:var(--text-primary);font-size:0.9rem;"></ul>
+        </div>
+      </div>
+
+      <!-- Blockera Tider -->
+      <div style="padding:20px;background:#1a1a1a;border-radius:12px;border:1px solid var(--border);">
+        <h4 style="margin:0 0 12px 0;color:var(--text-primary);font-size:1.1rem;font-weight:700;">⏰ Blockera Tider</h4>
+        <p style="margin:0 0 15px 0;color:var(--text-secondary);font-size:0.9rem;">Gör specifika tider otillgängliga</p>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <input type="date" id="blockTimeDateInput" style="padding:12px;border-radius:8px;border:2px solid var(--border);background:#0f0f0f;color:var(--text-primary);font-size:0.95rem;" />
+          <input type="time" id="blockTimeInput" step="1800" style="padding:12px;border-radius:8px;border:2px solid var(--border);background:#0f0f0f;color:var(--text-primary);font-size:0.95rem;" />
+          <div style="display:flex;gap:8px;">
+            <button id="addBlockedTimeBtn" class="submit-btn" style="flex:1;padding:10px;font-size:0.9rem;font-weight:600;">✓ Blockera</button>
+            <button id="removeBlockedTimeBtn" class="submit-btn" style="flex:1;padding:10px;background:#dc3545;border:none;font-size:0.9rem;font-weight:600;">✕ Ta bort</button>
+          </div>
+        </div>
+        <div style="margin-top:15px;padding:12px;background:#0f0f0f;border-radius:8px;max-height:150px;overflow-y:auto;">
+          <strong style="color:var(--text-secondary);font-size:0.9rem;">Blockerade:</strong>
+          <ul id="blockedTimesList" style="margin:8px 0 0 18px;color:var(--text-primary);font-size:0.9rem;"></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Annonsinställningar (Collapsible) -->
+  <div style="background:#0f0f0f;border-radius:16px;padding:30px;border:1px solid var(--border);box-shadow:0 4px 20px rgba(0,0,0,0.2);">
+    <h3 style="margin:0 0 10px 0;color:var(--text-primary);font-size:1.5rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:10px;user-select:none;" onclick="const content = this.nextElementSibling; content.style.display = content.style.display === 'none' ? 'block' : 'none'; this.querySelector('.collapse-icon').textContent = this.querySelector('.collapse-icon').textContent === '▼' ? '▶' : '▼';">
+      <span class="collapse-icon">▼</span>
+      📢 Annonsinställningar
+    </h3>
+    <div style="display:block;">
+    <p style="margin:0 0 20px 0;color:var(--text-secondary);font-size:0.95rem;">Skapa och hantera pop-up annonser</p>
+    
+    <div style="display:grid;grid-template-columns:1fr;gap:12px;">
+      <label style="display:flex;align-items:center;gap:8px;color:var(--text-primary);">
+        <input type="checkbox" id="ownerAdEnabled" style="width:16px;height:16px;cursor:pointer;" />
+        <span>Aktivera annons</span>
+      </label>
+
+      <!-- ENKELT LÄGE -->
+      <div style="padding:12px;border:1px solid var(--border);border-radius:8px;background:var(--bg-secondary);">
+        <h4 style="margin:0 0 10px 0;color:var(--text-primary);font-size:0.95rem;cursor:pointer;display:flex;align-items:center;gap:6px;" onclick="this.parentElement.querySelector('.content').style.display = this.parentElement.querySelector('.content').style.display === 'none' ? 'block' : 'none'; this.querySelector('.icon').textContent = this.querySelector('.icon').textContent === '▼' ? '▶' : '▼';">
+          <span class="icon">▼</span>📸 Enkelt läge (Bild + Text)
+        </h4>
+        <div class="content" style="display:block;">
+        
+        <div style="margin-bottom:12px;">
+          <label for="ownerAdImage" style="display:block;margin-bottom:6px;color:var(--text-primary);font-weight:500;font-size:0.9rem;">Dra in bild här eller klicka:</label>
+          <div id="imageDropZone" style="border:2px dashed var(--border);border-radius:8px;padding:20px;text-align:center;background:#0a0a0a;cursor:pointer;transition:all 0.2s;">
+            <p style="margin:0;color:var(--text-secondary);font-size:0.9rem;">📁 Dra bild hit eller klicka för att välja</p>
+            <input type="file" id="ownerAdImage" accept="image/*" style="display:none;" />
+            <div id="imagePreview" style="margin-top:10px;"></div>
+          </div>
+        </div>
+
+        <div style="margin-bottom:12px;">
+          <label for="ownerAdText" style="display:block;margin-bottom:6px;color:var(--text-primary);font-weight:500;font-size:0.9rem;">Annons text (valfritt):</label>
+          <textarea id="ownerAdText" placeholder="Skriv din annonse text här..." style="width:100%;height:80px;padding:10px;border-radius:8px;border:1px solid var(--border);background:#0f0f0f;color:var(--text-primary);font-family:inherit;font-size:0.9rem;resize:vertical;"></textarea>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+          <div>
+            <label for="ownerAdService" style="display:block;margin-bottom:6px;color:var(--text-primary);font-weight:500;font-size:0.9rem;">Tjänst (valfritt):</label>
+            <select id="ownerAdService" style="width:100%;padding:10px;border-radius:8px;border:1px solid var(--border);background:#0f0f0f;color:var(--text-primary);">
+              <option value="">Ingen tjänst</option>
+              <option value="basic">Utvändig Handtvätt</option>
+              <option value="interior-wash">Invändig Tvätt</option>
+              <option value="premium">Komplett In- & Utvändig</option>
+              <option value="inout">In- & Utvändig Med Sätten</option>
+              <option value="interior">Hel Glans</option>
+              <option value="full">Fullservice Rekond</option>
+            </select>
+          </div>
+          <div>
+            <label for="ownerAdCurrentPrice" style="display:block;margin-bottom:6px;color:var(--text-primary);font-weight:500;font-size:0.9rem;">Pris nu (kr):</label>
+            <input type="number" id="ownerAdCurrentPrice" placeholder="299" style="width:100%;padding:10px;border-radius:8px;border:1px solid var(--border);background:#0f0f0f;color:var(--text-primary);" />
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+          <div>
+            <label for="ownerAdOldPrice" style="display:block;margin-bottom:6px;color:var(--text-primary);font-weight:500;font-size:0.9rem;">Ordinarie pris (kr):</label>
+            <input type="number" id="ownerAdOldPrice" placeholder="499" style="width:100%;padding:10px;border-radius:8px;border:1px solid var(--border);background:#0f0f0f;color:var(--text-primary);" />
+          </div>
+          <div>
+            <label for="ownerAdButtonText" style="display:block;margin-bottom:6px;color:var(--text-primary);font-weight:500;font-size:0.9rem;">Knapp text:</label>
+            <input type="text" id="ownerAdButtonText" placeholder="Boka nu" value="Boka nu" style="width:100%;padding:10px;border-radius:8px;border:1px solid var(--border);background:#0f0f0f;color:var(--text-primary);" />
+          </div>
+        </div>
+
+        <button id="generateAdBtn" class="submit-btn" style="width:100%;margin:0;padding:10px 14px;background:#5a7aff;border-color:#7d99ff;">🎨 Skapa annons från bild + text</button>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div>
+          <label for="ownerAdMaxPerDay" style="display:block;margin-bottom:6px;color:var(--text-primary);font-weight:500;font-size:0.95rem;">Max gånger per dag:</label>
+          <input type="number" id="ownerAdMaxPerDay" min="1" value="1" style="width:100%;padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:#0f0f0f;color:var(--text-primary);" />
+        </div>
+        <div style="display:flex;align-items:flex-end;">
+          <label style="display:flex;align-items:center;gap:8px;color:var(--text-primary);width:100%;">
+            <input type="checkbox" id="ownerAdShowOnLoad" style="width:16px;height:16px;cursor:pointer;" />
+            <span>Visa vid sidladdning</span>
+          </label>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button id="saveAdConfigBtn" class="submit-btn" style="width:auto;margin:0;padding:10px 14px;">💾 Spara annons</button>
+        <button id="showAdNowBtn" class="submit-btn" style="width:auto;margin:0;padding:10px 14px;background:#4a7c4e;border-color:#7dcc7d;">👁️ Förhandsgranska</button>
+      </div>
+    </div>
+    </div>
   </div>
 </section>
 
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 <script src="firebase-config.js?v=4"></script>
-<script src="script.js?v=14"></script>
+<script src="script.js?v=102"></script>
 <script>
-  (function() {
-    const ownerBtn = document.getElementById('ownerPageLink');
-    if (!ownerBtn) return;
+(function() {
+  const KEY = 'pb_owner_auth';
+  const FIVE_HOURS = 5 * 60 * 60 * 1000;
+
+  // Expose helpers so script.js can call them
+  window.ownerSession = {
+    set: function() {
+      localStorage.setItem(KEY, JSON.stringify({ ts: Date.now() }));
+    },
+    clear: function() {
+      localStorage.removeItem(KEY);
+    },
+    isValid: function() {
+      try {
+        var d = JSON.parse(localStorage.getItem(KEY));
+        if (!d || !d.ts) return false;
+        if (Date.now() - d.ts > FIVE_HOURS) {
+          localStorage.removeItem(KEY);
+          return false;
+        }
+        // Refresh timestamp on valid check
+        localStorage.setItem(KEY, JSON.stringify({ ts: Date.now() }));
+        return true;
+      } catch(e) { return false; }
+    }
+  };
+
+  // Redirect owner link to owner.html
+  var ownerBtn = document.getElementById('ownerPageLink');
+  if (ownerBtn) {
     ownerBtn.addEventListener('click', function() {
       window.location.href = 'owner.html?v=6';
     });
-  })();
+  }
+})();
 </script>
 </body>
 </html>
