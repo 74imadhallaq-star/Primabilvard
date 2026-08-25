@@ -66,7 +66,15 @@ function isOwnerTemporarilyLocked() {
 }
 
 function isOwnerAuthenticated() {
-  return Date.now() < ownerAccessState.authenticatedUntil;
+  // Check in-memory session (same page visit)
+  if (Date.now() < ownerAccessState.authenticatedUntil) return true;
+  // Check persisted 5-hour localStorage session (survives refresh)
+  if (window.ownerSession && window.ownerSession.isValid()) {
+    // Restore in-memory state too
+    ownerAccessState.authenticatedUntil = Date.now() + OWNER_ACCESS_CONFIG.authSessionMs;
+    return true;
+  }
+  return false;
 }
 
 function timingSafeEqual(a, b) {
@@ -153,7 +161,19 @@ const DEFAULT_SERVICE_DURATIONS = {
   'premium': 100,
   'inout': 240,
   'interior': 180,
-  'full': 210
+  'full': 210,
+  // Car service durations
+  'tire-change': 30,
+  'tire-storage': 15,
+  'tire-repair': 20,
+  'basic-service': 60,
+  'major-service': 150,
+  'brake-service': 90,
+  'pre-inspection': 45,
+  'inspection-fix': 60,
+  'computer-diagnosis': 30,
+  'electrical-diagnosis': 60,
+  'engine-diagnosis': 90
 };
 let serviceDurations = { ...DEFAULT_SERVICE_DURATIONS };
 
@@ -163,8 +183,23 @@ const SERVICE_LABELS = {
   'premium': 'Komplett In- & Utvändig Tvätt',
   'inout': 'In- & Utvändig Tvätt Med Sätten',
   'interior': 'Hel Glans',
-  'full': 'Fullservice Rekond'
+  'full': 'Fullservice Rekond',
+  // Car service labels
+  'tire-change': 'Däckbyte',
+  'tire-storage': 'Däckhotell',
+  'tire-repair': 'Däckreparation',
+  'basic-service': 'Basservice',
+  'major-service': 'Storservice',
+  'brake-service': 'Bromsservice',
+  'pre-inspection': 'Förbered Besiktning',
+  'inspection-fix': 'Åtgärda Besiktningsanmärkningar',
+  'computer-diagnosis': 'Datordiagnos',
+  'electrical-diagnosis': 'Eldiagnos',
+  'engine-diagnosis': 'Motordiagnos'
 };
+
+// Global list of bilservice (non-wash) services
+const SERVICE_SERVICES = ['tire-change', 'tire-storage', 'tire-repair', 'basic-service', 'major-service', 'brake-service', 'pre-inspection', 'inspection-fix', 'computer-diagnosis', 'electrical-diagnosis', 'engine-diagnosis'];
 
 const SEAT_ADDON_OPTIONS = {
   none: { label: 'Ingen', price: 0, minutes: 0 },
@@ -974,7 +1009,19 @@ const servicePrices = {
   'premium': { small: 399, medium: 449, large: 479 },
   'inout': { small: 1000, medium: 1300, large: 1500 },
   'interior': { small: 1500, medium: 1700, large: 1900 },
-  'full': { small: 2000, medium: 2300, large: 2600 }
+  'full': { small: 2000, medium: 2300, large: 2600 },
+  // Car service prices (fixed prices, not size-dependent but we use 'small' for consistency)
+  'tire-change': { small: 500, medium: 500, large: 500 },
+  'tire-storage': { small: 750, medium: 750, large: 750 },
+  'tire-repair': { small: 200, medium: 200, large: 200 },
+  'basic-service': { small: 1800, medium: 1800, large: 1800 },
+  'major-service': { small: 3500, medium: 3500, large: 3500 },
+  'brake-service': { small: 1200, medium: 1200, large: 1200 },
+  'pre-inspection': { small: 1000, medium: 1000, large: 1000 },
+  'inspection-fix': { small: 0, medium: 0, large: 0 }, // Custom quote
+  'computer-diagnosis': { small: 600, medium: 600, large: 600 },
+  'electrical-diagnosis': { small: 900, medium: 900, large: 900 },
+  'engine-diagnosis': { small: 1200, medium: 1200, large: 1200 }
 };
 
 // Stripe Payment Links per kombination (lägg till fler länkar här)
@@ -1056,7 +1103,18 @@ const STRIPE_PAYMENT_LINKS = {
     // Fullservice Rekond - Stor + 2-Säten
   'full|large|2|none': 'https://buy.stripe.com/dRmeVf9fy0o4fSFeOHasg0z',
   // Fullservice Rekond - Stor + 5-Säten
-  'full|large|5|none': 'https://buy.stripe.com/00wdRb9fy7QwaylbCvasg0A'
+  'full|large|5|none': 'https://buy.stripe.com/00wdRb9fy7QwaylbCvasg0A',
+  // Verkstadstjänster har ett fast Stripe-pris oavsett bilstorlek.
+  'tire-change|any|none|none': 'https://buy.stripe.com/4gM7sN9fyeeU21PcGzasg0E',
+  'tire-storage|any|none|none': 'https://buy.stripe.com/5kQ4gB77q5Io6i57mfasg0F',
+  'tire-repair|any|none|none': 'https://buy.stripe.com/8x29AV3Ve3Ag5e1eOHasg0G',
+  'basic-service|any|none|none': 'https://buy.stripe.com/4gM6oJbnGgn2bCp7mfasg0H',
+  'major-service|any|none|none': 'https://buy.stripe.com/dRmeVf77qdaQ6i5cGzasg0I',
+  'brake-service|any|none|none': 'https://buy.stripe.com/bJe8wRajC1s8gWJ7mfasg0J',
+  'pre-inspection|any|none|none': 'https://buy.stripe.com/aFadRbbnG3AgbCp5e7asg0K',
+  'computer-diagnosis|any|none|none': 'https://buy.stripe.com/3cI7sNbnG6Ms7m97mfasg0L',
+  'electrical-diagnosis|any|none|none': 'https://buy.stripe.com/6oU9AVajCfiY49XcGzasg0M',
+  'engine-diagnosis|any|none|none': 'https://buy.stripe.com/bJe3cx8bueeUdKxcGzasg0N'
 };
 
 function buildStripeLinkKey(service, size, seatAddonType, asphaltAddonType) {
@@ -1064,9 +1122,17 @@ function buildStripeLinkKey(service, size, seatAddonType, asphaltAddonType) {
 }
 
 function getStripePaymentLink(service, size, seatAddonType, asphaltAddonType) {
-  if (!service || !size) return null;
+  if (!service) return null;
+  const fixedPriceKey = buildStripeLinkKey(service, 'any', 'none', 'none');
+  if (!size) return STRIPE_PAYMENT_LINKS[fixedPriceKey] || null;
   const key = buildStripeLinkKey(service, size, seatAddonType, asphaltAddonType);
-  return STRIPE_PAYMENT_LINKS[key] || null;
+  return STRIPE_PAYMENT_LINKS[key] || STRIPE_PAYMENT_LINKS[fixedPriceKey] || null;
+}
+
+function getStripeCheckoutUrl(paymentLink, bookingId) {
+  const checkoutUrl = new URL(paymentLink);
+  checkoutUrl.searchParams.set('client_reference_id', String(bookingId));
+  return checkoutUrl.toString();
 }
 
 function updateStripePayButton() {
@@ -1251,13 +1317,14 @@ if (bookingForm) bookingForm.addEventListener('submit', async function(e) {
   try {
     await savePendingBooking(booking);
     setPendingBookingCookie(booking.id);
+    sessionStorage.setItem('pendingBooking', JSON.stringify(booking));
   } catch (err) {
     console.error('Pending booking save error:', err);
     alert('Kunde inte starta betalningen just nu. Försök igen om en stund.');
     return;
   }
 
-  window.location.href = paymentLink;
+  window.location.href = getStripeCheckoutUrl(paymentLink, booking.id);
 });
 
 // ===== BOOKING STORAGE & OWNER VIEW HELPERS =====
@@ -1309,7 +1376,7 @@ async function loadBookingsFromFirebase() {
     return;
   }
   try {
-    const snapshot = await window.db.collection('bookings').get();
+    const snapshot = await window.db.collection('availability').get();
     cachedBookings = snapshot.docs.map(doc => doc.data());
     cachedBookings.sort((a, b) => (b.sortKey || 0) - (a.sortKey || 0));
     writeLocalArray(LOCAL_STORAGE_KEYS.bookings, cachedBookings);
@@ -1340,33 +1407,74 @@ async function deleteBooking(id) {
 function renderBookingsTable(serverBookings) {
   const tbody = document.querySelector('#bookingsTable tbody');
   if (!tbody) return;
+  
   const bookings = Array.isArray(serverBookings) ? serverBookings : loadBookings();
+  
+  // Get filter values
+  const typeFilter = document.getElementById('bookingTypeFilter')?.value || 'all';
+  const statusFilter = document.getElementById('bookingStatusFilter')?.value || 'all';
+  
+  // Define wash and service categories
+  const washServices = ['basic', 'interior-wash', 'premium', 'inout', 'interior', 'full'];
+  const serviceServices = ['tire-change', 'tire-storage', 'tire-repair', 'basic-service', 'major-service', 'brake-service', 'pre-inspection', 'inspection-fix', 'computer-diagnosis', 'electrical-diagnosis', 'engine-diagnosis'];
+  
+  // Filter bookings
+  let filteredBookings = bookings.filter(b => {
+    // Type filter
+    if (typeFilter === 'wash' && !washServices.includes(b.service)) return false;
+    if (typeFilter === 'service' && !serviceServices.includes(b.service)) return false;
+    
+    // Status filter
+    if (statusFilter !== 'all' && b.paymentStatus !== statusFilter) return false;
+    
+    return true;
+  });
+  
   tbody.innerHTML = '';
-  if (!bookings.length) {
-    tbody.innerHTML = '<tr><td colspan="10" style="padding:12px;color:var(--text-secondary);">Inga bokningar</td></tr>';
+  if (!filteredBookings.length) {
+    tbody.innerHTML = '<tr><td colspan="10" style="padding:20px;text-align:center;color:var(--text-secondary);">Inga bokningar matchar filtret</td></tr>';
     return;
   }
 
-  bookings.forEach(b => {
+  filteredBookings.forEach(b => {
     const tr = document.createElement('tr');
+    tr.style.transition = 'all 0.2s ease';
     tr.innerHTML = `
-      <td style="padding:10px;border-bottom:1px solid var(--border);color:var(--text-primary);">${escapeHtml(b.name)}</td>
-      <td style="padding:10px;border-bottom:1px solid var(--border);color:var(--text-primary);">${escapeHtml(b.email || '-')}</td>
-      <td style="padding:10px;border-bottom:1px solid var(--border);color:var(--text-primary);">${escapeHtml(b.phone)}</td>
-      <td style="padding:10px;border-bottom:1px solid var(--border);color:var(--text-primary);">${escapeHtml(b.registration || '-')}</td>
-      <td style="padding:10px;border-bottom:1px solid var(--border);color:var(--text-primary);">${escapeHtml(getServiceLabel(b.service, b.seatAddon, b.asphaltAddon))}</td>
-      <td style="padding:10px;border-bottom:1px solid var(--border);color:var(--text-primary);">${escapeHtml(b.size || '-')}</td>
-      <td style="padding:10px;border-bottom:1px solid var(--border);color:var(--text-primary);">${escapeHtml(b.date)}</td>
-      <td style="padding:10px;border-bottom:1px solid var(--border);color:var(--text-primary);">${escapeHtml(b.time)}</td>
-      <td style="padding:10px;border-bottom:1px solid var(--border);color:var(--text-primary);"><span style="background:#3d3d00;padding:4px 8px;border-radius:4px;font-size:0.85rem;">${escapeHtml(b.paymentStatus || 'Pending')} - ${b.price ? b.price + ' kr' : '-'}</span></td>
-      <td style="padding:10px;border-bottom:1px solid var(--border);"><button class="delete-btn" data-id="${b.id}" style="background:#aa3333;padding:6px 10px;border-radius:6px;border:none;color:#fff;cursor:pointer;">Ta bort</button></td>
+      <td style="padding:12px;border-bottom:1px solid var(--border);color:var(--text-primary);">${escapeHtml(b.name)}</td>
+      <td style="padding:12px;border-bottom:1px solid var(--border);color:var(--text-primary);">${escapeHtml(b.email || '-')}</td>
+      <td style="padding:12px;border-bottom:1px solid var(--border);color:var(--text-primary);">${escapeHtml(b.phone)}</td>
+      <td style="padding:12px;border-bottom:1px solid var(--border);color:var(--text-primary);">${escapeHtml(b.registration || '-')}</td>
+      <td style="padding:12px;border-bottom:1px solid var(--border);color:var(--text-primary);">${escapeHtml(getServiceLabel(b.service, b.seatAddon, b.asphaltAddon))}</td>
+      <td style="padding:12px;border-bottom:1px solid var(--border);color:var(--text-primary);">${escapeHtml(b.size || '-')}</td>
+      <td style="padding:12px;border-bottom:1px solid var(--border);color:var(--text-primary);">${escapeHtml(b.date)}</td>
+      <td style="padding:12px;border-bottom:1px solid var(--border);color:var(--text-primary);">${escapeHtml(b.time)}</td>
+      <td style="padding:12px;border-bottom:1px solid var(--border);color:var(--text-primary);"><span style="background:${getStatusColor(b.paymentStatus)};padding:6px 12px;border-radius:6px;font-size:0.85rem;font-weight:600;">${escapeHtml(b.paymentStatus || 'Pending')} - ${b.price ? b.price + ' kr' : '-'}</span></td>
+      <td style="padding:12px;border-bottom:1px solid var(--border);color:var(--text-primary);">${escapeHtml(b.pickup ? ('🚗 ' + (b.pickupAddress || '-')) : '-')}</td>
+      <td style="padding:12px;border-bottom:1px solid var(--border);text-align:center;"><button class="delete-btn" data-id="${b.id}" style="background:#dc3545;padding:8px 14px;border-radius:8px;border:none;color:#fff;cursor:pointer;font-weight:600;transition:all 0.2s;">🗑️ Ta bort</button></td>
     `;
     tbody.appendChild(tr);
   });
 
   tbody.querySelectorAll('.delete-btn').forEach(btn => {
     btn.addEventListener('click', () => deleteBooking(btn.dataset.id));
+    btn.addEventListener('mouseenter', (e) => {
+      e.target.style.background = '#c82333';
+      e.target.style.transform = 'scale(1.05)';
+    });
+    btn.addEventListener('mouseleave', (e) => {
+      e.target.style.background = '#dc3545';
+      e.target.style.transform = 'scale(1)';
+    });
   });
+}
+
+function getStatusColor(status) {
+  switch(status) {
+    case 'Paid': return '#28a745';
+    case 'Pending': return '#ffc107';
+    case 'Manuell (Telefon)': return '#17a2b8';
+    default: return '#6c757d';
+  }
 }
 
 function exportCSV() {
@@ -1401,6 +1509,588 @@ function getServiceLabel(service, seatAddonType = 'none', asphaltAddonType = 'no
   return extras.length ? `${base} + ${extras.join(' + ')}` : base;
 }
 
+// ===== AD CONFIGURATION FUNCTIONS =====
+let adConfig = {
+  enabled: false,
+  html: '',
+  maxPerDay: 1,
+  showOnLoad: false
+};
+
+const LOCAL_STORAGE_KEYS_AD = {
+  adConfig: 'primabilvard_adConfig',
+  adStats: 'primabilvard_adStats'
+};
+
+function getTodayKey() {
+  const now = new Date();
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+}
+
+function readAdConfigLocal() {
+  try {
+    const stored = localStorage.getItem(LOCAL_STORAGE_KEYS_AD.adConfig);
+    return stored ? JSON.parse(stored) : null;
+  } catch (e) {
+    console.error('Error reading ad config from localStorage:', e);
+    return null;
+  }
+}
+
+function writeAdConfigLocal(config) {
+  try {
+    localStorage.setItem(LOCAL_STORAGE_KEYS_AD.adConfig, JSON.stringify(config));
+  } catch (e) {
+    console.error('Error writing ad config to localStorage:', e);
+  }
+}
+
+function readAdStats() {
+  try {
+    const stored = localStorage.getItem(LOCAL_STORAGE_KEYS_AD.adStats);
+    return stored ? JSON.parse(stored) : {};
+  } catch (e) {
+    console.error('Error reading ad stats from localStorage:', e);
+    return {};
+  }
+}
+
+function writeAdStats(stats) {
+  try {
+    localStorage.setItem(LOCAL_STORAGE_KEYS_AD.adStats, JSON.stringify(stats));
+  } catch (e) {
+    console.error('Error writing ad stats to localStorage:', e);
+  }
+}
+
+function getAdCountToday() {
+  const stats = readAdStats();
+  const todayKey = getTodayKey();
+  return stats[todayKey] || 0;
+}
+
+function incrementAdCount() {
+  const stats = readAdStats();
+  const todayKey = getTodayKey();
+  stats[todayKey] = (stats[todayKey] || 0) + 1;
+  writeAdStats(stats);
+  return stats[todayKey];
+}
+
+function shouldShowAdOnLoad() {
+  if (!adConfig.enabled || !adConfig.html) return false;
+  if (!adConfig.showOnLoad) return false;
+  const count = getAdCountToday();
+  return count < adConfig.maxPerDay;
+}
+
+async function loadAdConfigFromFirebase() {
+  try {
+    if (canUseFirestore() && window.db) {
+      const doc = await window.db.collection('settings').doc('adConfig').get();
+      if (doc.exists) {
+        adConfig = { ...adConfig, ...doc.data() };
+        writeAdConfigLocal(adConfig);
+        updateAdConfigUI();
+        return;
+      }
+    }
+  } catch (e) {
+    console.error('Error loading ad config from Firebase:', e);
+  }
+  // Fallback to localStorage
+  const local = readAdConfigLocal();
+  if (local) {
+    adConfig = { ...adConfig, ...local };
+    updateAdConfigUI();
+  }
+}
+
+async function saveAdConfigToFirebase() {
+  writeAdConfigLocal(adConfig);
+  try {
+    if (canUseFirestore() && window.db) {
+      await window.db.collection('settings').doc('adConfig').set(adConfig, { merge: true });
+    }
+  } catch (e) {
+    console.error('Error saving ad config to Firebase:', e);
+  }
+}
+
+function updateAdConfigUI() {
+  const htmlField = document.getElementById('ownerAdHtml');
+  const enabledCheck = document.getElementById('ownerAdEnabled');
+  const maxPerDayField = document.getElementById('ownerAdMaxPerDay');
+  const showOnLoadCheck = document.getElementById('ownerAdShowOnLoad');
+
+  if (htmlField) htmlField.value = adConfig.html || '';
+  if (enabledCheck) enabledCheck.checked = adConfig.enabled;
+  if (maxPerDayField) maxPerDayField.value = adConfig.maxPerDay || 1;
+  if (showOnLoadCheck) showOnLoadCheck.checked = adConfig.showOnLoad;
+}
+
+function showAdPopup(html, isPreview = false) {
+  if (!html) return;
+
+  if (!isPreview) {
+    const count = incrementAdCount();
+    if (count > adConfig.maxPerDay) {
+      console.log('Ad daily quota reached');
+      return;
+    }
+  }
+
+  // Create overlay
+  const overlay = document.createElement('div');
+  overlay.className = 'ad-popup-overlay';
+  
+  // Create card
+  const card = document.createElement('div');
+  card.className = 'ad-popup-card';
+  
+  // Close button
+  const closeBtn = document.createElement('button');
+  closeBtn.className = 'ad-popup-close';
+  closeBtn.innerHTML = '&times;';
+  closeBtn.addEventListener('click', () => overlay.remove());
+  
+  // Content
+  const body = document.createElement('div');
+  body.className = 'ad-popup-body';
+  body.innerHTML = html;
+  
+  card.appendChild(closeBtn);
+  card.appendChild(body);
+  overlay.appendChild(card);
+  
+  // Close on background click
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) overlay.remove();
+  });
+  
+  document.body.appendChild(overlay);
+}
+
+function ensureAdStyles() {
+  if (document.getElementById('ad-popup-styles')) return;
+  
+  const style = document.createElement('style');
+  style.id = 'ad-popup-styles';
+  style.textContent = `
+    .ad-popup-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.75);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+      animation: fadeIn 0.25s ease-out;
+      padding: 20px;
+      backdrop-filter: blur(2px);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .ad-popup-card {
+      position: relative;
+      width: 100%;
+      max-width: 300px;
+      height: auto;
+      overflow: hidden;
+      animation: bounceIn 0.5s ease-out;
+      display: flex;
+      flex-direction: column;
+    }
+
+    @keyframes bounceIn {
+      0% {
+        opacity: 0;
+        transform: scale(0.3) translateY(30px);
+      }
+      50% {
+        transform: scale(1.05);
+      }
+      70% {
+        transform: scale(0.95);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    .ad-popup-image-wrapper {
+      position: relative;
+      width: 100%;
+      margin-bottom: 0;
+      perspective: 1000px;
+    }
+
+    .ad-popup-body img {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 12px 12px 0 0;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 40px rgba(90, 122, 255, 0.2);
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .ad-popup-content-wrapper {
+      background: linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%);
+      padding: 16px 14px;
+      border-radius: 0 0 12px 12px;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .ad-popup-body {
+      color: #1a1a1a;
+      margin: 0;
+      padding: 0;
+    }
+
+    .ad-popup-body h1,
+    .ad-popup-body h2,
+    .ad-popup-body h3 {
+      margin: 0 0 10px 0;
+      font-size: 1.3rem;
+      color: #000;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .ad-popup-body p {
+      margin: 0 0 12px 0;
+      line-height: 1.6;
+      font-size: 0.95rem;
+      color: #666;
+    }
+
+    .ad-popup-body a {
+      color: #5a7aff;
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.2s;
+    }
+
+    .ad-popup-body a:hover {
+      color: #3d5aff;
+      text-decoration: underline;
+    }
+
+    .ad-popup-body button {
+      background: linear-gradient(135deg, #2f2f2f 0%, #1a1a1a 100%);
+      color: white;
+      border: none;
+      padding: 14px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      margin-top: 16px;
+      transition: all 0.3s;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      letter-spacing: 0.5px;
+      width: 100%;
+    }
+
+    .ad-popup-body button:hover {
+      background: linear-gradient(135deg, #5a7aff 0%, #3d5aff 100%);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 35px rgba(90, 122, 255, 0.5);
+    }
+
+    .ad-popup-body button:active {
+      transform: translateY(-2px);
+    }
+
+    .ad-popup-price-section {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid #e0e0e0;
+    }
+
+    .ad-popup-price-current {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #2f2f2f;
+      margin: 8px 0;
+    }
+
+    .ad-popup-price-old {
+      color: #999;
+      text-decoration: line-through;
+      font-size: 0.95rem;
+      margin-top: 4px;
+    }
+
+    .ad-popup-discount {
+      color: #d32f2f;
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin-top: 8px;
+    }
+
+    .ad-popup-close {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: rgba(90, 122, 255, 0.9);
+      backdrop-filter: blur(10px);
+      border: 2px solid white;
+      color: #fff;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      font-size: 24px;
+      cursor: pointer;
+      z-index: 10002;
+      transition: all 0.25s ease;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      box-shadow: 0 4px 15px rgba(90, 122, 255, 0.3);
+    }
+
+    .ad-popup-close:hover {
+      background: rgba(90, 122, 255, 1);
+      transform: scale(1.15) rotate(90deg);
+      box-shadow: 0 8px 25px rgba(90, 122, 255, 0.5);
+    }
+  `;
+  document.head.appendChild(style);
+}
+
+function renderAdConfigControls() {
+  const saveBtn = document.getElementById('saveAdConfigBtn');
+  const showBtn = document.getElementById('showAdNowBtn');
+  const generateBtn = document.getElementById('generateAdBtn');
+  const htmlField = document.getElementById('ownerAdHtml');
+  const enabledCheck = document.getElementById('ownerAdEnabled');
+  const maxPerDayField = document.getElementById('ownerAdMaxPerDay');
+  const showOnLoadCheck = document.getElementById('ownerAdShowOnLoad');
+  const imageInput = document.getElementById('ownerAdImage');
+  const imageDropZone = document.getElementById('imageDropZone');
+  const textField = document.getElementById('ownerAdText');
+
+  updateAdConfigUI();
+
+  // Image upload handler
+  if (imageInput) {
+    imageInput.addEventListener('change', handleImageUpload);
+  }
+
+  // Drag and drop handler
+  if (imageDropZone) {
+    imageDropZone.addEventListener('click', () => imageInput?.click());
+    
+    imageDropZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      imageDropZone.style.background = '#1a1a1a';
+      imageDropZone.style.borderColor = 'var(--text-primary)';
+    });
+    
+    imageDropZone.addEventListener('dragleave', () => {
+      imageDropZone.style.background = '#0a0a0a';
+      imageDropZone.style.borderColor = 'var(--border)';
+    });
+    
+    imageDropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      imageDropZone.style.background = '#0a0a0a';
+      imageDropZone.style.borderColor = 'var(--border)';
+      const files = e.dataTransfer.files;
+      if (files.length > 0) {
+        imageInput.files = files;
+        handleImageUpload();
+      }
+    });
+  }
+
+  // Generate button
+  if (generateBtn) {
+    generateBtn.addEventListener('click', generateAdFromImageAndText);
+  }
+
+  if (saveBtn) {
+    saveBtn.addEventListener('click', async function() {
+      // adConfig.html är redan satt av generateAdFromImageAndText()
+      adConfig.enabled = enabledCheck ? enabledCheck.checked : false;
+      adConfig.maxPerDay = maxPerDayField ? parseInt(maxPerDayField.value, 10) || 1 : 1;
+      adConfig.showOnLoad = showOnLoadCheck ? showOnLoadCheck.checked : false;
+      
+      await saveAdConfigToFirebase();
+      alert('Annons inställningar sparade!');
+    });
+  }
+
+  if (showBtn) {
+    showBtn.addEventListener('click', function() {
+      const currentHtml = adConfig.html || '';
+      
+      console.log('Preview clicked. HTML:', currentHtml);
+      
+      if (!currentHtml) {
+        alert('Skapa en annons från bild och text först');
+        return;
+      }
+      showAdPopup(currentHtml, true);
+    });
+  }
+}
+
+function handleImageUpload() {
+  const imageInput = document.getElementById('ownerAdImage');
+  const imagePreview = document.getElementById('imagePreview');
+  const file = imageInput?.files?.[0];
+  
+  if (!file) return;
+  
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    window.currentAdImageData = e.target.result;
+    
+    if (imagePreview) {
+      imagePreview.innerHTML = `
+        <img src="${e.target.result}" style="max-width:100%;max-height:150px;border-radius:6px;" alt="Preview" />
+        <p style="margin:8px 0 0 0;color:var(--text-primary);font-size:0.85rem;">✓ Bild laddat</p>
+      `;
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+function generateAdFromImageAndText() {
+  const imageData = window.currentAdImageData;
+  const textField = document.getElementById('ownerAdText');
+  const serviceField = document.getElementById('ownerAdService');
+  const currentPriceField = document.getElementById('ownerAdCurrentPrice');
+  const oldPriceField = document.getElementById('ownerAdOldPrice');
+  const buttonTextField = document.getElementById('ownerAdButtonText');
+  
+  const textContent = textField ? textField.value.trim() : '';
+  const service = serviceField ? serviceField.value : '';
+  const currentPrice = currentPriceField ? parseInt(currentPriceField.value, 10) : 0;
+  const oldPrice = oldPriceField ? parseInt(oldPriceField.value, 10) : 0;
+  const buttonText = buttonTextField ? buttonTextField.value.trim() : 'Boka nu';
+  
+  // Get service name from dropdown
+  let serviceName = '';
+  if (service && serviceField) {
+    const selectedOption = serviceField.querySelector(`option[value="${service}"]`);
+    serviceName = selectedOption ? selectedOption.textContent : '';
+  }
+  
+  if (!imageData && !textContent) {
+    alert('Ladda upp en bild eller skriv text först');
+    return;
+  }
+  
+  let html = '';
+  
+  if (imageData) {
+    html += `<img src="${imageData}" alt="Annons" style="max-width:100%;height:auto;border-radius:8px;margin-bottom:16px;" />`;
+  }
+  
+  // Lägg till tjänstnamn om det finns
+  if (serviceName) {
+    html += `<div style="margin:0 0 8px 0;padding:12px 12px;background:#1a1a1a;border:2px solid #5a7aff;border-radius:8px;"><h3 style="margin:0;color:#ffffff;font-size:0.95rem;font-weight:700;">${escapeHtmlForAd(serviceName)}</h3></div>`;
+  }
+  
+  // Lägg till pris och text tillsammans om det finns pris
+  if (currentPrice > 0) {
+    let priceTextHtml = `<div style="margin:0 0 0 0;padding:12px;background:#1a1a1a;border:2px solid #5a7aff;border-radius:8px;">`;
+    
+    // Pris
+    priceTextHtml += `<div style="display:flex;align-items:baseline;gap:8px;margin-bottom:${textContent ? '8px' : '0'};">`;
+    priceTextHtml += `<span style="font-size:1.6rem;font-weight:700;color:#4caf50;">${currentPrice} kr</span>`;
+    
+    if (oldPrice > currentPrice) {
+      const discount = Math.round(((oldPrice - currentPrice) / oldPrice) * 100);
+      priceTextHtml += `<span style="font-size:0.85rem;color:#d32f2f;text-decoration:line-through;font-weight:700;">${oldPrice}</span>`;
+      priceTextHtml += `<span style="background:#d32f2f;color:white;padding:2px 6px;border-radius:4px;font-size:0.7rem;font-weight:700;margin-left:auto;">-${discount}%</span>`;
+    }
+    priceTextHtml += `</div>`;
+    
+    // Text under priset
+    if (textContent) {
+      priceTextHtml += `<p style="margin:0;color:#ffffff;line-height:1.4;font-size:0.85rem;">${escapeHtmlForAd(textContent)}</p>`;
+    }
+    
+    priceTextHtml += `</div>`;
+    html += priceTextHtml;
+  }
+  
+  // Lägg till knapp om det finns tjänst
+  if (service) {
+    html += `<button onclick="window.location.href='index.html?service=${encodeURIComponent(service)}';" style="width:100%;cursor:pointer;background:linear-gradient(135deg, #5a7aff 0%, #3d5aff 100%);color:white;border:none;padding:12px 16px;border-radius:6px;font-weight:700;font-size:0.9rem;text-transform:uppercase;margin-top:12px;transition:all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);box-shadow:0 6px 20px rgba(90, 122, 255, 0.35);letter-spacing:0.5px;">🛒 ${escapeHtmlForAd(buttonText)}</button>`;
+  }
+  
+  const htmlField = document.getElementById('ownerAdHtml');
+  if (htmlField) {
+    htmlField.value = html;
+  }
+  
+  adConfig.html = html;
+  alert('✓ Annons skapad! Du kan nu spara eller förhandsgranska den.');
+}
+
+function escapeHtmlForAd(text) {
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/\n/g, '<br>');
+}
+
+function scrollToBookingAndSelectService(service) {
+  // Stäng eventuell popup
+  const overlay = document.querySelector('.ad-popup-overlay');
+  if (overlay) overlay.remove();
+  
+  // Scrolla till booking sektion
+  const bookingSection = document.getElementById('booking');
+  if (bookingSection) {
+    bookingSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+  
+  // Väl tjänsten automatiskt
+  const serviceCards = document.querySelectorAll('.service-card');
+  serviceCards.forEach(card => {
+    const dataService = card.getAttribute('data-service');
+    if (dataService === service) {
+      card.style.border = '3px solid #5a7aff';
+      card.style.boxShadow = '0 0 20px rgba(90, 122, 255, 0.5)';
+      
+      // Setta den som selected
+      window.selectedService = service;
+      window.selectedSize = card.querySelector('.card-size')?.value;
+      
+      // Scroll till service kort
+      setTimeout(() => {
+        card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 300);
+    } else {
+      card.style.border = '';
+      card.style.boxShadow = '';
+    }
+  });
+}
+
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', async function() {
   document.body.classList.remove('owner-login-active');
@@ -1411,6 +2101,21 @@ document.addEventListener('DOMContentLoaded', async function() {
 
   // Reset scroll to top
   window.scrollTo(0, 0);
+  
+  // Check if service is specified in URL parameter and pre-select it
+  const urlParams = new URLSearchParams(window.location.search);
+  const serviceParam = urlParams.get('service');
+  if (serviceParam) {
+    const serviceSelect = document.getElementById('service');
+    if (serviceSelect) {
+      serviceSelect.value = serviceParam;
+      // Scroll to booking section
+      setTimeout(() => {
+        document.getElementById('booking').scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    }
+  }
+  
   // Load bookings + blocked dates from Firebase so calendar availability is correct
   await loadBookingsFromFirebase();
   await loadBlockedDatesFromFirebase();
@@ -1504,6 +2209,8 @@ document.addEventListener('DOMContentLoaded', async function() {
       if (isValid) {
         ownerAccessState.failedAttempts = 0;
         ownerAccessState.authenticatedUntil = Date.now() + OWNER_ACCESS_CONFIG.authSessionMs;
+        // Persist session so refresh doesn't log out (expires after 5 hours)
+        if (window.ownerSession) window.ownerSession.set();
 
         alert('✓ Inloggning lyckad!');
 
@@ -1722,26 +2429,688 @@ document.addEventListener('DOMContentLoaded', async function() {
         writeLocalArray(LOCAL_STORAGE_KEYS.bookings, cachedBookings);
         renderBookingsTable();
         alert('Bokningar rensade');
-        return;
+      } else {
+        try {
+          const snapshot = await db.collection('bookings').get();
+          const batch = db.batch();
+          snapshot.docs.forEach(doc => batch.delete(doc.ref));
+          await batch.commit();
+          cachedBookings = [];
+          renderBookingsTable();
+          alert('Bokningar rensade');
+        } catch (e) {
+          console.error('Firebase clear error:', e);
+        }
       }
-      try {
-        const batch = window.db.batch();
-        const snapshot = await window.db.collection('bookings').get();
-        snapshot.docs.forEach(doc => batch.delete(doc.ref));
-        await batch.commit();
-        cachedBookings = [];
-        writeLocalArray(LOCAL_STORAGE_KEYS.bookings, cachedBookings);
-      } catch (e) {
-        console.error('Firebase clear error:', e);
-      }
-      renderBookingsTable();
-      alert('Bokningar rensade');
     }
   });
+
+  // Booking filters event listeners
+  const bookingTypeFilter = document.getElementById('bookingTypeFilter');
+  const bookingStatusFilter = document.getElementById('bookingStatusFilter');
+  
+  if (bookingTypeFilter) {
+    bookingTypeFilter.addEventListener('change', () => {
+      renderBookingsTable();
+    });
+  }
+  
+  if (bookingStatusFilter) {
+    bookingStatusFilter.addEventListener('change', () => {
+      renderBookingsTable();
+    });
+  }
 
   const closeOwnerBtn = document.getElementById('closeOwnerBtn');
   if (closeOwnerBtn) closeOwnerBtn.addEventListener('click', function() {
     const ownerSection = document.getElementById('ownerSection');
     if (ownerSection) ownerSection.style.display = 'none';
+    // Clear persisted session on explicit logout
+    if (window.ownerSession) window.ownerSession.clear();
+    ownerAccessState.authenticatedUntil = 0;
   });
+
+  // ===== AD CONFIGURATION SYSTEM =====
+  ensureAdStyles();
+  await loadAdConfigFromFirebase();
+  renderAdConfigControls();
+  if (shouldShowAdOnLoad()) {
+    showAdPopup(adConfig.html);
+  }
+
+  // ===== CAR SERVICE INTERACTIONS =====
+  // Handle both service-item (old cards) and service-card clicks
+  document.querySelectorAll('.service-item, .service-card').forEach(item => {
+    const serviceName = item.dataset.service;
+    
+    item.addEventListener('click', () => {
+      console.log('Service clicked:', serviceName);
+      
+      // Set service in wizard data
+      wizardData.service = serviceName;
+      
+      // Find and click the corresponding service option in wizard
+      const wizardServiceOption = document.querySelector(`.service-option[data-service="${serviceName}"]`);
+      if (wizardServiceOption) {
+        // Remove selected from all options
+        document.querySelectorAll('.service-option').forEach(opt => opt.classList.remove('selected'));
+        // Select this one
+        wizardServiceOption.classList.add('selected');
+        console.log('Wizard service selected:', serviceName);
+      }
+      
+      // Show toast notification
+      const toast = document.createElement('div');
+      toast.textContent = `✓ ${SERVICE_LABELS[serviceName] || serviceName} vald`;
+      toast.style.cssText = `
+        position: fixed;
+        top: 100px;
+        right: 20px;
+        background: linear-gradient(135deg, var(--primary), var(--accent));
+        color: white;
+        padding: 15px 25px;
+        border-radius: 10px;
+        font-weight: 600;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        z-index: 10000;
+        animation: slideInRight 0.3s ease, slideOutRight 0.3s ease 2.7s;
+      `;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 3000);
+      
+      // Scroll to wizard booking section
+      const wizardSection = document.querySelector('.booking-wizard');
+      if (wizardSection) {
+        setTimeout(() => {
+          wizardSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 300);
+      }
+    });
+
+    // Add hover effect enhancement
+    item.addEventListener('mouseenter', () => {
+      item.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+    });
+  });
+
+  // ===== TABS FUNCTIONALITY =====
+  const tabButtons = document.querySelectorAll('.tab-btn');
+  const tabContents = document.querySelectorAll('.tab-content');
+
+  function switchTab(targetTab) {
+    // Remove active class from all buttons and contents
+    tabButtons.forEach(btn => btn.classList.remove('active'));
+    tabContents.forEach(content => content.classList.remove('active'));
+    
+    // Add active class to target button and content
+    const targetButton = document.querySelector(`.tab-btn[data-tab="${targetTab}"]`);
+    const targetContent = document.getElementById(targetTab);
+    
+    if (targetButton && targetContent) {
+      targetButton.classList.add('active');
+      targetContent.classList.add('active');
+    }
+  }
+
+  tabButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      switchTab(button.dataset.tab);
+    });
+  });
+
+  // Handle navigation links to the matching service tab.
+  document.querySelectorAll('.nav-link-service').forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      document.getElementById('services').scrollIntoView({ behavior: 'smooth' });
+      setTimeout(() => {
+        switchTab(link.dataset.tab || 'car-service');
+      }, 300);
+    });
+  });
+
+  // ===== ACCORDION FUNCTIONALITY =====
+  const accordionHeaders = document.querySelectorAll('.accordion-header');
+  
+  accordionHeaders.forEach(header => {
+    header.addEventListener('click', () => {
+      const accordionItem = header.parentElement;
+      const isOpen = accordionItem.classList.contains('open');
+      
+      // Close all accordions
+      document.querySelectorAll('.accordion-item').forEach(item => {
+        item.classList.remove('open');
+      });
+      
+      // Open clicked accordion if it was closed
+      if (!isOpen) {
+        accordionItem.classList.add('open');
+      }
+    });
+  });
+
+  // Open first accordion by default
+  const firstAccordion = document.querySelector('.accordion-item');
+  if (firstAccordion) {
+    firstAccordion.classList.add('open');
+  }
+
+  // ===== BOOKING WIZARD =====
+  const wizardData = {
+    currentStep: 1,
+    service: '',
+    size: '',
+    seatAddon: 'none',
+    asphaltAddon: 'none',
+    registration: '',
+    date: null,
+    time: '',
+    name: '',
+    phone: '',
+    email: '',
+    pickup: false,
+    pickupAddress: ''
+  };
+
+  let wizardCurrentDate = new Date();
+  let wizardSelectedDate = null;
+  let wizardSelectedTime = null;
+
+  function updateWizardStep(step) {
+    wizardData.currentStep = step;
+    
+    // Update progress
+    document.querySelectorAll('.wizard-step').forEach((stepEl, index) => {
+      const stepNum = index + 1;
+      stepEl.classList.remove('active', 'completed');
+      
+      if (stepNum < step) {
+        stepEl.classList.add('completed');
+      } else if (stepNum === step) {
+        stepEl.classList.add('active');
+      }
+    });
+    
+    // Update panels
+    document.querySelectorAll('.wizard-panel').forEach((panel, index) => {
+      panel.classList.remove('active');
+      if (index + 1 === step) {
+        panel.classList.add('active');
+      }
+    });
+    
+    // Update buttons
+    const prevBtn = document.getElementById('wizardPrevBtn');
+    const nextBtn = document.getElementById('wizardNextBtn');
+    const submitBtn = document.getElementById('wizardSubmitBtn');
+    
+    if (prevBtn) prevBtn.style.display = step > 1 ? 'block' : 'none';
+    if (nextBtn) nextBtn.style.display = step < 5 ? 'block' : 'none';
+    if (submitBtn) submitBtn.style.display = step === 5 ? 'block' : 'none';
+    
+    // Load step-specific data
+    if (step === 3) {
+      renderWizardCalendar();
+    } else if (step === 5) {
+      updateBookingSummary();
+    }
+  }
+
+  function validateWizardStep(step) {
+    const isServiceBooking = SERVICE_SERVICES.includes(wizardData.service);
+    switch(step) {
+      case 1:
+        return !!wizardData.service;
+      case 2:
+        if (isServiceBooking) return !!wizardData.registration;
+        return !!wizardData.size && !!wizardData.registration;
+      case 3:
+        return !!wizardData.date && !!wizardData.time;
+      case 4:
+        const baseValid = !!wizardData.name && wizardData.name.trim() !== '' && 
+               !!wizardData.phone && wizardData.phone.trim() !== '' && 
+               !!wizardData.email && wizardData.email.trim() !== '';
+        if (wizardData.pickup && (!wizardData.pickupAddress || wizardData.pickupAddress.trim() === '')) return false;
+        return baseValid;
+      default:
+        return true;
+    }
+  }
+
+  // Step 1: Service Selection
+  document.querySelectorAll('.category-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      
+      const category = btn.dataset.category;
+      document.getElementById('serviceOptionsWash').style.display = category === 'wash' ? 'grid' : 'none';
+      document.getElementById('serviceOptionsService').style.display = category === 'service' ? 'grid' : 'none';
+    });
+  });
+
+  document.querySelectorAll('.service-option').forEach(option => {
+    option.addEventListener('click', () => {
+      document.querySelectorAll('.service-option').forEach(opt => opt.classList.remove('selected'));
+      option.classList.add('selected');
+      wizardData.service = option.dataset.service;
+      
+      // Show/hide inspection-fix contact panel
+      const inspectionPanel = document.getElementById('wizardInspectionFixPanel');
+      const nextBtn = document.getElementById('wizardNextBtn');
+      if (option.dataset.service === 'inspection-fix') {
+        if (inspectionPanel) inspectionPanel.style.display = 'block';
+        if (nextBtn) nextBtn.style.display = 'none';
+      } else {
+        if (inspectionPanel) inspectionPanel.style.display = 'none';
+        if (nextBtn) nextBtn.style.display = 'block';
+      }
+    });
+  });
+
+  // Step 2: Details
+  document.querySelectorAll('.size-option').forEach(option => {
+    option.addEventListener('click', () => {
+      document.querySelectorAll('.size-option').forEach(opt => opt.classList.remove('selected'));
+      option.classList.add('selected');
+      wizardData.size = option.dataset.size;
+    });
+  });
+
+  document.querySelectorAll('#wizardSeatAddon .addon-option').forEach(option => {
+    option.addEventListener('click', () => {
+      document.querySelectorAll('#wizardSeatAddon .addon-option').forEach(opt => opt.classList.remove('active'));
+      option.classList.add('active');
+      wizardData.seatAddon = option.dataset.addon;
+    });
+  });
+
+  document.querySelectorAll('#wizardAsphaltAddon .addon-option').forEach(option => {
+    option.addEventListener('click', () => {
+      document.querySelectorAll('#wizardAsphaltAddon .addon-option').forEach(opt => opt.classList.remove('active'));
+      option.classList.add('active');
+      wizardData.asphaltAddon = option.dataset.addon;
+    });
+  });
+
+  const wizardRegInput = document.getElementById('wizardRegistration');
+  if (wizardRegInput) {
+    wizardRegInput.addEventListener('input', (e) => {
+      wizardData.registration = e.target.value;
+    });
+  }
+
+  // Step 3: Date & Time
+  function renderWizardCalendar() {
+    const calendarDays = document.getElementById('wizardCalendarDays');
+    const monthYear = document.getElementById('wizardMonthYear');
+    
+    if (!calendarDays || !monthYear) return;
+    
+    const year = wizardCurrentDate.getFullYear();
+    const month = wizardCurrentDate.getMonth();
+    
+    monthYear.textContent = new Date(year, month).toLocaleDateString('sv-SE', { month: 'long', year: 'numeric' });
+    
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const daysInMonth = lastDay.getDate();
+    const startDay = (firstDay.getDay() + 6) % 7;
+    
+    calendarDays.innerHTML = '';
+    
+    for (let i = 0; i < startDay; i++) {
+      const emptyDay = document.createElement('div');
+      emptyDay.className = 'day empty';
+      calendarDays.appendChild(emptyDay);
+    }
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    for (let day = 1; day <= daysInMonth; day++) {
+      const date = new Date(year, month, day);
+      const dayEl = document.createElement('div');
+      dayEl.className = 'day';
+      dayEl.textContent = day;
+      
+      if (date < today) {
+        dayEl.classList.add('past');
+      } else {
+        dayEl.classList.add('available');
+        dayEl.addEventListener('click', () => {
+          wizardSelectedDate = date;
+          wizardData.date = date;
+          showWizardTimeSlots(date);
+          
+          document.querySelectorAll('#wizardCalendarDays .day').forEach(d => d.classList.remove('selected'));
+          dayEl.classList.add('selected');
+        });
+      }
+      
+      calendarDays.appendChild(dayEl);
+    }
+  }
+
+  async function showWizardTimeSlots(date) {
+    const timesSection = document.getElementById('wizardTimesSection');
+    const timeSlots = document.getElementById('wizardTimeSlots');
+    const selectedDateEl = document.getElementById('wizardSelectedDate');
+    
+    if (!timesSection || !timeSlots || !selectedDateEl) return;
+    
+    selectedDateEl.textContent = date.toLocaleDateString('sv-SE', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    timesSection.style.display = 'block';
+    
+    // Use the same logic as the regular calendar
+    const selectedService = wizardData.service;
+    const selectedSeatAddon = wizardData.seatAddon || 'none';
+    const selectedAsphaltAddon = wizardData.asphaltAddon || 'none';
+    
+    if (!selectedService) {
+      timeSlots.innerHTML = '<p class="slot-info">Välj tjänst först</p>';
+      return;
+    }
+    
+    // Get available time slots using the existing function
+    const availableHours = getTimeSlotsForService(date, selectedService, selectedSeatAddon, selectedAsphaltAddon);
+    
+    timeSlots.innerHTML = '';
+    
+    if (!availableHours.length) {
+      timeSlots.innerHTML = '<p class="slot-info">Inga tider tillgängliga för vald tjänst denna dag.</p>';
+      return;
+    }
+    
+    availableHours.forEach(hour => {
+      const slot = document.createElement('button');
+      slot.type = 'button';
+      slot.className = 'time-slot';
+      slot.textContent = hour;
+      
+      if (isSlotAvailable(date, hour, selectedService, selectedSeatAddon, selectedAsphaltAddon)) {
+        slot.addEventListener('click', () => {
+          wizardSelectedTime = hour;
+          wizardData.time = hour;
+          document.querySelectorAll('#wizardTimeSlots .time-slot').forEach(s => s.classList.remove('selected'));
+          slot.classList.add('selected');
+        });
+      } else {
+        slot.classList.add('unavailable');
+      }
+      
+      timeSlots.appendChild(slot);
+    });
+  }
+
+  const wizardPrevMonth = document.getElementById('wizardPrevMonth');
+  const wizardNextMonth = document.getElementById('wizardNextMonth');
+  
+  if (wizardPrevMonth) {
+    wizardPrevMonth.addEventListener('click', () => {
+      wizardCurrentDate.setMonth(wizardCurrentDate.getMonth() - 1);
+      renderWizardCalendar();
+    });
+  }
+  
+  if (wizardNextMonth) {
+    wizardNextMonth.addEventListener('click', () => {
+      wizardCurrentDate.setMonth(wizardCurrentDate.getMonth() + 1);
+      renderWizardCalendar();
+    });
+  }
+
+  // Step 4: Contact Info
+  const wizardNameInput = document.getElementById('wizardName');
+  const wizardPhoneInput = document.getElementById('wizardPhone');
+  const wizardEmailInput = document.getElementById('wizardEmail');
+  
+  if (wizardNameInput) wizardNameInput.addEventListener('input', (e) => {
+    wizardData.name = e.target.value.trim();
+  });
+  if (wizardPhoneInput) wizardPhoneInput.addEventListener('input', (e) => {
+    wizardData.phone = e.target.value.trim();
+  });
+  if (wizardEmailInput) wizardEmailInput.addEventListener('input', (e) => {
+    wizardData.email = e.target.value.trim();
+  });
+
+  const wizardPickupCheckbox = document.getElementById('wizardPickupCheckbox');
+  const wizardPickupAddressSection = document.getElementById('wizardPickupAddressSection');
+  const wizardPickupAddress = document.getElementById('wizardPickupAddress');
+  if (wizardPickupCheckbox) {
+    wizardPickupCheckbox.addEventListener('change', (e) => {
+      wizardData.pickup = e.target.checked;
+      if (wizardPickupAddressSection) {
+        wizardPickupAddressSection.style.display = e.target.checked ? 'block' : 'none';
+      }
+    });
+  }
+  if (wizardPickupAddress) {
+    wizardPickupAddress.addEventListener('input', (e) => {
+      wizardData.pickupAddress = e.target.value;
+    });
+  }
+
+
+  // Step 5: Summary
+  function updateBookingSummary() {
+    document.getElementById('summaryService').textContent = SERVICE_LABELS[wizardData.service] || wizardData.service;
+    
+    const sizeLabels = { small: 'Liten', medium: 'Mellan', large: 'Stor' };
+    document.getElementById('summarySize').textContent = sizeLabels[wizardData.size] || wizardData.size;
+    
+    let addons = [];
+    if (wizardData.seatAddon && wizardData.seatAddon !== 'none') {
+      addons.push(getSeatAddonLabel(wizardData.service, wizardData.seatAddon));
+    }
+    if (wizardData.asphaltAddon && wizardData.asphaltAddon !== 'none') {
+      addons.push(getAsphaltAddonLabel(wizardData.service, wizardData.asphaltAddon));
+    }
+    
+    const addonRow = document.getElementById('summaryAddonRow');
+    if (addons.length > 0) {
+      document.getElementById('summaryAddons').textContent = addons.join(', ');
+      addonRow.style.display = 'flex';
+    } else {
+      addonRow.style.display = 'none';
+    }
+    
+    document.getElementById('summaryReg').textContent = wizardData.registration;
+    document.getElementById('summaryDate').textContent = wizardData.date ? wizardData.date.toLocaleDateString('sv-SE') : '-';
+    document.getElementById('summaryTime').textContent = wizardData.time;
+    
+    const duration = serviceDurations[wizardData.service] || 60;
+    const hours = Math.floor(duration / 60);
+    const minutes = duration % 60;
+    let durationText = '';
+    if (hours > 0) durationText += `${hours} timme${hours > 1 ? 'r' : ''}`;
+    if (minutes > 0) durationText += ` ${minutes} min`;
+    document.getElementById('summaryDuration').textContent = durationText.trim();
+    
+    document.getElementById('summaryName').textContent = wizardData.name;
+    document.getElementById('summaryPhone').textContent = wizardData.phone;
+    document.getElementById('summaryEmail').textContent = wizardData.email;
+    
+    // Calculate total price
+    const basePrice = (servicePrices[wizardData.service] || {})[wizardData.size] || 0;
+    const seatPrice = getSeatAddonPrice(wizardData.service, wizardData.seatAddon);
+    const asphaltPrice = getAsphaltAddonPrice(wizardData.service, wizardData.size, wizardData.asphaltAddon);
+    const totalPrice = basePrice + seatPrice + asphaltPrice;
+    
+    document.getElementById('summaryTotal').textContent = `${totalPrice} kr`;
+  }
+
+  // Navigation
+  const wizardPrevBtn = document.getElementById('wizardPrevBtn');
+  const wizardNextBtn = document.getElementById('wizardNextBtn');
+  const wizardSubmitBtn = document.getElementById('wizardSubmitBtn');
+  
+  if (wizardPrevBtn) {
+    wizardPrevBtn.addEventListener('click', () => {
+      if (wizardData.currentStep > 1) {
+        updateWizardStep(wizardData.currentStep - 1);
+      }
+    });
+  }
+  
+  if (wizardNextBtn) {
+    wizardNextBtn.addEventListener('click', () => {
+      if (!validateWizardStep(wizardData.currentStep)) {
+        alert('Vänligen fyll i alla obligatoriska fält.');
+        return;
+      }
+      
+      // Show/hide addons based on service
+      if (wizardData.currentStep === 1 && wizardData.service) {
+        const seatAddon = document.getElementById('wizardSeatAddon');
+        const asphaltAddon = document.getElementById('wizardAsphaltAddon');
+        const sizeSection = document.getElementById('wizardSizeSection');
+        
+        if (seatAddon) {
+          seatAddon.style.display = serviceSupportsSeatAddon(wizardData.service) ? 'block' : 'none';
+        }
+        if (asphaltAddon) {
+          asphaltAddon.style.display = serviceSupportsAsphaltAddon(wizardData.service) ? 'block' : 'none';
+        }
+        // Hide size selector for bilservice bookings
+        if (sizeSection) {
+          const isServiceBooking = SERVICE_SERVICES.includes(wizardData.service);
+          sizeSection.style.display = isServiceBooking ? 'none' : 'block';
+          if (isServiceBooking) wizardData.size = 'small'; // default size for pricing
+        }
+        // Show/hide pickup option
+        const pickupSection = document.getElementById('wizardPickupSection');
+        if (pickupSection) {
+          pickupSection.style.display = SERVICE_SERVICES.includes(wizardData.service) ? 'block' : 'none';
+        }
+      }
+      
+      if (wizardData.currentStep < 5) {
+        updateWizardStep(wizardData.currentStep + 1);
+      }
+    });
+  }
+  
+  if (wizardSubmitBtn) {
+    wizardSubmitBtn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      console.log('Wizard submit clicked', wizardData);
+      
+      // Validate all required data with detailed error messages
+      const validationErrors = [];
+      const isServiceBooking = SERVICE_SERVICES.includes(wizardData.service);
+      
+      if (!wizardData.service) validationErrors.push('Tjänst saknas');
+      if (!isServiceBooking && !wizardData.size) validationErrors.push('Bilstorlek saknas');
+      if (!wizardData.registration) validationErrors.push('Registreringsnummer saknas');
+      if (!wizardData.date) validationErrors.push('Datum saknas');
+      if (!wizardData.time) validationErrors.push('Tid saknas');
+      if (!wizardData.name || wizardData.name.trim() === '') validationErrors.push('Namn saknas');
+      if (!wizardData.phone || wizardData.phone.trim() === '') validationErrors.push('Telefonnummer saknas');
+      if (!wizardData.email || wizardData.email.trim() === '') validationErrors.push('E-post saknas');
+      if (wizardData.pickup && (!wizardData.pickupAddress || wizardData.pickupAddress.trim() === '')) validationErrors.push('Adress för hemhämtning saknas');
+      
+      if (validationErrors.length > 0) {
+        console.log('Validation errors:', validationErrors);
+        alert('Följande uppgifter saknas:\n\n' + validationErrors.join('\n'));
+        return;
+      }
+
+      // Check if slot is still available
+      try {
+        const slotAvailable = await isSlotAvailable(wizardData.date, wizardData.time, wizardData.service, wizardData.seatAddon || 'none', wizardData.asphaltAddon || 'none');
+        if (!slotAvailable) {
+          alert('Den valda tiden är inte längre tillgänglig. Välj en annan tid.');
+          updateWizardStep(3);
+          return;
+        }
+      } catch (error) {
+        console.error('Error checking slot availability:', error);
+      }
+
+      // Show loading state
+      wizardSubmitBtn.disabled = true;
+      wizardSubmitBtn.textContent = 'Bearbetar...';
+      
+      try {
+        const dateString = wizardData.date.toLocaleDateString('sv-SE');
+        
+        // Calculate price using servicePrices object
+        const servicePriceData = servicePrices[wizardData.service];
+        const servicePrice = servicePriceData
+          ? (servicePriceData[wizardData.size] ?? servicePriceData.small ?? 0)
+          : 0;
+        const seatAddonPrice = getSeatAddonPrice(wizardData.service, wizardData.seatAddon || 'none') || 0;
+        const asphaltAddonPrice = getAsphaltAddonPrice(wizardData.service, wizardData.size, wizardData.asphaltAddon || 'none') || 0;
+        const totalPrice = servicePrice + seatAddonPrice + asphaltAddonPrice;
+
+        console.log('Creating booking:', {
+          service: wizardData.service,
+          size: wizardData.size,
+          servicePrice,
+          seatAddonPrice,
+          asphaltAddonPrice,
+          totalPrice
+        });
+
+        // Get Stripe payment link FIRST
+        const paymentLink = getStripePaymentLink(
+          wizardData.service,
+          wizardData.size,
+          wizardData.seatAddon,
+          wizardData.asphaltAddon
+        );
+
+        console.log('Payment link:', paymentLink);
+
+        const booking = {
+          name: wizardData.name.trim(),
+          email: wizardData.email.trim(),
+          phone: wizardData.phone.trim(),
+          service: wizardData.service,
+          size: wizardData.size,
+          registration: wizardData.registration.trim(),
+          date: dateString,
+          time: wizardData.time,
+          seatAddon: wizardData.seatAddon || 'none',
+          asphaltAddon: wizardData.asphaltAddon || 'none',
+          price: totalPrice,
+          paymentStatus: 'Pending',
+          timestamp: new Date().toISOString(),
+          pickup: wizardData.pickup || false,
+          pickupAddress: wizardData.pickup ? (wizardData.pickupAddress || '') : ''
+        };
+
+        if (paymentLink) {
+          console.log('Redirecting to Stripe:', paymentLink);
+          sessionStorage.setItem('pendingBooking', JSON.stringify(booking));
+          window.location.href = getStripeCheckoutUrl(paymentLink, booking.id);
+        } else {
+          console.log('No payment link, saving booking as pending');
+          
+          if (canUseFirestore()) {
+            await window.db.collection('bookings').add(booking);
+            console.log('Booking saved to Firestore');
+          } else {
+            if (!Array.isArray(cachedBookings)) cachedBookings = [];
+            cachedBookings.push({ id: Date.now().toString(), ...booking });
+            writeLocalArray(LOCAL_STORAGE_KEYS.bookings, cachedBookings);
+            console.log('Booking saved to localStorage');
+          }
+          
+          alert('✅ Bokning mottagen!\n\nVi kontaktar dig snart angående betalning.\nBekräftelse skickas till: ' + wizardData.email);
+          location.reload();
+        }
+      } catch (error) {
+        console.error('Booking error:', error);
+        wizardSubmitBtn.disabled = false;
+        wizardSubmitBtn.textContent = 'Betala & Bekräfta';
+        alert('❌ Något gick fel vid bokningen.\n\nFörsök igen eller ring oss på 073-754 22 20.\n\nFelmeddelande: ' + error.message);
+      }
+    });
+  }
+  
+  // Initialize wizard
+  updateWizardStep(1);
 });
