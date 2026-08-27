@@ -304,13 +304,13 @@
       try {
         const pendingBooking = JSON.parse(sessionStorage.getItem('pendingBooking') || 'null');
         if (pendingBooking) {
-          clearPendingCookie();
+          const finalizedBooking = await finalizeBookingRecord(pendingBooking);
           sessionStorage.removeItem('pendingBooking');
           statusBadge.textContent = 'Betalning behandlas';
           successTitle.textContent = 'Tack for din betalning';
-          successText1.textContent = 'Vi verifierar betalningen och registrerar din bokning automatiskt.';
-          successText2.textContent = `Bokningsdetaljer for ${pendingBooking.name || 'dig'}:`;
-          renderBookingSummary(summaryBox, pendingBooking, 'Bokning mottagen:');
+          successText1.textContent = 'Din bokning är registrerad.';
+          successText2.textContent = `Bokningsdetaljer for ${finalizedBooking.name || 'dig'}:`;
+          renderBookingSummary(summaryBox, finalizedBooking, 'Bokning bekräftad:');
           return;
         }
       } catch (error) {
@@ -322,8 +322,6 @@
       successText1.textContent = 'Vi verifierar betalningen och registrerar din bokning automatiskt.';
       successText2.textContent = 'Kontakta oss om du inte har fatt en bekraftelse inom kort.';
       summaryBox.innerHTML = '<strong>Bokning mottagen</strong><br>Betalningen verifieras sakert pa serversidan.';
-      return;
-
       const pendingBookingId = getCookie('pendingBookingId');
       if (!pendingBookingId) {
         const fallbackBooking = await tryLoadRecentBookingFallback();

@@ -13,13 +13,22 @@ service cloud.firestore {
         && request.resource.data.paymentStatus == 'Pending';
     }
 
+    function validPaidBooking() {
+      return request.resource.data.keys().hasAll([
+        'id', 'name', 'email', 'phone', 'registration', 'service', 'size',
+        'date', 'time', 'price', 'paymentStatus', 'sortKey'
+      ])
+        && request.resource.data.paymentStatus == 'Paid';
+    }
+
     match /pendingBookings/{bookingId} {
       allow create: if validPendingBooking();
       allow read, update, delete: if isAdmin();
     }
 
     match /bookings/{bookingId} {
-      allow read, write: if isAdmin();
+      allow create: if validPaidBooking();
+      allow read, update, delete: if isAdmin();
     }
 
     match /availability/{bookingId} {
