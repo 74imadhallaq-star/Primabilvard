@@ -419,10 +419,14 @@ function renderBookingsTable() {
   const filteredBookings = cachedBookings.filter((booking) => {
     const service = String(booking.service || '').trim();
     const paymentStatus = String(booking.paymentStatus || 'Pending').trim().toLowerCase();
+    const bookingSource = booking.source === 'owner-manual' ? 'manual' : 'online';
 
     if (typeFilter === 'wash' && !WASH_SERVICES.has(service)) return false;
     if (typeFilter === 'service' && WASH_SERVICES.has(service)) return false;
-    if (statusFilter !== 'all' && paymentStatus !== statusFilter.trim().toLowerCase()) return false;
+    if (statusFilter === 'online' && bookingSource !== 'online') return false;
+    if (statusFilter === 'manual' && bookingSource !== 'manual') return false;
+    if (!['all', 'online', 'manual'].includes(statusFilter)
+      && paymentStatus !== statusFilter.trim().toLowerCase()) return false;
     return true;
   });
 

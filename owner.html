@@ -54,10 +54,11 @@
             <option value="service">🔧 Endast Service</option>
           </select>
           <select id="bookingStatusFilter" style="padding:10px 16px;border-radius:10px;border:2px solid var(--border);background:#1a1a1a;color:var(--text-primary);font-weight:600;cursor:pointer;transition:all 0.3s;">
-            <option value="all">Alla Status</option>
+            <option value="online" selected>Onlinebokningar</option>
+            <option value="all">Alla Bokningar</option>
+            <option value="manual">Manuella Bokningar</option>
             <option value="Paid">✅ Betalda</option>
             <option value="Pending">⏳ Väntande</option>
-            <option value="Manuell (Telefon)">📞 Manuella</option>
           </select>
         </div>
       </div>
@@ -286,6 +287,6 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 <script src="firebase-config.js?v=6"></script>
-<script src="owner.js?v=44"></script>
+<script src="owner.js?v=45"></script>
 </body>
 </html>
