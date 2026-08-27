@@ -276,19 +276,33 @@ async function loadBookings() {
   try {
     if (!canUseFirestore()) throw new Error('Firestore unavailable');
 
-    const [bookingsSnapshot, pendingSnapshot] = await Promise.all([
+    const [bookingsResult, pendingResult] = await Promise.allSettled([
       window.db.collection('bookings').get(),
       window.db.collection('pendingBookings').get()
     ]);
 
     const bookingsById = new Map();
-    bookingsSnapshot.docs.forEach(doc => bookingsById.set(String(doc.id), doc.data()));
-    pendingSnapshot.docs.forEach(doc => {
-      const pendingBooking = doc.data();
-      if (!bookingsById.has(String(doc.id))) {
-        bookingsById.set(String(doc.id), pendingBooking);
-      }
-    });
+    if (bookingsResult.status === 'fulfilled') {
+      bookingsResult.value.docs.forEach(doc => bookingsById.set(String(doc.id), doc.data()));
+    }
+    if (pendingResult.status === 'fulfilled') {
+      pendingResult.value.docs.forEach(doc => {
+        const pendingBooking = doc.data();
+        if (!bookingsById.has(String(doc.id))) {
+          bookingsById.set(String(doc.id), pendingBooking);
+        }
+      });
+    }
+
+    if (bookingsResult.status === 'rejected' && pendingResult.status === 'rejected') {
+      throw bookingsResult.reason;
+    }
+    if (bookingsResult.status === 'rejected') {
+      console.warn('Firebase bookings load error:', bookingsResult.reason);
+    }
+    if (pendingResult.status === 'rejected') {
+      console.warn('Firebase pendingBookings load error:', pendingResult.reason);
+    }
 
     cachedBookings = Array.from(bookingsById.values());
     cachedBookings.sort((a, b) => (b.sortKey || 0) - (a.sortKey || 0));
@@ -296,7 +310,7 @@ async function loadBookings() {
     console.error('Firebase bookings load error:', error);
     cachedBookings = [];
     if (error && error.code === 'permission-denied') {
-      alert('Ditt admin-konto saknar läsbehörighet till bokningar i Firestore. Kontrollera att du loggar in med admin-kontot 74imadhallaq@gmail.com.');
+      alert('Ditt konto saknar läsbehörighet till bokningar i Firestore. Kontrollera Firestore-reglerna och publicera den senaste versionen.');
     }
   }
 }
