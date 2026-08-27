@@ -291,8 +291,13 @@ async function loadBookings() {
 async function saveBooking(booking) {
   if (!canUseFirestore()) throw new Error('Firestore unavailable');
 
-  await window.db.collection('bookings').doc(String(booking.id)).set(booking);
-  await window.db.collection('availability').doc(String(booking.id)).set(availabilityFromBooking(booking));
+  const database = window.db;
+  const bookingRef = database.collection('bookings').doc(String(booking.id));
+  const availabilityRef = database.collection('availability').doc(String(booking.id));
+  await database.runTransaction(async (transaction) => {
+    transaction.set(bookingRef, booking);
+    transaction.set(availabilityRef, availabilityFromBooking(booking));
+  });
   cachedBookings.push(booking);
   cachedBookings.sort((a, b) => (b.sortKey || 0) - (a.sortKey || 0));
 }
