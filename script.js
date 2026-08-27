@@ -320,37 +320,14 @@ function setAsphaltAddonSelection(addonType = 'none') {
 }
 
 function bookService(serviceId, chosenSize, chosenSeatAddon = 'none', chosenAsphaltAddon = 'none') {
-  // Välj tjänst i dropdown
-  const serviceMap = {
-    'basic': 'basic',
-    'interior-wash': 'interior-wash',
-    'premium': 'premium',
-    'inout': 'inout',
-    'interior': 'interior',
-    'full': 'full'
-  };
-
-  document.getElementById('service').value = serviceMap[serviceId] || '';
-
-  // set size if provided or default small
-  const sizeInput = document.getElementById('size');
-  sizeInput.value = chosenSize || 'small';
-
-  // Uppdatera priset automatiskt
-  handleServiceChange();
-
-  // sync add-on from service card (for supported services)
-  if (serviceSupportsSeatAddon(serviceId)) {
-    setSeatAddonSelection(chosenSeatAddon || 'none');
-    handleSeatAddonChange();
-  }
-
-  if (serviceSupportsAsphaltAddon(serviceId)) {
-    setAsphaltAddonSelection(chosenAsphaltAddon || 'none');
-    handleAsphaltAddonChange();
-  }
-
-  // Scrolla till booking-sektionen
+  document.dispatchEvent(new CustomEvent('serviceCardSelected', {
+    detail: {
+      service: serviceId,
+      size: chosenSize || 'small',
+      seatAddon: chosenSeatAddon || 'none',
+      asphaltAddon: chosenAsphaltAddon || 'none'
+    }
+  }));
   document.getElementById('booking').scrollIntoView({ behavior: 'smooth' });
 }
 
@@ -2616,6 +2593,35 @@ document.addEventListener('DOMContentLoaded', async function() {
   let wizardSelectedDate = null;
   let wizardSelectedTime = null;
 
+  function updateWizardSizePrices(service) {
+    document.querySelectorAll('[data-size-price]').forEach((priceNode) => {
+      const price = servicePrices[service]?.[priceNode.dataset.sizePrice];
+      priceNode.textContent = price != null ? `${price} kr` : '';
+    });
+  }
+
+  function selectWizardService(service, size = '', seatAddon = 'none', asphaltAddon = 'none') {
+    wizardData.service = service;
+    wizardData.size = size;
+    wizardData.seatAddon = seatAddon;
+    wizardData.asphaltAddon = asphaltAddon;
+    updateWizardSizePrices(service);
+
+    document.querySelectorAll('.service-option').forEach((option) => {
+      option.classList.toggle('selected', option.dataset.service === service);
+    });
+    document.querySelectorAll('.size-option').forEach((option) => {
+      option.classList.toggle('selected', option.dataset.size === size);
+    });
+  }
+
+  document.addEventListener('serviceCardSelected', (event) => {
+    const selection = event.detail;
+    if (!selection) return;
+    selectWizardService(selection.service, selection.size, selection.seatAddon, selection.asphaltAddon);
+    updateWizardStep(2);
+  });
+
   function updateWizardStep(step) {
     wizardData.currentStep = step;
     
@@ -2694,6 +2700,7 @@ document.addEventListener('DOMContentLoaded', async function() {
       document.querySelectorAll('.service-option').forEach(opt => opt.classList.remove('selected'));
       option.classList.add('selected');
       wizardData.service = option.dataset.service;
+      updateWizardSizePrices(wizardData.service);
       
       // Show/hide inspection-fix contact panel
       const inspectionPanel = document.getElementById('wizardInspectionFixPanel');
@@ -3065,6 +3072,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         console.log('Payment link:', paymentLink);
 
         const booking = {
+          id: Date.now(),
           name: wizardData.name.trim(),
           email: wizardData.email.trim(),
           phone: wizardData.phone.trim(),
@@ -3079,11 +3087,20 @@ document.addEventListener('DOMContentLoaded', async function() {
           paymentStatus: 'Pending',
           timestamp: new Date().toISOString(),
           pickup: wizardData.pickup || false,
-          pickupAddress: wizardData.pickup ? (wizardData.pickupAddress || '') : ''
+          pickupAddress: wizardData.pickup ? (wizardData.pickupAddress || '') : '',
+          sortKey: new Date(
+            wizardData.date.getFullYear(),
+            wizardData.date.getMonth(),
+            wizardData.date.getDate(),
+            parseInt(wizardData.time.split(':')[0], 10),
+            parseInt(wizardData.time.split(':')[1] || '0', 10)
+          ).getTime()
         };
 
         if (paymentLink) {
           console.log('Redirecting to Stripe:', paymentLink);
+          await savePendingBooking(booking);
+          setPendingBookingCookie(booking.id);
           sessionStorage.setItem('pendingBooking', JSON.stringify(booking));
           window.location.href = getStripeCheckoutUrl(paymentLink, booking.id);
         } else {
