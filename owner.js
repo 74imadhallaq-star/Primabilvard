@@ -315,23 +315,24 @@ async function loadBookings() {
       window.db.collection('availability').get()
     ]);
 
-    const bookingsById = new Map();
+    const allBookings = [];
+    const firebaseBookingIds = new Set();
     if (bookingsResult.status === 'fulfilled') {
-      bookingsResult.value.docs.forEach(doc => bookingsById.set(String(doc.id), doc.data()));
+      bookingsResult.value.docs.forEach(doc => {
+        firebaseBookingIds.add(String(doc.id));
+        allBookings.push({ ...doc.data(), _recordSource: 'bookings', _recordId: String(doc.id) });
+      });
     }
     if (pendingResult.status === 'fulfilled') {
       pendingResult.value.docs.forEach(doc => {
-        const pendingBooking = doc.data();
-        if (!bookingsById.has(String(doc.id))) {
-          bookingsById.set(String(doc.id), pendingBooking);
-        }
+        firebaseBookingIds.add(String(doc.id));
+        allBookings.push({ ...doc.data(), _recordSource: 'pendingBookings', _recordId: String(doc.id) });
       });
     }
     if (availabilityResult.status === 'fulfilled') {
       availabilityResult.value.docs.forEach(doc => {
-        const availabilityBooking = doc.data();
-        if (!bookingsById.has(String(doc.id))) {
-          bookingsById.set(String(doc.id), availabilityBooking);
+        if (!firebaseBookingIds.has(String(doc.id))) {
+          allBookings.push({ ...doc.data(), _recordSource: 'availability', _recordId: String(doc.id) });
         }
       });
     }
@@ -339,8 +340,8 @@ async function loadBookings() {
     [...readLegacyBookings(LEGACY_BOOKINGS_KEY), ...readLegacyBookings(LEGACY_PENDING_BOOKINGS_KEY)]
       .forEach(legacyBooking => {
         const legacyId = String(legacyBooking.id || '');
-        if (legacyId && !bookingsById.has(legacyId)) {
-          bookingsById.set(legacyId, legacyBooking);
+        if (legacyId && !firebaseBookingIds.has(legacyId)) {
+          allBookings.push({ ...legacyBooking, _recordSource: 'localStorage', _recordId: legacyId });
         }
       });
 
@@ -365,7 +366,7 @@ async function loadBookings() {
       console.warn('Firebase availability sync error:', error);
     }
 
-    cachedBookings = Array.from(bookingsById.values());
+    cachedBookings = allBookings;
     cachedBookings.sort((a, b) => (b.sortKey || 0) - (a.sortKey || 0));
   } catch (error) {
     console.error('Firebase bookings load error:', error);
@@ -393,9 +394,18 @@ async function saveBooking(booking) {
 async function deleteBooking(id) {
   if (!canUseFirestore()) throw new Error('Firestore unavailable');
 
-  await window.db.collection('bookings').doc(String(id)).delete();
-  await window.db.collection('availability').doc(String(id)).delete();
+  await Promise.all([
+    window.db.collection('bookings').doc(String(id)).delete(),
+    window.db.collection('pendingBookings').doc(String(id)).delete(),
+    window.db.collection('availability').doc(String(id)).delete()
+  ]);
   cachedBookings = cachedBookings.filter(b => String(b.id) !== String(id));
+  try {
+    [LEGACY_BOOKINGS_KEY, LEGACY_PENDING_BOOKINGS_KEY].forEach(key => {
+      const remaining = readLegacyBookings(key).filter(b => String(b.id) !== String(id));
+      localStorage.setItem(key, JSON.stringify(remaining));
+    });
+  } catch (_) {}
   renderBookingsTable();
 }
 
