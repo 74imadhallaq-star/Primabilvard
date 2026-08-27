@@ -1310,6 +1310,7 @@ if (bookingForm) bookingForm.addEventListener('submit', async function(e) {
 
 // ===== BOOKING STORAGE & OWNER VIEW HELPERS =====
 let cachedBookings = [];
+let unsubscribeAvailability = null;
 
 async function saveBooking(booking) {
   if (!canUseFirestore()) {
@@ -1366,6 +1367,21 @@ async function loadBookingsFromFirebase() {
     cachedBookings = readLocalArray(LOCAL_STORAGE_KEYS.bookings);
     cachedBookings.sort((a, b) => (b.sortKey || 0) - (a.sortKey || 0));
   }
+}
+
+function subscribeToAvailability() {
+  if (!canUseFirestore() || typeof window.db.collection('availability').onSnapshot !== 'function') return;
+  if (unsubscribeAvailability) unsubscribeAvailability();
+
+  unsubscribeAvailability = window.db.collection('availability').onSnapshot(snapshot => {
+    cachedBookings = snapshot.docs.map(doc => doc.data());
+    cachedBookings.sort((a, b) => (b.sortKey || 0) - (a.sortKey || 0));
+    writeLocalArray(LOCAL_STORAGE_KEYS.bookings, cachedBookings);
+    renderCalendar();
+    if (selectedDate) showTimeSlots(selectedDate);
+  }, error => {
+    console.error('Firebase realtime availability error:', error);
+  });
 }
 
 async function deleteBooking(id) {
@@ -2099,6 +2115,7 @@ document.addEventListener('DOMContentLoaded', async function() {
   
   // Load bookings + blocked dates from Firebase so calendar availability is correct
   await loadBookingsFromFirebase();
+  subscribeToAvailability();
   await loadBlockedDatesFromFirebase();
   await loadBlockedTimesFromFirebase();
   loadServiceDurationsFromCards();
