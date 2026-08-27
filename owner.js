@@ -25,6 +25,8 @@ const WASH_SERVICES = new Set(['basic', 'interior-wash', 'premium', 'inout', 'in
 
 const OWNER_SESSION_KEY = 'primabilvard_owner_session_v2';
 const OWNER_SESSION_MAX_AGE_MS = 5 * 60 * 60 * 1000;
+const LEGACY_BOOKINGS_KEY = 'primabilvard_bookings';
+const LEGACY_PENDING_BOOKINGS_KEY = 'primabilvard_pendingBookings';
 
 function setOwnerSession() {
   try {
@@ -76,6 +78,15 @@ function canUseFirestore() {
 
 function canUseAuth() {
   return !!(window.auth && typeof window.auth.signInWithEmailAndPassword === 'function');
+}
+
+function readLegacyBookings(key) {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(key) || '[]');
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (_) {
+    return [];
+  }
 }
 
 function escapeHtml(str) {
@@ -302,6 +313,14 @@ async function loadBookings() {
         }
       });
     }
+
+    [...readLegacyBookings(LEGACY_BOOKINGS_KEY), ...readLegacyBookings(LEGACY_PENDING_BOOKINGS_KEY)]
+      .forEach(legacyBooking => {
+        const legacyId = String(legacyBooking.id || '');
+        if (legacyId && !bookingsById.has(legacyId)) {
+          bookingsById.set(legacyId, legacyBooking);
+        }
+      });
 
     if (bookingsResult.status === 'rejected'
       && pendingResult.status === 'rejected'
