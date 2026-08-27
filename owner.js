@@ -423,9 +423,12 @@ function renderBookingsTable() {
 
     if (typeFilter === 'wash' && !WASH_SERVICES.has(service)) return false;
     if (typeFilter === 'service' && WASH_SERVICES.has(service)) return false;
+    if (statusFilter === 'paid-manual'
+      && paymentStatus !== 'paid'
+      && bookingSource !== 'manual') return false;
     if (statusFilter === 'online' && bookingSource !== 'online') return false;
     if (statusFilter === 'manual' && bookingSource !== 'manual') return false;
-    if (!['all', 'online', 'manual'].includes(statusFilter)
+    if (!['all', 'online', 'manual', 'paid-manual'].includes(statusFilter)
       && paymentStatus !== statusFilter.trim().toLowerCase()) return false;
     return true;
   });
