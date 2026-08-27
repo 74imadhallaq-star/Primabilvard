@@ -323,12 +323,6 @@ async function loadBookings() {
         allBookings.push({ ...doc.data(), _recordSource: 'bookings', _recordId: String(doc.id) });
       });
     }
-    if (pendingResult.status === 'fulfilled') {
-      pendingResult.value.docs.forEach(doc => {
-        firebaseBookingIds.add(String(doc.id));
-        allBookings.push({ ...doc.data(), _recordSource: 'pendingBookings', _recordId: String(doc.id) });
-      });
-    }
     if (availabilityResult.status === 'fulfilled') {
       availabilityResult.value.docs.forEach(doc => {
         if (!firebaseBookingIds.has(String(doc.id))) {
