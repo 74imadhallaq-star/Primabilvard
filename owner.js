@@ -71,6 +71,7 @@ const servicePrices = {
 let cachedBookings = [];
 let blockedDateIds = new Set();
 let blockedTimeIds = new Set();
+let unsubscribeBookings = null;
 
 function canUseFirestore() {
   return !!(window.db && typeof window.db.collection === 'function');
@@ -371,6 +372,29 @@ async function loadBookings() {
   }
 }
 
+function subscribeToPaidBookings() {
+  if (!canUseFirestore() || typeof window.db.collection('bookings').onSnapshot !== 'function') return;
+  if (unsubscribeBookings) unsubscribeBookings();
+
+  unsubscribeBookings = window.db.collection('bookings').onSnapshot(snapshot => {
+    const firebaseBookings = snapshot.docs.map(doc => ({
+      ...doc.data(),
+      _recordSource: 'bookings',
+      _recordId: String(doc.id)
+    }));
+    const firebaseIds = new Set(firebaseBookings.map(booking => String(booking.id || booking._recordId)));
+    const legacyManualBookings = readLegacyBookings(LEGACY_BOOKINGS_KEY)
+      .filter(booking => !firebaseIds.has(String(booking.id || '')))
+      .map(booking => ({ ...booking, _recordSource: 'localStorage', _recordId: String(booking.id) }));
+
+    cachedBookings = [...firebaseBookings, ...legacyManualBookings];
+    cachedBookings.sort((a, b) => (b.sortKey || 0) - (a.sortKey || 0));
+    renderBookingsTable();
+  }, error => {
+    console.error('Firebase realtime bookings error:', error);
+  });
+}
+
 async function saveBooking(booking) {
   if (!canUseFirestore()) throw new Error('Firestore unavailable');
 
@@ -571,6 +595,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   await loadBlockedDates();
   await loadBlockedTimes();
   renderBookingsTable();
+  subscribeToPaidBookings();
   renderBlockedDatesList();
   renderBlockedTimesList();
 

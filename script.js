@@ -156,6 +156,7 @@ async function verifyOwnerCode(inputCode) {
 }
 
 const DEFAULT_SERVICE_DURATIONS = {
+  'stripe-test': 30,
   'basic': 20,
   'interior-wash': 40,
   'premium': 100,
@@ -178,6 +179,7 @@ const DEFAULT_SERVICE_DURATIONS = {
 let serviceDurations = { ...DEFAULT_SERVICE_DURATIONS };
 
 const SERVICE_LABELS = {
+  'stripe-test': 'Testköp',
   'basic': 'Utvändig Handtvätt',
   'interior-wash': 'Invändig Tvätt',
   'premium': 'Komplett In- & Utvändig Tvätt',
@@ -981,6 +983,7 @@ if (bookBtn) {
 
 // Service prices by size
 const servicePrices = {
+  'stripe-test': { small: 1, medium: 1, large: 1 },
   'basic': { small: 199, medium: 249, large: 279 },
   'interior-wash': { small: 249, medium: 279, large: 300 },
   'premium': { small: 399, medium: 449, large: 479 },
@@ -1100,6 +1103,7 @@ function buildStripeLinkKey(service, size, seatAddonType, asphaltAddonType) {
 
 function getStripePaymentLink(service, size, seatAddonType, asphaltAddonType) {
   if (!service) return null;
+  if (service === 'stripe-test') return 'https://buy.stripe.com/test_3cI00ldvYfwY3C55Vd0Ba01';
   const fixedPriceKey = buildStripeLinkKey(service, 'any', 'none', 'none');
   if (!size) return STRIPE_PAYMENT_LINKS[fixedPriceKey] || null;
   const key = buildStripeLinkKey(service, size, seatAddonType, asphaltAddonType);
