@@ -48,6 +48,7 @@
           📋 Bokningar
         </h3>
         <div style="display:flex;gap:12px;flex-wrap:wrap;">
+          <input id="bookingSearchInput" type="search" placeholder="Sök namn eller reg.nr" aria-label="Sök namn eller registreringsnummer" style="min-width:230px;padding:10px 16px;border-radius:10px;border:2px solid var(--border);background:#1a1a1a;color:var(--text-primary);font-weight:600;" />
           <select id="bookingTypeFilter" style="padding:10px 16px;border-radius:10px;border:2px solid var(--border);background:#1a1a1a;color:var(--text-primary);font-weight:600;cursor:pointer;transition:all 0.3s;">
             <option value="all">📦 Alla Bokningar</option>
             <option value="wash">🧼 Endast Tvätt</option>
@@ -285,6 +286,6 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 <script src="firebase-config.js?v=6"></script>
-<script src="owner.js?v=48"></script>
+<script src="owner.js?v=49"></script>
 </body>
 </html>

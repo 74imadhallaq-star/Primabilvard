@@ -434,13 +434,20 @@ function renderBookingsTable() {
 
   const typeFilter = document.getElementById('bookingTypeFilter')?.value || 'all';
   const statusFilter = document.getElementById('bookingStatusFilter')?.value || 'all';
+  const searchTerm = (document.getElementById('bookingSearchInput')?.value || '')
+    .toLowerCase()
+    .replace(/\s+/g, '');
   const filteredBookings = cachedBookings.filter((booking) => {
     const service = String(booking.service || '').trim();
     const paymentStatus = String(booking.paymentStatus || 'Pending').trim().toLowerCase();
     const bookingSource = booking.source === 'owner-manual' ? 'manual' : 'online';
+    const searchableText = `${booking.name || ''}${booking.registration || ''}`
+      .toLowerCase()
+      .replace(/\s+/g, '');
 
     if (typeFilter === 'wash' && !WASH_SERVICES.has(service)) return false;
     if (typeFilter === 'service' && WASH_SERVICES.has(service)) return false;
+    if (searchTerm && !searchableText.includes(searchTerm)) return false;
     if (statusFilter === 'paid-manual'
       && paymentStatus !== 'paid'
       && bookingSource !== 'manual') return false;
@@ -601,6 +608,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   document.getElementById('bookingTypeFilter')?.addEventListener('change', renderBookingsTable);
   document.getElementById('bookingStatusFilter')?.addEventListener('change', renderBookingsTable);
+  document.getElementById('bookingSearchInput')?.addEventListener('input', renderBookingsTable);
 
   const ownerManualBookingForm = document.getElementById('ownerManualBookingForm');
   if (ownerManualBookingForm) {
