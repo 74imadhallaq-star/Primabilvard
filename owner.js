@@ -89,6 +89,28 @@ function readLegacyBookings(key) {
   }
 }
 
+async function syncAvailabilityRecords(bookingsResult, pendingResult) {
+  const records = new Map();
+  [bookingsResult, pendingResult].forEach(result => {
+    if (result.status !== 'fulfilled') return;
+    result.value.docs.forEach(doc => records.set(String(doc.id), doc.data()));
+  });
+
+  const entries = Array.from(records.entries());
+  for (let start = 0; start < entries.length; start += 450) {
+    const batch = window.db.batch();
+    entries.slice(start, start + 450).forEach(([id, booking]) => {
+      if (!booking.date || !booking.time || !booking.service) return;
+      batch.set(
+        window.db.collection('availability').doc(id),
+        availabilityFromBooking(booking),
+        { merge: true }
+      );
+    });
+    await batch.commit();
+  }
+}
+
 function escapeHtml(str) {
   if (!str && str !== 0) return '';
   return String(str).replace(/[&<>\"]/g, function(c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; });
@@ -335,6 +357,12 @@ async function loadBookings() {
     }
     if (availabilityResult.status === 'rejected') {
       console.warn('Firebase availability load error:', availabilityResult.reason);
+    }
+
+    try {
+      await syncAvailabilityRecords(bookingsResult, pendingResult);
+    } catch (error) {
+      console.warn('Firebase availability sync error:', error);
     }
 
     cachedBookings = Array.from(bookingsById.values());
