@@ -276,9 +276,10 @@ async function loadBookings() {
   try {
     if (!canUseFirestore()) throw new Error('Firestore unavailable');
 
-    const [bookingsResult, pendingResult] = await Promise.allSettled([
+    const [bookingsResult, pendingResult, availabilityResult] = await Promise.allSettled([
       window.db.collection('bookings').get(),
-      window.db.collection('pendingBookings').get()
+      window.db.collection('pendingBookings').get(),
+      window.db.collection('availability').get()
     ]);
 
     const bookingsById = new Map();
@@ -293,8 +294,18 @@ async function loadBookings() {
         }
       });
     }
+    if (availabilityResult.status === 'fulfilled') {
+      availabilityResult.value.docs.forEach(doc => {
+        const availabilityBooking = doc.data();
+        if (!bookingsById.has(String(doc.id))) {
+          bookingsById.set(String(doc.id), availabilityBooking);
+        }
+      });
+    }
 
-    if (bookingsResult.status === 'rejected' && pendingResult.status === 'rejected') {
+    if (bookingsResult.status === 'rejected'
+      && pendingResult.status === 'rejected'
+      && availabilityResult.status === 'rejected') {
       throw bookingsResult.reason;
     }
     if (bookingsResult.status === 'rejected') {
@@ -302,6 +313,9 @@ async function loadBookings() {
     }
     if (pendingResult.status === 'rejected') {
       console.warn('Firebase pendingBookings load error:', pendingResult.reason);
+    }
+    if (availabilityResult.status === 'rejected') {
+      console.warn('Firebase availability load error:', availabilityResult.reason);
     }
 
     cachedBookings = Array.from(bookingsById.values());
