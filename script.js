@@ -1313,25 +1313,19 @@ let cachedBookings = [];
 let unsubscribeAvailability = null;
 
 async function saveBooking(booking) {
+  cachedBookings.push(booking);
+  cachedBookings.sort((a, b) => (b.sortKey || 0) - (a.sortKey || 0));
+  writeLocalArray(LOCAL_STORAGE_KEYS.bookings, cachedBookings);
+  
   if (!canUseFirestore()) {
-    cachedBookings.push(booking);
-    cachedBookings.sort((a, b) => (b.sortKey || 0) - (a.sortKey || 0));
-    writeLocalArray(LOCAL_STORAGE_KEYS.bookings, cachedBookings);
     return;
   }
   try {
     await window.db.collection('bookings').doc(String(booking.id)).set(booking);
-    cachedBookings.push(booking);
-    cachedBookings.sort((a, b) => (b.sortKey || 0) - (a.sortKey || 0));
-    writeLocalArray(LOCAL_STORAGE_KEYS.bookings, cachedBookings);
   } catch (e) {
     console.error('Firebase save error:', e);
-    cachedBookings.push(booking);
-    cachedBookings.sort((a, b) => (b.sortKey || 0) - (a.sortKey || 0));
-    writeLocalArray(LOCAL_STORAGE_KEYS.bookings, cachedBookings);
   }
 }
-
 async function savePendingBooking(booking) {
   if (!canUseFirestore()) throw new Error('Firestore unavailable');
 
