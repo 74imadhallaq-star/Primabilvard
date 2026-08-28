@@ -1358,7 +1358,7 @@ async function loadBookingsFromFirebase() {
     return;
   }
   try {
-    const snapshot = await window.db.collection('availability').get();
+    const snapshot = await window.db.collection('bookings').get();
     cachedBookings = snapshot.docs.map(doc => doc.data());
     cachedBookings.sort((a, b) => (b.sortKey || 0) - (a.sortKey || 0));
     writeLocalArray(LOCAL_STORAGE_KEYS.bookings, cachedBookings);
