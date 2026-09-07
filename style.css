@@ -1867,6 +1867,11 @@ body.owner-login-active {
   cursor: pointer;
 }
 
+  /* Keep the Stripe test purchase available in code without showing it to customers. */
+.service-option[data-service="stripe-test"] {
+  display: none !important;
+}
+
 .owner-login-cancel {
   background: #2f2f2f;
   color: var(--text-primary);
