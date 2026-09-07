@@ -789,6 +789,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   // ===== AD CONFIGURATION SYSTEM =====
+  await loadCurrentUpdateFromFirebase();
+  renderCurrentUpdateControls();
   ensureAdStyles();
   await loadAdConfigFromFirebase();
   renderAdConfigControls();
@@ -796,6 +798,74 @@ document.addEventListener('DOMContentLoaded', async () => {
     showAdPopup(adConfig.html);
   }
 });
+
+// ===== CURRENT UPDATE CONFIGURATION =====
+const DEFAULT_CURRENT_UPDATE = {
+  enabled: true,
+  text: 'Vi hämtar och lämnar bilen på utvalda tjänster. Vid avstånd över 10 km kan en extra avgift förekomma.'
+};
+const CURRENT_UPDATE_LOCAL_KEY = 'primabilvard_currentUpdate';
+let currentUpdateConfig = { ...DEFAULT_CURRENT_UPDATE };
+
+function readCurrentUpdateLocal() {
+  try {
+    const stored = localStorage.getItem(CURRENT_UPDATE_LOCAL_KEY);
+    return stored ? JSON.parse(stored) : null;
+  } catch (_) {
+    return null;
+  }
+}
+
+function writeCurrentUpdateLocal(config) {
+  try {
+    localStorage.setItem(CURRENT_UPDATE_LOCAL_KEY, JSON.stringify(config));
+  } catch (_) {}
+}
+
+async function loadCurrentUpdateFromFirebase() {
+  try {
+    if (canUseFirestore() && window.db) {
+      const doc = await window.db.collection('settings').doc('currentUpdate').get();
+      if (doc.exists) {
+        currentUpdateConfig = { ...currentUpdateConfig, ...doc.data() };
+        writeCurrentUpdateLocal(currentUpdateConfig);
+        return;
+      }
+    }
+  } catch (error) {
+    console.error('Error loading current update:', error);
+  }
+  const local = readCurrentUpdateLocal();
+  if (local) currentUpdateConfig = { ...currentUpdateConfig, ...local };
+}
+
+async function saveCurrentUpdateToFirebase() {
+  writeCurrentUpdateLocal(currentUpdateConfig);
+  if (canUseFirestore() && window.db) {
+    await window.db.collection('settings').doc('currentUpdate').set(currentUpdateConfig, { merge: true });
+  }
+}
+
+function renderCurrentUpdateControls() {
+  const enabledCheck = document.getElementById('ownerCurrentUpdateEnabled');
+  const textField = document.getElementById('ownerCurrentUpdateText');
+  const saveBtn = document.getElementById('saveCurrentUpdateBtn');
+  if (enabledCheck) enabledCheck.checked = currentUpdateConfig.enabled;
+  if (textField) textField.value = currentUpdateConfig.text || '';
+  if (!saveBtn) return;
+
+  saveBtn.addEventListener('click', async () => {
+    currentUpdateConfig.enabled = enabledCheck ? enabledCheck.checked : false;
+    currentUpdateConfig.text = textField ? textField.value.trim().slice(0, 300) : '';
+    try {
+      await saveCurrentUpdateToFirebase();
+      alert('Aktuell information sparad.');
+    } catch (error) {
+      console.error('Error saving current update:', error);
+      alert('Kunde inte spara aktuell information.');
+    }
+  });
+}
 
 // ===== AD CONFIGURATION FUNCTIONS =====
 let adConfig = {

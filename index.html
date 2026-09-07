@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Cormorant+Garamond:wght@400;500;600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=10">
+<link rel="stylesheet" href="style.css?v=17">
 </head>
 <body>
 
@@ -43,8 +43,23 @@
     <p class="tagline">✨ Där Glans Möter Elegans ✨</p>
     <p class="hero-description">Exklusiv bilvård för de som bryr sig om detaljer</p>
     <button id="bookBtn" class="cta-button">Boka Din Tid Nu</button>
+    <div class="mobile-service-actions" aria-label="Välj tjänsteområde">
+      <button type="button" class="mobile-service-button" data-mobile-tab="car-wash">🚗 Bilvård</button>
+      <button type="button" class="mobile-service-button" data-mobile-tab="car-service">🔧 Bilservice</button>
+    </div>
   </div>
 </header>
+
+<!-- CURRENT UPDATE -->
+<aside class="current-update" aria-label="Aktuell information">
+  <div class="current-update-inner">
+    <span class="current-update-icon" aria-hidden="true">✦</span>
+    <div class="current-update-content">
+      <span class="current-update-label">Aktuellt</span>
+      <p>Vi hämtar och lämnar bilen på utvalda tjänster. Vid avstånd över 10 km kan en extra avgift förekomma.</p>
+    </div>
+  </div>
+</aside>
 
 <!-- SERVICES -->
 <section id="services" class="services">
@@ -72,7 +87,13 @@
       <div class="service-items">
     <div class="service-card service-item" data-service="basic" style="cursor: pointer;">
       <h3>Utvändig Handtvätt</h3>
-      <p>Ge din bil nybilskänslan tillbaka. Vi använder kraftfullt högtryck för att få bort all lös smuts och salt, följt av en noggrann handtvätt som gör lacken skinande ren. I paketet ingår även grundlig fälgtvätt och putsning av rutorna utvändigt. Det trygga valet för dig som vill ha en bil som ser ut som ny igen.</p>
+      <p>En noggrann utvändig handtvätt för en ren och skinande bil.</p>
+      <ul class="service-features">
+        <li>Högtryckstvätt</li>
+        <li>Handtvätt av karossen</li>
+        <li>Grundlig fälgtvätt</li>
+        <li>Putsning av rutor utvändigt</li>
+      </ul>
       <p><strong>Tid: ca 20 minuter</strong></p>
       <select class="card-size">
         <option value="small">Liten - 199 kr</option>
@@ -87,7 +108,13 @@
     </div>
     <div class="service-card service-item" data-service="interior-wash" style="cursor: pointer;">
       <h3>Invändig Tvätt</h3>
-      <p>Djuprengöring av bilens interiör. Vi dammsuger hela kupén, rengör alla ytor noggrant och putsar rutorna invändigt. Perfekt för att få bort damm, fläckar och skapa en fräsch miljö i bilen.</p>
+      <p>En grundlig invändig rengöring som gör kupén fräsch och ren.</p>
+      <ul class="service-features">
+        <li>Dammsugning av hela kupén</li>
+        <li>Rengöring av alla ytor</li>
+        <li>Putsning av rutor invändigt</li>
+        <li>Borttagning av damm och smuts</li>
+      </ul>
       <p><strong>Tid: ca 40 minuter</strong></p>
       <select class="card-size">
         <option value="small">Liten - 249 kr</option>
@@ -98,7 +125,14 @@
     </div>
     <div class="service-card service-item" data-service="premium" style="cursor: pointer;">
       <h3>Komplett In- & Utvändig Tvätt</h3>
-      <p>Ge hela bilen nybilskänslan tillbaka. Vi kombinerar en grundlig handtvätt med högtryck på utsidan och en noggrann städning på insidan. Vi dammsuger hela kupén, putsar rutorna och gör rent fälgarna ordentligt & toppar av det med däckglans. Det perfekta valet för dig som vill ha en bil som känns både ren, fräsch och som ny igen, både utvändigt och invändigt.</p>
+      <p>En komplett tvätt av både bilens utsida och insida.</p>
+      <ul class="service-features">
+        <li>Högtrycks- och handtvätt</li>
+        <li>Dammsugning av kupén</li>
+        <li>Rengöring av fälgar</li>
+        <li>Putsning av rutor</li>
+        <li>Däckglans</li>
+      </ul>
       <p><strong>Tid: ca 100 minuter</strong></p>
       <select class="card-size">
         <option value="small">Liten - 399 kr</option>
@@ -128,7 +162,14 @@
       <div class="service-items">
     <div class="service-card service-item" data-service="inout" style="cursor: pointer;">
       <h3>In- & Utvändig Tvätt Med Sätten</h3>
-      <p>En komplett in- och utvändig behandling för dig som vill få bilen ordentligt uppfräschad. Vi tvättar utsidan noggrant, rengör kupén grundligt, dammsuger, putsar rutor och går igenom detaljer för ett rent och fräscht helhetsintryck.</p>
+      <p>En komplett in- och utvändig tvätt med extra fokus på sätena.</p>
+      <ul class="service-features">
+        <li>Utvändig handtvätt</li>
+        <li>Grundlig interiörrengöring</li>
+        <li>Dammsugning av kupén</li>
+        <li>Putsning av rutor</li>
+        <li>Tvätt av säten</li>
+      </ul>
       <p><strong>Tid: ca 4 timmar</strong></p>
       <select class="card-size">
         <option value="small">Liten - 1000 kr</option>
@@ -143,6 +184,14 @@
     </div>
     <div class="service-card service-item" data-service="interior" style="cursor: pointer;">
       <h3>Hel Glans</h3>
+      <p class="service-short-description">En premiumrekond som ger bilen extra glans och en fräsch interiör.</p>
+      <ul class="service-features">
+        <li>Handtvätt in- och utvändigt</li>
+        <li>Djupgående interiörrengöring</li>
+        <li>Vax för extra glans och skydd</li>
+        <li>Rengöring av fönster och dörrkarmar</li>
+        <li>Klädseltvätt kan väljas till</li>
+      </ul>
       <p>Ge din bil en ordentlig uppfräschning med vårt Premiumpaket! Här ingår en noggrann handtvätt både in- och utvändigt, djupgående interiörrekonditionering, applicering av vax för extra skydd och glans samt en grundlig rengöring av fönster, dörrkarmar och trösklar. Perfekt för dig som vill att bilen ska se och kännas som ny – varje dag. Du kan även välja till klädseltvätt mot en extra kostnad för ett ännu fräschare resultat.</p>
       <p><strong>Tid: ca 3 timmar</strong></p>
       <select class="card-size">
@@ -159,6 +208,15 @@
     </div>
     <div class="service-card service-item" data-service="full" style="cursor: pointer;">
       <h3>Fullservice Rekond</h3>
+      <p class="service-short-description">Vår mest kompletta rekond för maximal glans, skydd och rengöring.</p>
+      <ul class="service-features">
+        <li>Fullständig handtvätt in- och utvändigt</li>
+        <li>Avancerad polering och repborttagning</li>
+        <li>Professionellt lackskydd</li>
+        <li>Motortvätt</li>
+        <li>Komplett interiörrekonditionering</li>
+        <li>Klädseltvätt kan väljas till</li>
+      </ul>
       <p>För dig som vill ge bilen det allra bästa erbjuder vi vårt Exklusivpaket. Paketet inkluderar fullständig handtvätt in- och utvändigt, avancerad polering för maximal glans och borttagning av djupare repor, samt professionellt lackskydd med keramisk coating eller högkvalitativt vax. Motortvätt och komplett interiörrekonditionering ingår också, vilket ger din bil en total förvandling från hjul till tak. Detta paket är perfekt för bilentusiaster, företagskunder med höga krav och bilhandlare som vill säkerställa att deras bilar är i toppskick. Du kan även välja till klädseltvätt mot en extra kostnad för en ännu mer komplett rekond.</p>
       <p><strong>Tid: ca 3,5 timmar</strong></p>
       <select class="card-size">
@@ -476,16 +534,6 @@
             <button type="button" class="category-btn active" data-category="wash">🚗 Bilvård</button>
             <button type="button" class="category-btn" data-category="service">🔧 Bilservice</button>
           </div>
-          <!-- Inspection-fix contact panel (shown when inspection-fix is selected) -->
-          <div id="wizardInspectionFixPanel" style="display:none;margin-top:20px;padding:24px;background:rgba(26,93,168,0.12);border:1px solid rgba(26,93,168,0.4);border-radius:12px;">
-            <h4 style="margin:0 0 12px 0;color:#5b9bd5;">📋 Åtgärda Besiktningsanmärkningar</h4>
-            <p style="margin:0 0 16px 0;color:var(--text-secondary);">Denna tjänst kräver en individuell offert. Kontakta oss så hjälper vi dig snabbt!</p>
-            <div style="display:flex;flex-wrap:wrap;gap:12px;">
-              <a href="tel:0737542220" style="display:inline-flex;align-items:center;gap:8px;padding:12px 20px;background:#1a5da8;color:#fff;border-radius:10px;text-decoration:none;font-weight:600;">📞 Ring oss: 073-754 22 20</a>
-              <a href="mailto:foretag@primabilvard.com" style="display:inline-flex;align-items:center;gap:8px;padding:12px 20px;background:#0a3d78;color:#fff;border-radius:10px;text-decoration:none;font-weight:600;">✉️ foretag@primabilvard.com</a>
-            </div>
-          </div>
-          
           <div class="service-options" id="serviceOptionsWash">
             <div class="service-option" data-service="basic">
               <div class="service-option-icon">💧</div>
@@ -523,12 +571,7 @@
               <p>Exklusiv totalbehandling</p>
               <span class="service-option-price">Från 2000 kr</span>
             </div>
-            <div class="service-option" data-service="stripe-test">
-              <div class="service-option-icon">🧪</div>
-              <h4>Testköp</h4>
-              <p>Testa betalningen med Stripe</p>
-              <span class="service-option-price">1 kr</span>
-            </div>
+
           </div>
 
           <div class="service-options" id="serviceOptionsService" style="display:none;">
@@ -606,6 +649,14 @@
       <div class="wizard-panel" data-panel="2">
         <h3>Ange detaljer för din bokning</h3>
         <div class="wizard-form">
+          <div id="wizardInspectionFixPanel" style="display:none;margin-bottom:20px;padding:24px;background:rgba(26,93,168,0.12);border:1px solid rgba(26,93,168,0.4);border-radius:12px;">
+            <h4 style="margin:0 0 12px 0;color:#5b9bd5;">📋 Åtgärda Besiktningsanmärkningar</h4>
+            <p style="margin:0 0 16px 0;color:var(--text-secondary);">Denna tjänst kräver en individuell offert. Ring eller mejla oss så hjälper vi dig snabbt!</p>
+            <div style="display:flex;flex-wrap:wrap;gap:12px;">
+              <a href="tel:0737542220" style="display:inline-flex;align-items:center;gap:8px;padding:12px 20px;background:#1a5da8;color:#fff;border-radius:10px;text-decoration:none;font-weight:600;">📞 Ring oss: 073-754 22 20</a>
+              <a href="mailto:foretag@primabilvard.com" style="display:inline-flex;align-items:center;gap:8px;padding:12px 20px;background:#0a3d78;color:#fff;border-radius:10px;text-decoration:none;font-weight:600;">✉️ foretag@primabilvard.com</a>
+            </div>
+          </div>
           <div class="form-section" id="wizardSizeSection">
             <label>Bilstorlek *</label>
             <div class="size-selector">
@@ -655,7 +706,7 @@
               </div>
               <div class="addon-option" data-addon="yes">
                 <span>Lägg till</span>
-                <small>+30 min</small>
+                <small id="wizardAsphaltAddonPrice">+250 kr, +30 min</small>
               </div>
             </div>
           </div>
@@ -712,12 +763,13 @@
             <label for="wizardEmail">E-post *</label>
             <input type="email" id="wizardEmail" placeholder="din@email.se" required>
           </div>
-          <!-- Hemhämtning (only shown for bilservice bookings) -->
+          <!-- Hemhämtning (shown for bilservice and complete detailing bookings) -->
           <div class="form-section" id="wizardPickupSection" style="display:none;">
             <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
               <input type="checkbox" id="wizardPickupCheckbox" style="width:18px;height:18px;cursor:pointer;">
-              <span>Hemhämtning av bilen 🚗 <small style="color:var(--text-secondary);">(vi hämtar bilen hos dig)</small></span>
+              <span>Vi hämtar och lämnar bilen 🚗</span>
             </label>
+            <p class="pickup-warning">OBS! Vid avstånd över 10 km kan en extra avgift förekomma.</p>
           </div>
           <div class="form-section" id="wizardPickupAddressSection" style="display:none;">
             <label for="wizardPickupAddress">Adress för hämtning *</label>
@@ -870,7 +922,7 @@
           <label>Extra tillbehör: Asfaltrengöring</label>
           <div class="addon-buttons" id="asphaltAddonButtons">
             <button type="button" class="addon-btn active" data-addon="none">Ingen</button>
-            <button type="button" class="addon-btn" data-addon="yes">Lägg till asfaltrengöring (+30 min)</button>
+            <button type="button" class="addon-btn" data-addon="yes">Lägg till asfaltrengöring (+250/+300/+350 kr, +30 min)</button>
           </div>
           <p id="asphaltAddonHelp" class="addon-help">Välj Utvändig Handtvätt, Komplett In- & Utvändig Tvätt eller In- & Utvändig Tvätt Med Sätten för att aktivera tillval.</p>
         </div>

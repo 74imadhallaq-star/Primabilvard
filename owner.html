@@ -192,6 +192,19 @@
       </div>
     </div>
 
+    <!-- Aktuell information -->
+    <div style="background:#0f0f0f;border-radius:16px;padding:30px;margin-bottom:30px;border:1px solid var(--border);box-shadow:0 4px 20px rgba(0,0,0,0.2);">
+      <h3 style="margin:0 0 10px 0;color:var(--text-primary);font-size:1.5rem;font-weight:700;">📌 Aktuell information</h3>
+      <p style="margin:0 0 20px 0;color:var(--text-secondary);font-size:0.95rem;">Styr den lilla informationsrutan på startsidan.</p>
+      <label style="display:flex;align-items:center;gap:8px;margin-bottom:14px;color:var(--text-primary);font-weight:600;">
+        <input type="checkbox" id="ownerCurrentUpdateEnabled" style="width:16px;height:16px;cursor:pointer;" />
+        <span>Visa Aktuellt-rutan</span>
+      </label>
+      <label for="ownerCurrentUpdateText" style="display:block;margin-bottom:6px;color:var(--text-primary);font-weight:500;font-size:0.9rem;">Text:</label>
+      <textarea id="ownerCurrentUpdateText" maxlength="300" placeholder="Skriv aktuell information här..." style="width:100%;min-height:90px;padding:10px;border-radius:8px;border:1px solid var(--border);background:#0f0f0f;color:var(--text-primary);font-family:inherit;font-size:0.9rem;resize:vertical;"></textarea>
+      <button id="saveCurrentUpdateBtn" class="submit-btn" style="width:auto;margin:14px 0 0;padding:10px 14px;">💾 Spara aktuell information</button>
+    </div>
+
     <!-- Annonsinställningar (Collapsible) -->
     <div style="background:#0f0f0f;border-radius:16px;padding:30px;border:1px solid var(--border);box-shadow:0 4px 20px rgba(0,0,0,0.2);">
       <h3 style="margin:0 0 10px 0;color:var(--text-primary);font-size:1.5rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:10px;user-select:none;" onclick="const content = this.nextElementSibling; content.style.display = content.style.display === 'none' ? 'block' : 'none'; this.querySelector('.collapse-icon').textContent = this.querySelector('.collapse-icon').textContent === '▼' ? '▶' : '▼';">
@@ -286,6 +299,6 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 <script src="firebase-config.js?v=6"></script>
-<script src="owner.js?v=49"></script>
+<script src="owner.js?v=50"></script>
 </body>
 </html>

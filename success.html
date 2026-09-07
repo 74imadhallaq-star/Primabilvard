@@ -261,6 +261,27 @@
         paymentStatus: 'Paid'
       };
 
+      const serviceLabels = {
+        basic: 'Utvändig Handtvätt',
+        'interior-wash': 'Invändig Tvätt',
+        premium: 'Komplett In- & Utvändig Tvätt',
+        inout: 'In- & Utvändig Tvätt Med Sätten',
+        interior: 'Hel Glans',
+        full: 'Fullservice Rekond',
+        'tire-change': 'Däckbyte',
+        'tire-storage': 'Däckhotell',
+        'tire-repair': 'Däckreparation',
+        'basic-service': 'Basservice',
+        'major-service': 'Storservice',
+        'brake-service': 'Bromsservice',
+        'pre-inspection': 'Förbered Besiktning',
+        'inspection-fix': 'Åtgärda Besiktningsanmärkningar',
+        'computer-diagnosis': 'Datordiagnos',
+        'electrical-diagnosis': 'Eldiagnos',
+        'engine-diagnosis': 'Motordiagnos'
+      };
+      const serviceName = serviceLabels[finalizedBooking.service] || finalizedBooking.service;
+
       // 1) Spara alltid slutlig bokning först
       await db.collection('bookings').doc(String(finalizedBooking.id)).set(finalizedBooking, { merge: true });
 
@@ -277,7 +298,8 @@
           email: finalizedBooking.email,
           phone: finalizedBooking.phone,
           registration: finalizedBooking.registration,
-          service: finalizedBooking.service,
+          service: serviceName,
+          serviceId: finalizedBooking.service,
           seatAddon: finalizedBooking.seatAddon || 'none',
           asphaltAddon: finalizedBooking.asphaltAddon || 'none',
           size: finalizedBooking.size,

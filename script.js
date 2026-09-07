@@ -330,7 +330,11 @@ function bookService(serviceId, chosenSize, chosenSeatAddon = 'none', chosenAsph
       asphaltAddon: chosenAsphaltAddon || 'none'
     }
   }));
-  document.getElementById('booking').scrollIntoView({ behavior: 'smooth' });
+  const bookingSection = document.getElementById('booking');
+  if (bookingSection) {
+    const behavior = window.matchMedia('(max-width: 768px)').matches ? 'auto' : 'smooth';
+    bookingSection.scrollIntoView({ behavior });
+  }
 }
 
 // Available hours for booking (08:00 - 18:00, 1 hour slots)
@@ -1500,6 +1504,41 @@ function getServiceLabel(service, seatAddonType = 'none', asphaltAddonType = 'no
   return extras.length ? `${base} + ${extras.join(' + ')}` : base;
 }
 
+// ===== CURRENT UPDATE CONFIGURATION =====
+const DEFAULT_CURRENT_UPDATE = {
+  enabled: true,
+  text: 'Vi hämtar och lämnar bilen på utvalda tjänster. Vid avstånd över 10 km kan en extra avgift förekomma.'
+};
+const CURRENT_UPDATE_LOCAL_KEY = 'primabilvard_currentUpdate';
+
+function applyCurrentUpdate(config) {
+  const update = document.querySelector('.current-update');
+  if (!update) return;
+  const textNode = update.querySelector('.current-update-content p');
+  if (textNode) textNode.textContent = config.text || '';
+  update.hidden = !config.enabled || !config.text;
+}
+
+async function loadCurrentUpdate() {
+  let config = { ...DEFAULT_CURRENT_UPDATE };
+  try {
+    if (window.db && typeof window.db.collection === 'function') {
+      const doc = await window.db.collection('settings').doc('currentUpdate').get();
+      if (doc.exists) config = { ...config, ...doc.data() };
+    } else {
+      const stored = localStorage.getItem(CURRENT_UPDATE_LOCAL_KEY);
+      if (stored) config = { ...config, ...JSON.parse(stored) };
+    }
+  } catch (error) {
+    try {
+      const stored = localStorage.getItem(CURRENT_UPDATE_LOCAL_KEY);
+      if (stored) config = { ...config, ...JSON.parse(stored) };
+    } catch (_) {}
+    console.warn('Kunde inte läsa aktuell information:', error);
+  }
+  applyCurrentUpdate(config);
+}
+
 // ===== AD CONFIGURATION FUNCTIONS =====
 let adConfig = {
   enabled: false,
@@ -2089,6 +2128,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 
   syncMobilePaymentSection();
   window.addEventListener('resize', syncMobilePaymentSection);
+  await loadCurrentUpdate();
 
   // Reset scroll to top
   window.scrollTo(0, 0);
@@ -2120,7 +2160,7 @@ document.addEventListener('DOMContentLoaded', async function() {
   updateAsphaltAddonVisibility();
   
   // hook up service cards to select pricing & scroll
-  document.querySelectorAll('.service-card').forEach(card => {
+  document.querySelectorAll('.service-card[data-service], .service-item[data-service]').forEach(card => {
     const service = card.dataset.service;
     const sizeSelect = card.querySelector('.card-size');
     const seatAddonSelect = card.querySelector('.card-addon-seat');
@@ -2510,13 +2550,6 @@ document.addEventListener('DOMContentLoaded', async function() {
       document.body.appendChild(toast);
       setTimeout(() => toast.remove(), 3000);
       
-      // Scroll to wizard booking section
-      const wizardSection = document.querySelector('.booking-wizard');
-      if (wizardSection) {
-        setTimeout(() => {
-          wizardSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }, 300);
-      }
     });
 
     // Add hover effect enhancement
@@ -2547,6 +2580,19 @@ document.addEventListener('DOMContentLoaded', async function() {
   tabButtons.forEach(button => {
     button.addEventListener('click', () => {
       switchTab(button.dataset.tab);
+    });
+  });
+
+  // Mobile hero shortcuts reuse the same tab state as the service tabs.
+  document.querySelectorAll('.mobile-service-button').forEach(button => {
+    button.addEventListener('click', () => {
+      const targetTab = button.dataset.mobileTab;
+      if (!targetTab) return;
+      switchTab(targetTab);
+      const servicesSection = document.getElementById('services');
+      if (servicesSection) {
+        servicesSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
     });
   });
 
@@ -2615,12 +2661,52 @@ document.addEventListener('DOMContentLoaded', async function() {
     });
   }
 
+  function updateWizardAsphaltPrice() {
+    const priceNode = document.getElementById('wizardAsphaltAddonPrice');
+    if (!priceNode) return;
+    const size = wizardData.size || 'small';
+    const price = getAsphaltAddonPrice(wizardData.service, size, 'yes');
+    priceNode.textContent = price ? `+${price} kr, +30 min` : '+30 min';
+  }
+
+  function updateWizardDetailsVisibility() {
+    const seatAddon = document.getElementById('wizardSeatAddon');
+    const asphaltAddon = document.getElementById('wizardAsphaltAddon');
+    const sizeSection = document.getElementById('wizardSizeSection');
+    const pickupSection = document.getElementById('wizardPickupSection');
+    const isServiceBooking = SERVICE_SERVICES.includes(wizardData.service);
+
+    if (seatAddon) {
+      seatAddon.style.display = serviceSupportsSeatAddon(wizardData.service) ? 'block' : 'none';
+    }
+    if (asphaltAddon) {
+      asphaltAddon.style.display = serviceSupportsAsphaltAddon(wizardData.service) ? 'block' : 'none';
+    }
+    if (sizeSection) {
+      sizeSection.style.display = isServiceBooking ? 'none' : 'block';
+      if (isServiceBooking) wizardData.size = 'small';
+    }
+    if (pickupSection) {
+      const pickupEligible = isServiceBooking || ['inout', 'interior', 'full'].includes(wizardData.service);
+      pickupSection.style.display = pickupEligible ? 'block' : 'none';
+    }
+
+    document.querySelectorAll('#wizardSeatAddon .addon-option').forEach((option) => {
+      option.classList.toggle('active', option.dataset.addon === (wizardData.seatAddon || 'none'));
+    });
+    document.querySelectorAll('#wizardAsphaltAddon .addon-option').forEach((option) => {
+      option.classList.toggle('active', option.dataset.addon === (wizardData.asphaltAddon || 'none'));
+    });
+    updateWizardAsphaltPrice();
+  }
+
   function selectWizardService(service, size = '', seatAddon = 'none', asphaltAddon = 'none') {
     wizardData.service = service;
     wizardData.size = size;
     wizardData.seatAddon = seatAddon;
     wizardData.asphaltAddon = asphaltAddon;
     updateWizardSizePrices(service);
+    updateWizardDetailsVisibility();
 
     document.querySelectorAll('.service-option').forEach((option) => {
       option.classList.toggle('selected', option.dataset.service === service);
@@ -2635,6 +2721,16 @@ document.addEventListener('DOMContentLoaded', async function() {
     if (!selection) return;
     selectWizardService(selection.service, selection.size, selection.seatAddon, selection.asphaltAddon);
     updateWizardStep(2);
+
+    const inspectionPanel = document.getElementById('wizardInspectionFixPanel');
+    const nextBtn = document.getElementById('wizardNextBtn');
+    if (selection.service === 'inspection-fix') {
+      if (inspectionPanel) inspectionPanel.style.display = 'block';
+      if (nextBtn) nextBtn.style.display = 'none';
+    } else {
+      if (inspectionPanel) inspectionPanel.style.display = 'none';
+      if (nextBtn) nextBtn.style.display = 'block';
+    }
   });
 
   function updateWizardStep(step) {
@@ -2717,11 +2813,13 @@ document.addEventListener('DOMContentLoaded', async function() {
       wizardData.service = option.dataset.service;
       updateWizardSizePrices(wizardData.service);
       
-      // Show/hide inspection-fix contact panel
+      // Inspection-fix is an estimate request, so show its contact details in step 2.
       const inspectionPanel = document.getElementById('wizardInspectionFixPanel');
       const nextBtn = document.getElementById('wizardNextBtn');
       if (option.dataset.service === 'inspection-fix') {
         if (inspectionPanel) inspectionPanel.style.display = 'block';
+        updateWizardDetailsVisibility();
+        updateWizardStep(2);
         if (nextBtn) nextBtn.style.display = 'none';
       } else {
         if (inspectionPanel) inspectionPanel.style.display = 'none';
@@ -2736,6 +2834,7 @@ document.addEventListener('DOMContentLoaded', async function() {
       document.querySelectorAll('.size-option').forEach(opt => opt.classList.remove('selected'));
       option.classList.add('selected');
       wizardData.size = option.dataset.size;
+      updateWizardAsphaltPrice();
     });
   });
 
@@ -2982,34 +3081,28 @@ document.addEventListener('DOMContentLoaded', async function() {
         alert('Vänligen fyll i alla obligatoriska fält.');
         return;
       }
+
+      // Prevent mobile browsers from scrolling to the focused button when the next panel changes height.
+      wizardNextBtn.blur();
+      const mobileScrollTop = window.matchMedia('(max-width: 768px)').matches ? window.scrollY : null;
       
-      // Show/hide addons based on service
+      // Keep the details controls synchronized when moving from service selection.
       if (wizardData.currentStep === 1 && wizardData.service) {
-        const seatAddon = document.getElementById('wizardSeatAddon');
-        const asphaltAddon = document.getElementById('wizardAsphaltAddon');
-        const sizeSection = document.getElementById('wizardSizeSection');
-        
-        if (seatAddon) {
-          seatAddon.style.display = serviceSupportsSeatAddon(wizardData.service) ? 'block' : 'none';
-        }
-        if (asphaltAddon) {
-          asphaltAddon.style.display = serviceSupportsAsphaltAddon(wizardData.service) ? 'block' : 'none';
-        }
-        // Hide size selector for bilservice bookings
-        if (sizeSection) {
-          const isServiceBooking = SERVICE_SERVICES.includes(wizardData.service);
-          sizeSection.style.display = isServiceBooking ? 'none' : 'block';
-          if (isServiceBooking) wizardData.size = 'small'; // default size for pricing
-        }
-        // Show/hide pickup option
-        const pickupSection = document.getElementById('wizardPickupSection');
-        if (pickupSection) {
-          pickupSection.style.display = SERVICE_SERVICES.includes(wizardData.service) ? 'block' : 'none';
-        }
+        updateWizardDetailsVisibility();
       }
       
       if (wizardData.currentStep < 5) {
         updateWizardStep(wizardData.currentStep + 1);
+        if (mobileScrollTop !== null) {
+          const root = document.documentElement;
+          const previousScrollBehavior = root.style.scrollBehavior;
+          root.style.scrollBehavior = 'auto';
+          setTimeout(() => window.scrollTo(0, mobileScrollTop), 0);
+          setTimeout(() => {
+            window.scrollTo(0, mobileScrollTop);
+            root.style.scrollBehavior = previousScrollBehavior;
+          }, 600);
+        }
       }
     });
   }

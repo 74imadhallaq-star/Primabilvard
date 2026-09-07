@@ -286,6 +286,59 @@ body {
   box-shadow: 0 12px 30px rgba(26, 93, 168, 0.5);
 }
 
+.mobile-service-actions {
+  display: none;
+}
+
+/* Quiet, high-visibility update strip between the hero and services. */
+.current-update {
+  max-width: 1120px;
+  margin: 28px auto -28px;
+  padding: 0 20px;
+}
+
+.current-update-inner {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 20px;
+  border: 1px solid rgba(30, 90, 168, 0.55);
+  border-left: 4px solid var(--accent);
+  border-radius: 10px;
+  background: linear-gradient(90deg, rgba(10, 61, 120, 0.25), rgba(15, 15, 15, 0.72));
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
+}
+
+.current-update-icon {
+  flex: 0 0 auto;
+  color: #8bbcff;
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+.current-update-content {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  min-width: 0;
+}
+
+.current-update-label {
+  flex: 0 0 auto;
+  color: #8bbcff;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.current-update p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
 /* ===== SERVICES ===== */
 .services {
   max-width: 1200px;
@@ -494,6 +547,7 @@ body {
   padding: 50px;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
   border: 2px solid var(--border);
+  overflow-anchor: none;
 }
 
 .wizard-progress {
@@ -552,10 +606,17 @@ body {
   background: var(--primary);
   border-color: var(--primary);
   color: white;
+  font-size: 0;
+  color: transparent !important;
 }
 
 .wizard-step.completed .step-circle::before {
-  content: '✓';
+  content: '';
+  width: 10px;
+  height: 17px;
+  border: solid #ffffff;
+  border-width: 0 3px 3px 0;
+  transform: rotate(45deg) translate(-2px, -2px);
 }
 
 .step-label {
@@ -1453,6 +1514,46 @@ body {
   background: rgba(10, 20, 30, 0.4);
 }
 
+.car-wash-categories .service-card h3 {
+  padding-right: 130px;
+  margin-bottom: 12px;
+  font-size: 1.2rem;
+  line-height: 1.3;
+}
+
+.car-wash-categories .service-card .price {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  margin: 0;
+  padding: 4px 10px;
+  font-size: 0.95rem;
+  line-height: 1.3;
+  white-space: nowrap;
+  background: rgba(30, 90, 168, 0.15);
+  border: 1px solid var(--primary);
+  border-radius: 6px;
+}
+
+.car-wash-categories .service-card > p strong {
+  display: block;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+  color: var(--accent);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.car-wash-categories .service-short-description {
+  margin-bottom: 12px;
+}
+
+.car-wash-categories .service-card[data-service="interior"] > p:nth-of-type(2),
+.car-wash-categories .service-card[data-service="full"] > p:nth-of-type(2) {
+  display: none;
+}
+
 .car-wash-categories .service-card:hover {
   transform: translateY(-3px);
   border-color: var(--primary);
@@ -1547,17 +1648,21 @@ body {
   font-size: 0.82rem;
   color: var(--text-secondary);
   margin-bottom: 6px;
-  padding-left: 5px;
+  padding-left: 24px;
   position: relative;
   line-height: 1.4;
 }
 
 .service-features li::before {
-  content: '✓';
-  color: var(--accent);
-  font-weight: bold;
-  margin-right: 8px;
-  font-size: 0.95rem;
+  content: '';
+  position: absolute;
+  left: 5px;
+  top: 0.3em;
+  width: 7px;
+  height: 12px;
+  border: solid var(--accent);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
 }
 
 .service-timing {
@@ -1867,9 +1972,16 @@ body.owner-login-active {
   cursor: pointer;
 }
 
-  /* Keep the Stripe test purchase available in code without showing it to customers. */
+/* Keep the Stripe test purchase available in code without showing it to customers. */
 .service-option[data-service="stripe-test"] {
   display: none !important;
+}
+
+.pickup-warning {
+  margin: 8px 0 0 28px;
+  color: #f0b35a;
+  font-size: 0.85rem;
+  line-height: 1.4;
 }
 
 .owner-login-cancel {
@@ -2019,8 +2131,8 @@ body.owner-login-active {
 
   /* --- HERO --- */
   .hero {
-    min-height: 60vh;
-    padding: 30px 16px;
+    min-height: 52vh;
+    padding: 24px 16px 30px;
   }
 
   .hero-logo {
@@ -2045,7 +2157,7 @@ body.owner-login-active {
 
   .hero-description {
     font-size: 0.95rem;
-    margin: 6px 0 24px 0;
+    margin: 6px 0 20px 0;
   }
 
   .cta-button {
@@ -2055,10 +2167,68 @@ body.owner-login-active {
     max-width: 320px;
   }
 
+  .cta-button {
+    display: none;
+  }
+
+  .mobile-service-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    width: 100%;
+    max-width: 360px;
+  }
+
+  .mobile-service-button {
+    min-height: 48px;
+    padding: 12px 10px;
+    border: 1px solid rgba(212, 221, 232, 0.7);
+    border-radius: 10px;
+    background: rgba(10, 61, 120, 0.92);
+    color: var(--text-primary);
+    font: inherit;
+    font-size: 0.88rem;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+    cursor: pointer;
+    box-shadow: 0 5px 14px rgba(0, 0, 0, 0.24);
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .mobile-service-button:active {
+    background: var(--accent);
+    transform: translateY(1px);
+  }
+
   /* --- SERVICES --- */
   .services {
     margin: 50px auto;
     padding: 0 14px;
+  }
+
+  .current-update {
+    margin: 18px auto -22px;
+    padding: 0 14px;
+  }
+
+  .current-update-inner {
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 14px;
+  }
+
+  .current-update-content {
+    display: block;
+  }
+
+  .current-update-label {
+    display: block;
+    margin-bottom: 3px;
+    font-size: 0.72rem;
+  }
+
+  .current-update p {
+    font-size: 0.82rem;
   }
 
   .services h2 {
@@ -2119,6 +2289,16 @@ body.owner-login-active {
   .service-card h3 {
     font-size: 1.25rem;
     margin-bottom: 10px;
+  }
+
+  .car-wash-categories .service-card h3 {
+    padding-right: 0;
+  }
+
+  .car-wash-categories .service-card .price {
+    position: static;
+    display: inline-block;
+    margin: 0 0 10px;
   }
 
   .service-card p {
@@ -2311,6 +2491,11 @@ body.owner-login-active {
     width: 42px;
     height: 42px;
     font-size: 0.95rem;
+  }
+
+  .wizard-step.completed .step-circle {
+    font-size: 0 !important;
+    color: transparent !important;
   }
 
   .step-label {
