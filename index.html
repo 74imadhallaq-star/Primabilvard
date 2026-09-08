@@ -6,6 +6,24 @@
 <title>Prima Bilvård - Professional Car Wash</title>
 <meta name="description" content="Prima Bilvård erbjuder professionell bilvård, handtvätt, rekond och bilservice. Boka din tid online i dag.">
 <link rel="canonical" href="https://primabilvard.com/">
+<link rel="icon" type="image/png" href="logo.png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Prima Bilvård">
+<meta property="og:description" content="Professionell bilvård, rekond och bilservice.">
+<meta property="og:url" content="https://primabilvard.com/">
+<meta property="og:image" content="https://primabilvard.com/logo.png">
+<meta property="og:image:alt" content="Prima Bilvård">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "AutoWash",
+  "name": "Prima Bilvård",
+  "url": "https://primabilvard.com/",
+  "logo": "https://primabilvard.com/logo.png",
+  "image": "https://primabilvard.com/logo.png",
+  "sameAs": ["https://www.instagram.com/priimabilvard/"]
+}
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Cormorant+Garamond:wght@400;500;600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -145,23 +163,8 @@
       </select>
       <span class="price">Från 399 kr</span>
     </div>
-      </div>
-      </div>
-    </div>
-
-    <div class="service-category-card accordion-item" data-category="wash-complete">
-      <div class="accordion-header">
-        <div class="category-icon">✨</div>
-        <div>
-          <h3>Komplett Bilvård &amp; Rekond</h3>
-          <p class="category-description">Fördjupad behandling, glans och komplett rekonditionering</p>
-        </div>
-        <span class="accordion-arrow">▼</span>
-      </div>
-      <div class="accordion-content">
-      <div class="service-items">
     <div class="service-card service-item" data-service="inout" style="cursor: pointer;">
-      <h3>In- & Utvändig Tvätt Med Sätten</h3>
+      <h3>In- &amp; Utvändig Tvätt Med Säten</h3>
       <p>En komplett in- och utvändig tvätt med extra fokus på sätena.</p>
       <ul class="service-features">
         <li>Utvändig handtvätt</li>
@@ -182,6 +185,21 @@
       </select>
       <span class="price">Från 1000 kr</span>
     </div>
+      </div>
+      </div>
+    </div>
+
+    <div class="service-category-card accordion-item" data-category="wash-complete">
+      <div class="accordion-header">
+        <div class="category-icon">✨</div>
+        <div>
+          <h3>Komplett Bilvård &amp; Rekond</h3>
+          <p class="category-description">Fördjupad behandling, glans och komplett rekonditionering</p>
+        </div>
+        <span class="accordion-arrow">▼</span>
+      </div>
+      <div class="accordion-content">
+      <div class="service-items">
     <div class="service-card service-item" data-service="interior" style="cursor: pointer;">
       <h3>Hel Glans</h3>
       <p class="service-short-description">En premiumrekond som ger bilen extra glans och en fräsch interiör.</p>
@@ -230,6 +248,30 @@
         <option value="5">Säten: 5 st (+699 kr, +3,5h)</option>
       </select>
       <span class="price">Från 2000 kr</span>
+    </div>
+    <div class="service-card service-item" data-service="ceramic" style="cursor: pointer;">
+      <h3>Keramiskt Lackskydd</h3>
+      <p>Vår mest exklusiva bilvård med professionellt keramiskt lackskydd.</p>
+      <ul class="service-features">
+        <li>Noggrann rekond och polering</li>
+        <li>Professionell keramisk coating</li>
+        <li>Djup glans och exklusiv finish</li>
+        <li>Långvarigt skydd mot smuts och vatten</li>
+        <li>Skydd mot yttre påfrestningar</li>
+      </ul>
+      <p>För dig som vill kombinera nybilskänsla med premiumskydd och hålla bilen blank, ren och välvårdad längre.</p>
+      <p class="ceramic-seat-included">Klädseltvätt av 2 säten ingår med keramiskt lackskydd.</p>
+      <p><strong>Tid: ca 5 timmar</strong></p>
+      <select class="card-size">
+        <option value="small">Liten - 3499 kr</option>
+        <option value="medium">Mellan - 3799 kr</option>
+        <option value="large">Stor - 3999 kr</option>
+      </select>
+      <select class="card-size card-addon-seat">
+        <option value="2">Klädseltvätt: 2 säten ingår</option>
+        <option value="5">Klädseltvätt: 5 säten (+399 kr)</option>
+      </select>
+      <span class="price">Från 3499 kr</span>
     </div>
       </div>
       </div>
@@ -571,6 +613,12 @@
               <p>Exklusiv totalbehandling</p>
               <span class="service-option-price">Från 2000 kr</span>
             </div>
+            <div class="service-option" data-service="ceramic">
+              <div class="service-option-icon">🛡️</div>
+              <h4>Keramiskt Lackskydd</h4>
+              <p>Exklusiv rekond med keramisk coating</p>
+              <span class="service-option-price">Från 3499 kr</span>
+            </div>
 
           </div>
 
@@ -688,12 +736,16 @@
                 <span>Ingen</span>
               </div>
               <div class="addon-option" data-addon="2">
-                <span>2 säten</span>
+                <span>2 säten ingår vid keramiskt lackskydd</span>
+                <small>+399 kr</small>
+              </div>
+              <div class="addon-option" data-addon="3">
+                <span>3 säten</span>
                 <small>+399 kr</small>
               </div>
               <div class="addon-option" data-addon="5">
                 <span>5 säten</span>
-                <small>+699 kr</small>
+                <small>+699 kr, +3,5h</small>
               </div>
             </div>
           </div>
@@ -882,9 +934,10 @@
               <option value="basic">Utvändig Handtvätt</option>
               <option value="interior-wash">Invändig Tvätt</option>
               <option value="premium">Komplett In- & Utvändig Tvätt</option>
-              <option value="inout">In- & Utvändig Tvätt Med Sätten</option>
+              <option value="inout">In- & Utvändig Tvätt Med Säten</option>
               <option value="interior">HelGlans</option>
               <option value="full">Fullservice Rekond</option>
+              <option value="ceramic">Keramiskt Lackskydd</option>
             </optgroup>
             <optgroup label="🛞 Däckservice">
               <option value="tire-change">Däckbyte</option>
@@ -913,9 +966,10 @@
           <div class="addon-buttons" id="seatAddonButtons">
             <button type="button" class="addon-btn active" data-addon="none">Ingen</button>
             <button type="button" class="addon-btn" data-addon="2">2 säten (+399 kr, +2,5h)</button>
+            <button type="button" class="addon-btn" data-addon="3">3 säten (+399 kr, +2,5h)</button>
             <button type="button" class="addon-btn" data-addon="5">5 säten (+699 kr, +3,5h)</button>
           </div>
-          <p id="seatAddonHelp" class="addon-help">Välj Hel Glans eller Fullservice Rekond för att aktivera tillval.</p>
+          <p id="seatAddonHelp" class="addon-help">Välj Hel Glans, Fullservice Rekond eller Keramiskt Lackskydd för att aktivera tillval.</p>
         </div>
 
         <div class="form-group" id="asphaltAddonGroup">
@@ -924,7 +978,7 @@
             <button type="button" class="addon-btn active" data-addon="none">Ingen</button>
             <button type="button" class="addon-btn" data-addon="yes">Lägg till asfaltrengöring (+250/+300/+350 kr, +30 min)</button>
           </div>
-          <p id="asphaltAddonHelp" class="addon-help">Välj Utvändig Handtvätt, Komplett In- & Utvändig Tvätt eller In- & Utvändig Tvätt Med Sätten för att aktivera tillval.</p>
+          <p id="asphaltAddonHelp" class="addon-help">Välj Utvändig Handtvätt, Komplett In- & Utvändig Tvätt eller In- & Utvändig Tvätt Med Säten för att aktivera tillval.</p>
         </div>
 
         <div class="form-group">
@@ -1015,7 +1069,7 @@
     <div class="contact-item">
       <span class="icon">📸</span>
       <p><strong>Instagram:</strong></p>
-      <a href="https://www.instagram.com/shineuppcarwash?igsh=Y3RIZmJjYmQ3NzA1" target="_blank" rel="noopener noreferrer" class="contact-facebook-btn">Besök vår Instagram</a>
+      <a href="https://www.instagram.com/priimabilvard/" target="_blank" rel="noopener noreferrer" class="contact-facebook-btn">Besök vår Instagram</a>
     </div>
   </div>
 </section>
@@ -1060,9 +1114,10 @@
           <option value="basic">Utvändig Handtvätt</option>
           <option value="interior-wash">Invändig Tvätt</option>
           <option value="premium">Komplett In- &amp; Utvändig Tvätt</option>
-          <option value="inout">In- &amp; Utvändig Tvätt Med Sätten</option>
+              <option value="inout">In- &amp; Utvändig Tvätt Med Säten</option>
           <option value="interior">Hel Glans</option>
           <option value="full">Fullservice Rekond</option>
+          <option value="ceramic">Keramiskt Lackskydd</option>
         </optgroup>
         <optgroup label="🛞 Däckservice">
           <option value="tire-change">Däckbyte</option>
@@ -1237,7 +1292,7 @@
               <option value="basic">Utvändig Handtvätt</option>
               <option value="interior-wash">Invändig Tvätt</option>
               <option value="premium">Komplett In- & Utvändig</option>
-              <option value="inout">In- & Utvändig Med Sätten</option>
+              <option value="inout">In- & Utvändig Med Säten</option>
               <option value="interior">Hel Glans</option>
               <option value="full">Fullservice Rekond</option>
             </select>

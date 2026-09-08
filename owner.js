@@ -4,9 +4,10 @@ const SERVICE_LABELS = {
   'basic': 'Utvändig Handtvätt',
   'interior-wash': 'Invändig Tvätt',
   'premium': 'Komplett In- & Utvändig Tvätt',
-  'inout': 'In- & Utvändig Tvätt Med Sätten',
+  'inout': 'In- & Utvändig Tvätt Med Säten',
   'interior': 'Hel Glans',
   'full': 'Fullservice Rekond',
+  'ceramic': 'Keramiskt Lackskydd',
   'tire-change': 'Däckbyte',
   'tire-storage': 'Däckhotell',
   'tire-repair': 'Däckreparation',
@@ -21,7 +22,7 @@ const SERVICE_LABELS = {
   'ac-service': 'AC-Service'
 };
 
-const WASH_SERVICES = new Set(['basic', 'interior-wash', 'premium', 'inout', 'interior', 'full']);
+const WASH_SERVICES = new Set(['basic', 'interior-wash', 'premium', 'inout', 'interior', 'full', 'ceramic']);
 
 const OWNER_SESSION_KEY = 'primabilvard_owner_session_v2';
 const OWNER_SESSION_MAX_AGE_MS = 5 * 60 * 60 * 1000;
@@ -66,6 +67,7 @@ const servicePrices = {
   'inout': { small: 1000, medium: 1300, large: 1500 },
   'interior': { small: 1500, medium: 1700, large: 1900 },
   'full': { small: 2000, medium: 2300, large: 2600 }
+  'ceramic': { small: 3499, medium: 3799, large: 3999 },
 };
 
 let cachedBookings = [];

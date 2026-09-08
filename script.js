@@ -163,6 +163,7 @@ const DEFAULT_SERVICE_DURATIONS = {
   'inout': 240,
   'interior': 180,
   'full': 210,
+  'ceramic': 300,
   // Car service durations
   'tire-change': 30,
   'tire-storage': 15,
@@ -183,9 +184,10 @@ const SERVICE_LABELS = {
   'basic': 'Utvändig Handtvätt',
   'interior-wash': 'Invändig Tvätt',
   'premium': 'Komplett In- & Utvändig Tvätt',
-  'inout': 'In- & Utvändig Tvätt Med Sätten',
+  'inout': 'In- & Utvändig Tvätt Med Säten',
   'interior': 'Hel Glans',
   'full': 'Fullservice Rekond',
+  'ceramic': 'Keramiskt Lackskydd',
   // Car service labels
   'tire-change': 'Däckbyte',
   'tire-storage': 'Däckhotell',
@@ -206,6 +208,7 @@ const SERVICE_SERVICES = ['tire-change', 'tire-storage', 'tire-repair', 'basic-s
 const SEAT_ADDON_OPTIONS = {
   none: { label: 'Ingen', price: 0, minutes: 0 },
   '2': { label: '2 säten', price: 399, minutes: 150 },
+  '3': { label: '3 säten', price: 399, minutes: 150 },
   '5': { label: '5 säten', price: 699, minutes: 210 }
 };
 
@@ -215,7 +218,7 @@ const ASPHALT_ADDON_OPTIONS = {
 };
 
 function serviceSupportsSeatAddon(service) {
-  return service === 'interior' || service === 'full';
+  return service === 'interior' || service === 'full' || service === 'ceramic';
 }
 
 function serviceSupportsAsphaltAddon(service) {
@@ -238,11 +241,15 @@ function getSeatAddonInfo(addonType) {
 
 function getSeatAddonPrice(service, addonType) {
   if (!serviceSupportsSeatAddon(service)) return 0;
+  if (service === 'ceramic' && addonType === '2') return 0;
+  if (service === 'ceramic' && addonType === '5') return 399;
   return getSeatAddonInfo(addonType).price;
 }
 
 function getSeatAddonMinutes(service, addonType) {
   if (!serviceSupportsSeatAddon(service)) return 0;
+  if (service === 'ceramic' && addonType === '2') return 0;
+  if (service === 'ceramic' && addonType === '5') return 150;
   return getSeatAddonInfo(addonType).minutes;
 }
 
@@ -914,7 +921,7 @@ function updateSeatAddonVisibility() {
   if (help) {
     help.textContent = show
       ? 'Tillval aktivt för vald tjänst.'
-      : 'Välj Hel Glans eller Fullservice Rekond för att aktivera tillval.';
+      : 'Välj Hel Glans, Fullservice Rekond eller Keramiskt Lackskydd för att aktivera tillval.';
   }
 
   if (!show) {
@@ -942,7 +949,7 @@ function updateAsphaltAddonVisibility() {
   if (help) {
     help.textContent = show
       ? 'Tillval aktivt för vald tjänst. Pris: +250 kr (Liten), +300 kr (Mellan), +350 kr (Stor).'
-      : 'Välj Utvändig Handtvätt, Komplett In- & Utvändig Tvätt eller In- & Utvändig Tvätt Med Sätten för att aktivera tillval.';
+      : 'Välj Utvändig Handtvätt, Komplett In- & Utvändig Tvätt eller In- & Utvändig Tvätt Med Säten för att aktivera tillval.';
   }
 
   if (!show) {
@@ -994,6 +1001,7 @@ const servicePrices = {
   'inout': { small: 1000, medium: 1300, large: 1500 },
   'interior': { small: 1500, medium: 1700, large: 1900 },
   'full': { small: 2000, medium: 2300, large: 2600 },
+  'ceramic': { small: 3499, medium: 3799, large: 3999 },
   // Car service prices (fixed prices, not size-dependent but we use 'small' for consistency)
   'tire-change': { small: 500, medium: 500, large: 500 },
   'tire-storage': { small: 750, medium: 750, large: 750 },
@@ -1040,17 +1048,17 @@ const STRIPE_PAYMENT_LINKS = {
   'premium|large|none|none': 'https://buy.stripe.com/5kQ8wRajC5IogWJgWPasg08',
   // Komplett In- & Utvändig Tvätt - Stor + Asfaltrengöring
   'premium|large|none|yes': 'https://buy.stripe.com/9B6dRbfDW5IogWJgWPasg0n',
-  // In- & Utvändig Tvätt Med Sätten - Liten
+  // In- & Utvändig Tvätt Med Säten - Liten
   'inout|small|none|none': 'https://buy.stripe.com/eVqfZjfDW3Ag7m9dKDasg09',
-  // In- & Utvändig Tvätt Med Sätten - Liten + Asfaltrengöring
+  // In- & Utvändig Tvätt Med Säten - Liten + Asfaltrengöring
   'inout|small|none|yes': 'https://buy.stripe.com/eVqcN78bu1s8dKx8qjasg0o',
-  // In- & Utvändig Tvätt Med Sätten - Mellan
+  // In- & Utvändig Tvätt Med Säten - Mellan
   'inout|medium|none|none': 'https://buy.stripe.com/cNi3cx0J20o4eOBfSLasg0a',
-  // In- & Utvändig Tvätt Med Sätten - Mellan + Asfaltrengöring
+  // In- & Utvändig Tvätt Med Säten - Mellan + Asfaltrengöring
   'inout|medium|none|yes': 'https://buy.stripe.com/00waEZ8buc6M0XLgWPasg0p',
-  // In- & Utvändig Tvätt Med Sätten - Stor
+  // In- & Utvändig Tvätt Med Säten - Stor
   'inout|large|none|none': 'https://buy.stripe.com/aFa00l9fy3AgdKx21Vasg0b',
-  // In- & Utvändig Tvätt Med Sätten - Stor + Asfaltrengöring
+  // In- & Utvändig Tvätt Med Säten - Stor + Asfaltrengöring
   'inout|large|none|yes': 'https://buy.stripe.com/3cIaEZfDW1s88qd4a3asg0q',
   // Hel Glans - Liten
   'interior|small|none|none': 'https://buy.stripe.com/3cIbJ3ajCgn26i56ibasg0c',
@@ -1088,6 +1096,15 @@ const STRIPE_PAYMENT_LINKS = {
   'full|large|2|none': 'https://buy.stripe.com/dRmeVf9fy0o4fSFeOHasg0z',
   // Fullservice Rekond - Stor + 5-Säten
   'full|large|5|none': 'https://buy.stripe.com/00wdRb9fy7QwaylbCvasg0A',
+  // Keramiskt Lackskydd - Liten
+  'ceramic|small|none|none': 'https://buy.stripe.com/3cIeVffDWc6M5e121Vasg0O',
+  'ceramic|small|5|none': 'https://buy.stripe.com/3cI6oJfDW7Qw5e14a3asg0T',
+  // Keramiskt Lackskydd - Mellan
+  'ceramic|medium|none|none': 'https://buy.stripe.com/bJebJ3gI02wccGtbCvasg0P',
+  'ceramic|medium|5|none': 'https://buy.stripe.com/14A5kFezSb2I21P6ibasg0S',
+  // Keramiskt Lackskydd - Stor
+  'ceramic|large|none|none': 'https://buy.stripe.com/eVq9AVfDWfiYayl4a3asg0Q',
+  'ceramic|large|5|none': 'https://buy.stripe.com/5kQ4gB1N60o4ayl7mfasg0R',
   // Verkstadstjänster har ett fast Stripe-pris oavsett bilstorlek.
   'tire-change|any|none|none': 'https://buy.stripe.com/4gM7sN9fyeeU21PcGzasg0E',
   'tire-storage|any|none|none': 'https://buy.stripe.com/5kQ4gB77q5Io6i57mfasg0F',
@@ -1108,6 +1125,7 @@ function buildStripeLinkKey(service, size, seatAddonType, asphaltAddonType) {
 function getStripePaymentLink(service, size, seatAddonType, asphaltAddonType) {
   if (!service) return null;
   if (service === 'stripe-test') return 'https://buy.stripe.com/test_3cI00ldvYfwY3C55Vd0Ba01';
+  if (service === 'ceramic' && seatAddonType === '2') seatAddonType = 'none';
   const fixedPriceKey = buildStripeLinkKey(service, 'any', 'none', 'none');
   if (!size) return STRIPE_PAYMENT_LINKS[fixedPriceKey] || null;
   const key = buildStripeLinkKey(service, size, seatAddonType, asphaltAddonType);
@@ -2687,12 +2705,39 @@ document.addEventListener('DOMContentLoaded', async function() {
       if (isServiceBooking) wizardData.size = 'small';
     }
     if (pickupSection) {
-      const pickupEligible = isServiceBooking || ['inout', 'interior', 'full'].includes(wizardData.service);
+      const pickupEligible = isServiceBooking || ['inout', 'interior', 'full', 'ceramic'].includes(wizardData.service);
       pickupSection.style.display = pickupEligible ? 'block' : 'none';
+      if (!pickupEligible) {
+        wizardData.pickup = false;
+        wizardData.pickupAddress = '';
+        const pickupCheckbox = document.getElementById('wizardPickupCheckbox');
+        const pickupAddressSection = document.getElementById('wizardPickupAddressSection');
+        if (pickupCheckbox) pickupCheckbox.checked = false;
+        if (pickupAddressSection) pickupAddressSection.style.display = 'none';
+      }
     }
 
     document.querySelectorAll('#wizardSeatAddon .addon-option').forEach((option) => {
       option.classList.toggle('active', option.dataset.addon === (wizardData.seatAddon || 'none'));
+      const optionText = option.querySelector('span');
+      const label = option.querySelector('small');
+      if (optionText && option.dataset.addon === '2') {
+        optionText.textContent = wizardData.service === 'ceramic'
+          ? '2 säten ingår'
+          : '2 säten';
+      }
+      if (optionText && option.dataset.addon === '5') {
+        optionText.textContent = '5 säten';
+      }
+      if (label && option.dataset.addon === '2') {
+        label.textContent = wizardData.service === 'ceramic' ? 'Ingår' : '+399 kr, +2,5h';
+      }
+      if (label && wizardData.service === 'ceramic' && option.dataset.addon === '5') {
+        label.textContent = '+399 kr, +2,5h';
+      } else if (label && option.dataset.addon === '5') {
+        label.textContent = '+699 kr, +3,5h';
+      }
+      option.style.display = wizardData.service === 'ceramic' && option.dataset.addon === '3' ? 'none' : '';
     });
     document.querySelectorAll('#wizardAsphaltAddon .addon-option').forEach((option) => {
       option.classList.toggle('active', option.dataset.addon === (wizardData.asphaltAddon || 'none'));
@@ -2703,7 +2748,7 @@ document.addEventListener('DOMContentLoaded', async function() {
   function selectWizardService(service, size = '', seatAddon = 'none', asphaltAddon = 'none') {
     wizardData.service = service;
     wizardData.size = size;
-    wizardData.seatAddon = seatAddon;
+    wizardData.seatAddon = service === 'ceramic' && seatAddon === 'none' ? '2' : seatAddon;
     wizardData.asphaltAddon = asphaltAddon;
     updateWizardSizePrices(service);
     updateWizardDetailsVisibility();
@@ -2811,6 +2856,9 @@ document.addEventListener('DOMContentLoaded', async function() {
       document.querySelectorAll('.service-option').forEach(opt => opt.classList.remove('selected'));
       option.classList.add('selected');
       wizardData.service = option.dataset.service;
+      if (wizardData.service === 'ceramic' && wizardData.seatAddon === 'none') {
+        wizardData.seatAddon = '2';
+      }
       updateWizardSizePrices(wizardData.service);
       
       // Inspection-fix is an estimate request, so show its contact details in step 2.
