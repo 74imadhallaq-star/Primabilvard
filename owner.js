@@ -66,7 +66,7 @@ const servicePrices = {
   'premium': { small: 399, medium: 449, large: 479 },
   'inout': { small: 1000, medium: 1300, large: 1500 },
   'interior': { small: 1500, medium: 1700, large: 1900 },
-  'full': { small: 2000, medium: 2300, large: 2600 }
+  'full': { small: 2000, medium: 2300, large: 2600 },
   'ceramic': { small: 3499, medium: 3799, large: 3999 },
 };
 
