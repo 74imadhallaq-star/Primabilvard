@@ -119,12 +119,18 @@ function escapeHtml(str) {
   return String(str).replace(/[&<>\"]/g, function(c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; });
 }
 
-function getServiceLabel(service) {
-  return SERVICE_LABELS[service] || service || '-';
+function getServiceLabel(bookingOrService) {
+  if (bookingOrService && typeof bookingOrService === 'object') {
+    if (Array.isArray(bookingOrService.services) && bookingOrService.services.length > 1) {
+      return bookingOrService.services.map(id => SERVICE_LABELS[id] || id).join(' + ');
+    }
+    return SERVICE_LABELS[bookingOrService.service] || bookingOrService.service || '-';
+  }
+  return SERVICE_LABELS[bookingOrService] || bookingOrService || '-';
 }
 
 function availabilityFromBooking(booking) {
-  return {
+  const data = {
     service: booking.service,
     seatAddon: booking.seatAddon || 'none',
     asphaltAddon: booking.asphaltAddon || 'none',
@@ -133,6 +139,10 @@ function availabilityFromBooking(booking) {
     sortKey: booking.sortKey || 0,
     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
   };
+  // Combo bookings (wash + car service) need their combined duration for correct capacity checks.
+  if (Number.isFinite(booking.duration) && booking.duration > 0) data.duration = booking.duration;
+  if (Array.isArray(booking.services) && booking.services.length) data.services = booking.services;
+  return data;
 }
 
 function getStatusNode() {
@@ -441,14 +451,15 @@ function renderBookingsTable() {
     .replace(/\s+/g, '');
   const filteredBookings = cachedBookings.filter((booking) => {
     const service = String(booking.service || '').trim();
+    const services = Array.isArray(booking.services) && booking.services.length ? booking.services : [service];
     const paymentStatus = String(booking.paymentStatus || 'Pending').trim().toLowerCase();
     const bookingSource = booking.source === 'owner-manual' ? 'manual' : 'online';
     const searchableText = `${booking.name || ''}${booking.registration || ''}`
       .toLowerCase()
       .replace(/\s+/g, '');
 
-    if (typeFilter === 'wash' && !WASH_SERVICES.has(service)) return false;
-    if (typeFilter === 'service' && WASH_SERVICES.has(service)) return false;
+    if (typeFilter === 'wash' && !services.some(id => WASH_SERVICES.has(id))) return false;
+    if (typeFilter === 'service' && !services.some(id => !WASH_SERVICES.has(id))) return false;
     if (searchTerm && !searchableText.includes(searchTerm)) return false;
     if (statusFilter === 'paid-manual'
       && paymentStatus !== 'paid'
@@ -472,7 +483,7 @@ function renderBookingsTable() {
       <td style="padding:10px;border-bottom:1px solid var(--border);color:var(--text-primary);">${escapeHtml(b.email || '-')}</td>
       <td style="padding:10px;border-bottom:1px solid var(--border);color:var(--text-primary);">${escapeHtml(b.phone || '-')}</td>
       <td style="padding:10px;border-bottom:1px solid var(--border);color:var(--text-primary);">${escapeHtml(b.registration || '-')}</td>
-      <td style="padding:10px;border-bottom:1px solid var(--border);color:var(--text-primary);">${escapeHtml(getServiceLabel(b.service))}</td>
+      <td style="padding:10px;border-bottom:1px solid var(--border);color:var(--text-primary);">${escapeHtml(getServiceLabel(b))}</td>
       <td style="padding:10px;border-bottom:1px solid var(--border);color:var(--text-primary);">${escapeHtml(b.size || '-')}</td>
       <td style="padding:10px;border-bottom:1px solid var(--border);color:var(--text-primary);">${escapeHtml(b.date || '-')}</td>
       <td style="padding:10px;border-bottom:1px solid var(--border);color:var(--text-primary);">${escapeHtml(b.time || '-')}</td>
@@ -554,7 +565,7 @@ function exportCSV() {
   let csv = 'Namn,E-post,Telefon,Registreringsnummer,Tjänst,Storlek,Pris,Datum,Tid,Betalningsstatus\n';
   cachedBookings.forEach(b => {
     const safe = v => '"' + String(v ?? '').replace(/"/g, '""') + '"';
-    csv += [safe(b.name), safe(b.email), safe(b.phone), safe(b.registration), safe(getServiceLabel(b.service)), safe(b.size), safe(b.price), safe(b.date), safe(b.time), safe(b.paymentStatus || 'Pending')].join(',') + '\n';
+    csv += [safe(b.name), safe(b.email), safe(b.phone), safe(b.registration), safe(getServiceLabel(b)), safe(b.size), safe(b.price), safe(b.date), safe(b.time), safe(b.paymentStatus || 'Pending')].join(',') + '\n';
   });
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);

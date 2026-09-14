@@ -114,8 +114,162 @@ exports.createProductCheckout = onRequest(
   }
 );
 
+// Server-side source of truth for prices/durations, so a client can never dictate what it pays.
+const SERVICE_CATALOG = {
+  'stripe-test': { small: 1, medium: 1, large: 1 },
+  basic: { small: 199, medium: 249, large: 279 },
+  'interior-wash': { small: 249, medium: 279, large: 300 },
+  premium: { small: 399, medium: 449, large: 479 },
+  inout: { small: 1000, medium: 1300, large: 1500 },
+  interior: { small: 1500, medium: 1700, large: 1900 },
+  full: { small: 2000, medium: 2300, large: 2600 },
+  ceramic: { small: 3499, medium: 3799, large: 3999 },
+  'tire-change': { small: 500, medium: 500, large: 500 },
+  'tire-storage': { small: 750, medium: 750, large: 750 },
+  'tire-repair': { small: 200, medium: 200, large: 200 },
+  'basic-service': { small: 1800, medium: 1800, large: 1800 },
+  'major-service': { small: 3500, medium: 3500, large: 3500 },
+  'brake-service': { small: 1200, medium: 1200, large: 1200 },
+  'pre-inspection': { small: 1000, medium: 1000, large: 1000 },
+  'computer-diagnosis': { small: 600, medium: 600, large: 600 },
+  'electrical-diagnosis': { small: 900, medium: 900, large: 900 },
+  'engine-diagnosis': { small: 1200, medium: 1200, large: 1200 }
+};
+
+const SERVICE_LABELS_MAP = {
+  'stripe-test': 'Testköp',
+  basic: 'Utvändig Handtvätt',
+  'interior-wash': 'Invändig Tvätt',
+  premium: 'Komplett In- & Utvändig Tvätt',
+  inout: 'In- & Utvändig Tvätt Med Säten',
+  interior: 'Hel Glans',
+  full: 'Fullservice Rekond',
+  ceramic: 'Keramiskt Lackskydd',
+  'tire-change': 'Däckbyte',
+  'tire-storage': 'Däckhotell',
+  'tire-repair': 'Däckreparation',
+  'basic-service': 'Basservice',
+  'major-service': 'Storservice',
+  'brake-service': 'Bromsservice',
+  'pre-inspection': 'Förbered Besiktning',
+  'computer-diagnosis': 'Datordiagnos',
+  'electrical-diagnosis': 'Eldiagnos',
+  'engine-diagnosis': 'Motordiagnos'
+};
+
+const CAR_SERVICE_IDS = new Set([
+  'tire-change', 'tire-storage', 'tire-repair', 'basic-service', 'major-service',
+  'brake-service', 'pre-inspection', 'computer-diagnosis', 'electrical-diagnosis', 'engine-diagnosis'
+]);
+
+function serviceSupportsSeatAddon(service) {
+  return service === 'interior' || service === 'full' || service === 'ceramic';
+}
+
+function serviceSupportsAsphaltAddon(service) {
+  return service === 'basic' || service === 'premium' || service === 'inout';
+}
+
+function getSeatAddonPrice(service, addonType) {
+  if (!serviceSupportsSeatAddon(service)) return 0;
+  if (service === 'ceramic' && addonType === '2') return 0;
+  if (service === 'ceramic' && addonType === '5') return 399;
+  const prices = { '2': 399, '3': 399, '5': 699 };
+  return prices[addonType] || 0;
+}
+
+function getAsphaltAddonPrice(service, size, addonType) {
+  if (!serviceSupportsAsphaltAddon(service) || addonType !== 'yes') return 0;
+  const prices = { small: 250, medium: 300, large: 350 };
+  return prices[size] || 0;
+}
+
+function computeBookingPrice(services, size, seatAddon, asphaltAddon) {
+  const chosenSize = size || 'small';
+  const washService = services.find(id => !CAR_SERVICE_IDS.has(id));
+  const base = services.reduce((sum, id) => {
+    const prices = SERVICE_CATALOG[id];
+    if (!prices) throw new Error(`Okänd tjänst: ${id}`);
+    const price = prices[chosenSize] != null ? prices[chosenSize] : prices.small;
+    return sum + price;
+  }, 0);
+  const seatPrice = washService ? getSeatAddonPrice(washService, seatAddon || 'none') : 0;
+  const asphaltPrice = washService ? getAsphaltAddonPrice(washService, chosenSize, asphaltAddon || 'none') : 0;
+  return base + seatPrice + asphaltPrice;
+}
+
+// Combo bookings (wash + car service) have no pre-made Stripe Payment Link, since every
+// combination would need its own static link. Instead we create a Checkout Session on
+// demand here, recomputing the price server-side so the client can never alter what it pays.
+exports.createBookingCheckout = onRequest(
+  { region: 'europe-west1', secrets: [stripeSecretKey], invoker: 'public' },
+  async (request, response) => {
+    allowCors(response);
+    if (request.method === 'OPTIONS') {
+      response.status(204).send('');
+      return;
+    }
+    if (request.method !== 'POST') {
+      response.status(405).json({ error: 'Method not allowed' });
+      return;
+    }
+
+    try {
+      const bookingId = String(request.body?.bookingId || '').trim();
+      if (!bookingId) throw new Error('Bokning saknas.');
+
+      const database = admin.firestore();
+      const pendingRef = database.collection('pendingBookings').doc(bookingId);
+      const snapshot = await pendingRef.get();
+      if (!snapshot.exists) throw new Error('Bokningen kunde inte hittas.');
+
+      const booking = snapshot.data();
+      const services = Array.isArray(booking.services) && booking.services.length
+        ? booking.services
+        : [booking.service];
+      if (!services.length || services.some(id => !SERVICE_CATALOG[id])) {
+        throw new Error('Ogiltig tjänst i bokningen.');
+      }
+
+      const size = booking.size || 'small';
+      const seatAddon = booking.seatAddon || 'none';
+      const asphaltAddon = booking.asphaltAddon || 'none';
+      const price = computeBookingPrice(services, size, seatAddon, asphaltAddon);
+      if (!Number.isInteger(price) || price < 1) throw new Error('Ogiltigt pris för denna bokning.');
+
+      const label = services.map(id => SERVICE_LABELS_MAP[id] || id).join(' + ');
+
+      const stripe = new Stripe(stripeSecretKey.value());
+      const siteUrl = 'https://primabilvard.com';
+      const session = await stripe.checkout.sessions.create({
+        mode: 'payment',
+        line_items: [{
+          quantity: 1,
+          price_data: {
+            currency: 'sek',
+            unit_amount: price * 100,
+            product_data: { name: label }
+          }
+        }],
+        client_reference_id: bookingId,
+        customer_creation: 'always',
+        success_url: `${siteUrl}/success.html?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${siteUrl}/cancel.html`
+      });
+
+      // Store the server-computed price as the authoritative value before Stripe redirects the customer.
+      await pendingRef.set({ price, serviceLabel: label, stripeCheckoutSessionId: session.id }, { merge: true });
+
+      response.status(200).json({ url: session.url });
+    } catch (error) {
+      console.error('Booking checkout creation error:', error);
+      response.status(400).json({ error: error.message || 'Betalningen kunde inte startas.' });
+    }
+  }
+);
+
 function availabilityFromBooking(booking) {
-  return {
+  const data = {
     service: booking.service,
     seatAddon: booking.seatAddon || 'none',
     asphaltAddon: booking.asphaltAddon || 'none',
@@ -124,6 +278,9 @@ function availabilityFromBooking(booking) {
     sortKey: booking.sortKey,
     updatedAt: admin.firestore.FieldValue.serverTimestamp()
   };
+  if (Number.isFinite(booking.duration) && booking.duration > 0) data.duration = booking.duration;
+  if (Array.isArray(booking.services) && booking.services.length) data.services = booking.services;
+  return data;
 }
 
 exports.stripeWebhook = onRequest(
