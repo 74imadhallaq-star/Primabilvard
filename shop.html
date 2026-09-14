@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bilvårdsprodukter - Prima Bilvård</title>
+  <meta name="description" content="Handla utvalda bilvårdsprodukter från DVx Sverige hos Prima Bilvård.">
+  <link rel="icon" type="image/png" href="logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Cormorant+Garamond:wght@400;500;600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=17">
+  <link rel="stylesheet" href="shop.css?v=1">
+  <link rel="stylesheet" href="cart.css?v=1">
+</head>
+<body class="shop-page">
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="nav-logo" style="text-decoration:none;">
+        <img src="logo.png" alt="Prima Bilvård Logo" class="logo-img">
+        <span class="logo-text">Prima Bilvård</span>
+      </a>
+      <div class="nav-quick">
+        <a href="index.html#services" class="nav-quick-link" data-tab="car-wash">Bilvård</a>
+        <a href="index.html#services" class="nav-quick-link" data-tab="car-service">Bilservice</a>
+        <a href="shop.html" class="nav-quick-link">Produkter</a>
+      </div>
+      <div class="nav-actions">
+        <button type="button" class="nav-quick-cart" data-cart-toggle aria-label="Öppna varukorg">
+          <span aria-hidden="true">🛒</span><b data-cart-count hidden>0</b>
+        </button>
+        <button class="hamburger" id="hamburger" aria-label="Öppna meny">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+      <ul class="nav-menu" id="navMenu">
+        <li><a href="index.html" class="nav-link">Hem</a></li>
+        <li><a href="index.html#services" class="nav-link">Tjänster</a></li>
+        <li><a href="index.html#booking" class="nav-link">Boka</a></li>
+        <li><a href="index.html#contact" class="nav-link">Kontakt</a></li>
+        <li><a href="shop.html" class="nav-link nav-link-shop">Produkter</a></li>
+        <li><a href="foretag.html" class="nav-link nav-link-foretag">För Företag</a></li>
+        <li><button type="button" class="site-cart-button" data-cart-toggle aria-label="Öppna varukorg"><span>Varukorg</span><b data-cart-count hidden>0</b></button></li>
+      </ul>
+    </div>
+  </nav>
+  <div class="nav-overlay" id="navOverlay"></div>
+
+  <main>
+    <header class="shop-hero">
+      <div>
+        <p class="shop-eyebrow">Prima Bilvård × DVx Sverige</p>
+        <h1>Rätt produkter för en bil som håller glansen.</h1>
+        <p>Utvalda produkter för tvätt, skydd och finish. Beställ hem eller välj upphämtning hos oss.</p>
+      </div>
+      <div class="shop-hero-mark" aria-hidden="true">✦</div>
+    </header>
+
+    <section class="shop-layout" aria-labelledby="productsHeading">
+      <div class="shop-heading-row">
+        <div>
+          <p class="shop-eyebrow">I butiken</p>
+          <h2 id="productsHeading">Bilvård från DVx Sverige</h2>
+        </div>
+        <div class="shop-controls">
+          <label class="shop-search"><span>Sök</span><input id="productSearch" type="search" placeholder="Sök produkter..." autocomplete="off"></label>
+          <label class="shop-filter">Visa <select id="categoryFilter"><option value="all">Alla produkter</option></select></label>
+        </div>
+      </div>
+      <div id="productGrid" class="product-grid" aria-live="polite">
+        <div class="shop-loading">Laddar produkter...</div>
+      </div>
+    </section>
+  </main>
+
+  <aside id="cartDrawer" class="cart-drawer" aria-label="Varukorg">
+    <div class="cart-drawer-header"><div><p class="shop-eyebrow">Din beställning</p><h2>Varukorg</h2></div><button type="button" class="icon-button" data-cart-toggle aria-label="Stäng varukorg">×</button></div>
+    <div id="cartItems" class="cart-items"></div>
+    <div class="cart-summary"><span>Summa produkter</span><strong id="cartTotal">0 kr</strong></div>
+    <p class="cart-shipping-note">Frakt och upphämtning väljs i kassan. Fraktpris läggs till senare.</p>
+    <button type="button" id="checkoutButton" class="shop-primary-button" disabled>Gå till kassan</button>
+  </aside>
+  <div class="cart-backdrop" data-cart-toggle></div>
+
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+  <script src="firebase-config.js?v=4"></script>
+  <script src="cart.js?v=1"></script>
+  <script src="shop.js?v=1"></script>
+</body>
+</html>

@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /owner.html
+
+Sitemap: https://primabilvard.com/sitemap.xml

@@ -1,0 +1,103 @@
+.nav-link-shop {
+  background: linear-gradient(135deg, #b6812f, #8a6423) !important;
+  color: #ffffff !important;
+  padding: 8px 18px !important;
+  border-radius: 7px !important;
+  border: 1px solid rgba(255,255,255,0.15) !important;
+  box-shadow: 0 4px 14px rgba(182, 129, 47, 0.35) !important;
+  letter-spacing: 0.4px !important;
+  transition: all 0.3s ease !important;
+}
+.nav-link-shop:hover {
+  background: linear-gradient(135deg, #caa452, #b6812f) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 22px rgba(182, 129, 47, 0.55) !important;
+  color: #ffffff !important;
+}
+.site-cart-button { display: inline-flex; align-items: center; gap: 8px; padding: 8px 18px; border: 1px solid rgba(255,255,255,0.15); border-radius: 7px; color: #fff; background: rgba(255,255,255,0.06); cursor: pointer; font: 600 0.95rem 'Montserrat', sans-serif; text-transform: uppercase; letter-spacing: 0.5px; transition: all 0.3s ease; }
+.site-cart-button:hover { background: rgba(255,255,255,0.12); transform: translateY(-2px); }
+.site-cart-button b { min-width: 19px; padding: 2px 6px; border-radius: 999px; color: #111; background: #d8a451; text-align: center; font-size: .72rem; font-weight: 800; }
+.shared-cart-drawer { position: fixed; z-index: 300; top: 0; right: 0; width: min(430px, 100%); height: 100vh; padding: 28px; display: flex; flex-direction: column; color: #fff; background: #111820; box-shadow: -14px 0 40px rgba(0,0,0,.45); transform: translateX(102%); transition: transform .25s ease; }
+.shared-cart-drawer.is-open { transform: translateX(0); }
+.shared-cart-backdrop { position: fixed; z-index: 290; inset: 0; display: none; background: rgba(0,0,0,.62); }
+.shared-cart-drawer.is-open + .shared-cart-backdrop { display: block; }
+.shared-cart-header { display: flex; justify-content: space-between; align-items: start; padding-bottom: 20px; border-bottom: 1px solid #303943; }
+.shared-cart-header h2 { margin: 0; font: 700 1.7rem 'Playfair Display', serif; }
+.shared-cart-eyebrow { margin: 0 0 7px; color: #d8a451; font-size: .7rem; font-weight: 800; letter-spacing: 1.8px; text-transform: uppercase; }
+.shared-cart-close { border: 0; color: #c7ccd1; background: transparent; cursor: pointer; font-size: 2rem; line-height: 1; }
+.shared-cart-items { flex: 1; overflow-y: auto; padding: 18px 0; }
+.shared-cart-empty { padding: 48px 14px; border: 1px dashed #3c4654; color: #abb7c5; text-align: center; }
+.shared-cart-line { display: grid; grid-template-columns: 56px 1fr auto; gap: 12px; align-items: center; padding: 12px 0; border-bottom: 1px solid #28313a; }
+.shared-cart-line > img, .shared-cart-line-placeholder { width: 56px; height: 56px; object-fit: cover; border-radius: 5px; background: #1b2430; }
+.shared-cart-line h3 { margin: 0 0 4px; font-size: .88rem; }
+.shared-cart-line p { margin: 0; color: #abb7c5; font-size: .78rem; }
+.shared-cart-quantity { display: flex; align-items: center; gap: 7px; margin-top: 8px; }
+.shared-cart-quantity button { width: 23px; height: 23px; border: 1px solid #52606e; border-radius: 4px; color: #fff; background: #202a35; cursor: pointer; }
+.shared-cart-remove { margin-top: 7px; padding: 0; border: 0; color: #ef9b83; background: transparent; cursor: pointer; font-size: .7rem; }
+.shared-cart-total { display: flex; justify-content: space-between; padding: 18px 0 8px; border-top: 1px solid #303943; color: #c7ccd1; }
+.shared-cart-total strong { color: #fff; }
+.shared-cart-note { margin: 0 0 16px; color: #8d9cac; font-size: .75rem; line-height: 1.5; }
+.shared-cart-checkout { width: 100%; padding: 13px 16px; border: 1px solid #9fb6d5; border-radius: 6px; color: #fff; background: linear-gradient(135deg, #0a3d78, #1e5aa8); cursor: pointer; font: inherit; font-weight: 800; }
+.shared-cart-checkout:disabled { cursor: not-allowed; opacity: .45; }
+@media (max-width: 700px) { .shared-cart-drawer { padding: 22px 18px; } }
+
+/* Persistent quick-access bar: always visible, independent of the hamburger dropdown. */
+.nav-quick { display: flex; align-items: center; gap: 18px; }
+.nav-quick-link { color: var(--text-secondary); font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.4px; text-decoration: none; white-space: nowrap; transition: color 0.3s; }
+.nav-quick-link:hover { color: var(--primary); }
+.nav-actions { display: flex; align-items: center; gap: 10px; }
+.nav-quick-cart { position: relative; display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px; flex-shrink: 0; border: 1px solid rgba(255,255,255,0.18); border-radius: 50%; background: rgba(255,255,255,0.06); color: #fff; cursor: pointer; font-size: 1.15rem; line-height: 1; }
+.nav-quick-cart:hover { background: rgba(255,255,255,0.12); }
+.nav-quick-cart b { position: absolute; top: -6px; right: -6px; min-width: 18px; height: 18px; padding: 0 4px; border-radius: 999px; background: #d8a451; color: #111; font-size: 0.65rem; font-weight: 800; display: flex; align-items: center; justify-content: center; }
+
+/* The hamburger dropdown is the single source of truth for full navigation,
+   at every screen size, so the quick-access bar never duplicates on screen. */
+.navbar .hamburger { display: flex; }
+.navbar .nav-menu {
+  position: fixed;
+  top: 0;
+  right: -100%;
+  width: 75vw;
+  max-width: 320px;
+  height: 100dvh;
+  background: #111;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 0;
+  z-index: 150;
+  transition: right 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: -6px 0 30px rgba(0,0,0,0.5);
+  border-left: 3px solid var(--primary);
+  padding: 80px 0 40px 0;
+  list-style: none;
+}
+.navbar .nav-menu.open { right: 0; }
+.navbar .nav-menu li { width: 100%; text-align: center; border-bottom: 1px solid var(--border); }
+.navbar .nav-menu li:first-child { border-top: 1px solid var(--border); }
+.navbar .nav-menu a { display: block; padding: 20px 30px; font-size: 1.1rem; letter-spacing: 1px; color: var(--text-primary); }
+.nav-menu li .site-cart-button,
+.nav-menu li .nav-link-shop,
+.nav-menu li .nav-link-foretag { width: calc(100% - 60px); justify-content: center; margin: 8px auto; }
+
+/* Plain dropdown look for Bilv\u00e5rd/Bilservice; the blue pill is only for the quick bar. */
+.navbar .nav-menu .nav-link-service {
+  background: transparent !important;
+  color: var(--text-primary) !important;
+  border: none !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  padding: 20px 30px !important;
+}
+.navbar .nav-menu .nav-link-service:hover {
+  background: rgba(10, 61, 120, 0.15) !important;
+  color: var(--accent) !important;
+  transform: none !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+}
+
+@media (max-width: 560px) {
+  .navbar .nav-container { flex-wrap: wrap; row-gap: 10px; }
+  .navbar .nav-quick { order: 3; flex-basis: 100%; justify-content: center; }
+}
