@@ -751,8 +751,8 @@ async function saveOwnerProduct(event) {
   event.preventDefault();
   const name = document.getElementById('productName').value.trim();
   const price = Number(document.getElementById('productPrice').value);
-  if (!name || !Number.isInteger(price) || price < 0) {
-    alert('Ange produktnamn och ett giltigt heltalspris.');
+  if (!name || !Number.isInteger(price) || price < 5) {
+    alert('Ange produktnamn och ett heltalspris på minst 5 kr.');
     return;
   }
   const id = document.getElementById('productId').value.trim() || `product_${Date.now()}`;

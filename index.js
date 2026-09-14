@@ -52,7 +52,7 @@ exports.createProductCheckout = onRequest(
         if (!snapshot.exists) throw new Error('En produkt finns inte längre.');
         const product = snapshot.data();
         const price = Number(product.price);
-        if (!product.active || product.outOfStock || !Number.isInteger(price) || price < 0 || !product.name) {
+        if (!product.active || product.outOfStock || !Number.isInteger(price) || price < 5 || !product.name) {
           throw new Error(`Produkten "${product.name || 'okänd'}" kan inte köpas just nu.`);
         }
         if (product.pickupAvailable !== true && product.pickupAvailable !== undefined) allItemsSupportPickup = false;
