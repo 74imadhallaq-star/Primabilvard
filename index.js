@@ -63,7 +63,10 @@ exports.createProductCheckout = onRequest(
           price_data: {
             currency: 'sek',
             unit_amount: price * 100,
-            product_data: { name: String(product.name), description: String(product.description || '').slice(0, 500) }
+            product_data: {
+              name: String(product.name),
+              ...(String(product.description || '').trim() ? { description: String(product.description).trim().slice(0, 500) } : {})
+            }
           }
         });
       });
