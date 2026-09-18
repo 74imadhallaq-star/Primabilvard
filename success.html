@@ -1,6 +1,22 @@
 <!DOCTYPE html>
 <html lang="sv">
 <head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=AW-18457408182"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'AW-18457408182');
+</script>
+<!-- Event snippet for Köp conversion page -->
+<script>
+  gtag('event', 'conversion', {
+      'send_to': 'AW-18457408182/iJ8WCPua8vocELblluFE',
+      'transaction_id': new URLSearchParams(window.location.search).get('session_id') || ''
+  });
+</script>
+
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Betalning lyckades - Prima Bilvård</title>
