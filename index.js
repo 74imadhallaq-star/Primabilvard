@@ -102,7 +102,7 @@ exports.createProductCheckout = onRequest(
           type: 'dropdown',
           dropdown: { options: fulfillmentOptions }
         }],
-        success_url: `${siteUrl}/product-success.html?session_id={CHECKOUT_SESSION_ID}`,
+        success_url: `${siteUrl}/product-success.html?session_id={CHECKOUT_SESSION_ID}&order_id=${encodeURIComponent(orderId)}`,
         cancel_url: `${siteUrl}/product-cancel.html`
       });
       await database.collection('orders').doc(orderId).update({ stripeCheckoutSessionId: session.id });
@@ -296,8 +296,9 @@ exports.getCheckoutConversionSummary = onRequest(
         return;
       }
 
-      const transactionId = session.metadata?.orderId
-        ? String(session.metadata.orderId)
+      const orderId = String(request.body?.orderId || '').trim();
+      const transactionId = orderId && String(session.metadata?.orderId || '') === orderId
+        ? orderId
         : (bookingId && String(session.client_reference_id || '') === bookingId ? bookingId : '');
       if (!transactionId) {
         response.status(404).json({ error: 'No verified checkout summary found.' });

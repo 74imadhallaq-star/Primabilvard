@@ -105,7 +105,7 @@ test('getCheckoutConversionSummary returns product order summary', async () => {
     }
   };
   const response = createResponse();
-  await functions.getCheckoutConversionSummary({ method: 'POST', body: { sessionId: 'sess_product' } }, response);
+  await functions.getCheckoutConversionSummary({ method: 'POST', body: { sessionId: 'sess_product', orderId: 'order_123' } }, response);
   assert.equal(response.statusCode, 200);
   assert.deepEqual(response.body, {
     transactionId: 'order_123',
@@ -162,6 +162,22 @@ test('getCheckoutConversionSummary rejects mismatched booking sessions', async (
   };
   const response = createResponse();
   await functions.getCheckoutConversionSummary({ method: 'POST', body: { sessionId: 'sess_mismatch', bookingId: 'booking_456' } }, response);
+  assert.equal(response.statusCode, 404);
+  assert.deepEqual(response.body, { error: 'No verified checkout summary found.' });
+});
+
+test('getCheckoutConversionSummary rejects mismatched product order ids', async () => {
+  StripeMock.sessions = {
+    sess_product_mismatch: {
+      payment_status: 'paid',
+      amount_total: 24900,
+      currency: 'sek',
+      metadata: { orderId: 'order_123' },
+      client_reference_id: ''
+    }
+  };
+  const response = createResponse();
+  await functions.getCheckoutConversionSummary({ method: 'POST', body: { sessionId: 'sess_product_mismatch', orderId: 'order_999' } }, response);
   assert.equal(response.statusCode, 404);
   assert.deepEqual(response.body, { error: 'No verified checkout summary found.' });
 });
