@@ -1,2 +1,36 @@
 <!DOCTYPE html>
-<html lang="sv"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Order mottagen - Prima Bilvård</title><link rel="stylesheet" href="shop.css?v=1"><link rel="stylesheet" href="style.css?v=17"></head><body class="shop-page" data-no-cart><main class="order-result"><p class="shop-eyebrow">Prima Bilvård</p><div class="order-result-icon">✓</div><h1>Tack för din beställning</h1><p>Betalningen är mottagen. Vi återkommer med bekräftelse och information om frakt eller upphämtning.</p><a class="shop-primary-button" href="shop.html">Till produkterna</a></main><script src="cart.js?v=2"></script><script>window.addEventListener('DOMContentLoaded', function () { try { localStorage.removeItem('primabilvard_product_cart_v1'); } catch (_) {} if (window.productCart) window.productCart.clear(); });</script></body></html>
+<html lang="sv"><head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=AW-18457408182"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'AW-18457408182');
+</script>
+<!-- Event snippet for Köp conversion page -->
+<script>
+  (async function () {
+    const sessionId = new URLSearchParams(window.location.search).get('session_id') || '';
+    const orderId = new URLSearchParams(window.location.search).get('order_id') || '';
+    if (!sessionId || !orderId) return;
+    try {
+      const response = await fetch('https://europe-west1-primabilvard-6c99e.cloudfunctions.net/getCheckoutConversionSummary', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sessionId, orderId })
+      });
+      const result = await response.json();
+      if (!response.ok || !(Number(result.amount) > 0) || !result.transactionId) return;
+      gtag('event', 'conversion', {
+          'send_to': 'AW-18457408182/iJ8WCPua8vocELblluFE',
+          'value': Number(result.amount),
+          'currency': String(result.currency || 'SEK'),
+          'transaction_id': String(result.transactionId)
+      });
+    } catch (_) {
+      return;
+    }
+  })();
+</script>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Order mottagen - Prima Bilvård</title><link rel="stylesheet" href="shop.css?v=1"><link rel="stylesheet" href="style.css?v=17"></head><body class="shop-page" data-no-cart><main class="order-result"><p class="shop-eyebrow">Prima Bilvård</p><div class="order-result-icon">✓</div><h1>Tack för din beställning</h1><p>Betalningen är mottagen. Vi återkommer med bekräftelse och information om frakt eller upphämtning.</p><a class="shop-primary-button" href="shop.html">Till produkterna</a></main><script src="cart.js?v=2"></script><script>window.addEventListener('DOMContentLoaded', function () { try { localStorage.removeItem('primabilvard_product_cart_v1'); } catch (_) {} if (window.productCart) window.productCart.clear(); });</script></body></html>

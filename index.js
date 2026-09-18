@@ -102,7 +102,7 @@ exports.createProductCheckout = onRequest(
           type: 'dropdown',
           dropdown: { options: fulfillmentOptions }
         }],
-        success_url: `${siteUrl}/product-success.html?session_id={CHECKOUT_SESSION_ID}`,
+        success_url: `${siteUrl}/product-success.html?session_id={CHECKOUT_SESSION_ID}&order_id=${encodeURIComponent(orderId)}`,
         cancel_url: `${siteUrl}/product-cancel.html`
       });
       await database.collection('orders').doc(orderId).update({ stripeCheckoutSessionId: session.id });
@@ -264,6 +264,55 @@ exports.createBookingCheckout = onRequest(
     } catch (error) {
       console.error('Booking checkout creation error:', error);
       response.status(400).json({ error: error.message || 'Betalningen kunde inte startas.' });
+    }
+  }
+);
+
+exports.getCheckoutConversionSummary = onRequest(
+  { region: 'europe-west1', secrets: [stripeSecretKey], invoker: 'public' },
+  async (request, response) => {
+    allowCors(response);
+    if (request.method === 'OPTIONS') {
+      response.status(204).send('');
+      return;
+    }
+    if (request.method !== 'POST') {
+      response.status(405).json({ error: 'Method not allowed' });
+      return;
+    }
+
+    try {
+      const sessionId = String(request.body?.sessionId || '').trim();
+      const bookingId = String(request.body?.bookingId || '').trim();
+      if (!sessionId) {
+        response.status(400).json({ error: 'sessionId is required.' });
+        return;
+      }
+
+      const stripe = new Stripe(stripeSecretKey.value());
+      const session = await stripe.checkout.sessions.retrieve(sessionId);
+      if (!session || session.payment_status !== 'paid') {
+        response.status(404).json({ error: 'No paid checkout summary found.' });
+        return;
+      }
+
+      const orderId = String(request.body?.orderId || '').trim();
+      const transactionId = orderId && String(session.metadata?.orderId || '') === orderId
+        ? orderId
+        : (bookingId && String(session.client_reference_id || '') === bookingId ? bookingId : '');
+      if (!transactionId) {
+        response.status(404).json({ error: 'No verified checkout summary found.' });
+        return;
+      }
+
+      response.status(200).json({
+        transactionId,
+        amount: Number(session.amount_total || 0) / 100,
+        currency: String(session.currency || 'sek').toUpperCase()
+      });
+    } catch (error) {
+      console.error('Checkout conversion summary error:', error);
+      response.status(400).json({ error: error.message || 'Checkout summary could not be loaded.' });
     }
   }
 );
