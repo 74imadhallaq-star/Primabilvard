@@ -31,7 +31,7 @@
           'send_to': 'AW-18457408182/iJ8WCPua8vocELblluFE',
           'value': Number(result.amount),
           'currency': String(result.currency || 'SEK'),
-          'transaction_id': transactionId
+          'transaction_id': String(result.transactionId || bookingId)
       });
     } catch (_) {
       return;

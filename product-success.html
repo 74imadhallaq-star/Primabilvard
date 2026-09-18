@@ -12,21 +12,32 @@
 <script>
   (function () {
     const transactionId = new URLSearchParams(window.location.search).get('session_id') || '';
-    if (!transactionId) return;
+    if (!transactionId) {
+      sessionStorage.removeItem('pendingProductCheckout');
+      return;
+    }
     let orderAmount = 0;
     let orderCurrency = 'SEK';
+    let orderTransactionId = '';
     try {
       const pendingCheckout = JSON.parse(sessionStorage.getItem('pendingProductCheckout') || 'null');
-      if (!pendingCheckout || String(pendingCheckout.sessionId || '') !== transactionId) return;
+      if (!pendingCheckout || String(pendingCheckout.sessionId || '') !== transactionId) {
+        sessionStorage.removeItem('pendingProductCheckout');
+        return;
+      }
       orderAmount = Number(pendingCheckout.amount) || 0;
       orderCurrency = String(pendingCheckout.currency || 'SEK');
+      orderTransactionId = String(pendingCheckout.transactionId || '');
     } catch (_) {}
-    if (orderAmount <= 0) return;
+    if (orderAmount <= 0 || !orderTransactionId) {
+      sessionStorage.removeItem('pendingProductCheckout');
+      return;
+    }
     gtag('event', 'conversion', {
         'send_to': 'AW-18457408182/iJ8WCPua8vocELblluFE',
         'value': orderAmount,
         'currency': orderCurrency,
-        'transaction_id': transactionId
+        'transaction_id': orderTransactionId
     });
     sessionStorage.removeItem('pendingProductCheckout');
   })();

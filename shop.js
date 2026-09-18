@@ -144,11 +144,7 @@
       const response = await fetch(checkoutEndpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ items: cart.map(item => ({ id: item.id, quantity: item.quantity })) }) });
       const result = await response.json();
       if (!response.ok || !result.url) throw new Error(result.error || 'Checkout kunde inte startas');
-      sessionStorage.setItem('pendingProductCheckout', JSON.stringify({
-        sessionId: String(result.sessionId || ''),
-        amount: Number(result.amount) || 0,
-        currency: String(result.currency || 'SEK')
-      }));
+      if (typeof window.storePendingProductCheckout === 'function') window.storePendingProductCheckout(result);
       window.location.href = result.url;
     } catch (error) {
       console.error('Product checkout error:', error);
