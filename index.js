@@ -106,7 +106,7 @@ exports.createProductCheckout = onRequest(
         cancel_url: `${siteUrl}/product-cancel.html`
       });
       await database.collection('orders').doc(orderId).update({ stripeCheckoutSessionId: session.id });
-      response.status(200).json({ url: session.url, sessionId: session.id, transactionId: orderId, amount: items.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0), currency: 'SEK' });
+      response.status(200).json({ url: session.url });
     } catch (error) {
       console.error('Product checkout creation error:', error);
       response.status(400).json({ error: error.message || 'Kassan kunde inte startas.' });
@@ -268,7 +268,7 @@ exports.createBookingCheckout = onRequest(
   }
 );
 
-exports.getBookingCheckoutSummary = onRequest(
+exports.getCheckoutConversionSummary = onRequest(
   { region: 'europe-west1', secrets: [stripeSecretKey], invoker: 'public' },
   async (request, response) => {
     allowCors(response);
@@ -282,27 +282,35 @@ exports.getBookingCheckoutSummary = onRequest(
     }
 
     try {
-      const bookingId = String(request.body?.bookingId || '').trim();
       const sessionId = String(request.body?.sessionId || '').trim();
-      if (!bookingId || !sessionId) {
-        response.status(400).json({ error: 'bookingId and sessionId are required.' });
+      const bookingId = String(request.body?.bookingId || '').trim();
+      if (!sessionId) {
+        response.status(400).json({ error: 'sessionId is required.' });
         return;
       }
 
       const stripe = new Stripe(stripeSecretKey.value());
       const session = await stripe.checkout.sessions.retrieve(sessionId);
-      if (!session || String(session.client_reference_id || '') !== bookingId || session.payment_status !== 'paid') {
+      if (!session || session.payment_status !== 'paid') {
         response.status(404).json({ error: 'No paid checkout summary found.' });
         return;
       }
 
+      const transactionId = session.metadata?.orderId
+        ? String(session.metadata.orderId)
+        : (bookingId && String(session.client_reference_id || '') === bookingId ? bookingId : '');
+      if (!transactionId) {
+        response.status(404).json({ error: 'No verified checkout summary found.' });
+        return;
+      }
+
       response.status(200).json({
-        transactionId: bookingId,
+        transactionId,
         amount: Number(session.amount_total || 0) / 100,
         currency: String(session.currency || 'sek').toUpperCase()
       });
     } catch (error) {
-      console.error('Booking checkout summary error:', error);
+      console.error('Checkout conversion summary error:', error);
       response.status(400).json({ error: error.message || 'Checkout summary could not be loaded.' });
     }
   }

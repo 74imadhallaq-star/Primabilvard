@@ -144,7 +144,6 @@
       const response = await fetch(checkoutEndpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ items: cart.map(item => ({ id: item.id, quantity: item.quantity })) }) });
       const result = await response.json();
       if (!response.ok || !result.url) throw new Error(result.error || 'Checkout kunde inte startas');
-      if (typeof window.storePendingProductCheckout === 'function') window.storePendingProductCheckout(result);
       window.location.href = result.url;
     } catch (error) {
       console.error('Product checkout error:', error);

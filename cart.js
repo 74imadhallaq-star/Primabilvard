@@ -15,15 +15,6 @@
     window.dispatchEvent(new CustomEvent('productCartChanged', { detail: cart }));
   }
 
-  function storePendingProductCheckout(checkout) {
-    sessionStorage.setItem('pendingProductCheckout', JSON.stringify({
-      sessionId: String(checkout && checkout.sessionId || ''),
-      transactionId: String(checkout && checkout.transactionId || ''),
-      amount: Number(checkout && checkout.amount) || 0,
-      currency: String(checkout && checkout.currency || 'SEK')
-    }));
-  }
-
   function cartCount() {
     return readCart().reduce((sum, item) => sum + Number(item.quantity || 0), 0);
   }
@@ -96,7 +87,6 @@
       const response = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ items: cart.map(item => ({ id: item.id, quantity: item.quantity })) }) });
       const result = await response.json();
       if (!response.ok || !result.url) throw new Error(result.error || 'Checkout kunde inte startas');
-      storePendingProductCheckout(result);
       window.location.href = result.url;
     } catch (error) {
       console.error('Product checkout error:', error);
@@ -135,7 +125,6 @@
     },
     count: cartCount
   };
-  window.storePendingProductCheckout = storePendingProductCheckout;
 
   function bindHamburgerMenu() {
     const hamburger = document.getElementById('hamburger');

@@ -20,18 +20,18 @@
     const bookingId = bookingIdCookie ? decodeURIComponent(bookingIdCookie.split('=').slice(1).join('=')) : '';
     if (!bookingId) return;
     try {
-      const response = await fetch('https://europe-west1-primabilvard-6c99e.cloudfunctions.net/getBookingCheckoutSummary', {
+      const response = await fetch('https://europe-west1-primabilvard-6c99e.cloudfunctions.net/getCheckoutConversionSummary', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ bookingId, sessionId: transactionId })
       });
       const result = await response.json();
-      if (!response.ok || !(Number(result.amount) > 0)) return;
+      if (!response.ok || result.transactionId !== bookingId || !(Number(result.amount) > 0)) return;
       gtag('event', 'conversion', {
           'send_to': 'AW-18457408182/iJ8WCPua8vocELblluFE',
           'value': Number(result.amount),
           'currency': String(result.currency || 'SEK'),
-          'transaction_id': String(result.transactionId || bookingId)
+          'transaction_id': result.transactionId
       });
     } catch (_) {
       return;
