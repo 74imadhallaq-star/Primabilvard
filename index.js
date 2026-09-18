@@ -106,7 +106,7 @@ exports.createProductCheckout = onRequest(
         cancel_url: `${siteUrl}/product-cancel.html`
       });
       await database.collection('orders').doc(orderId).update({ stripeCheckoutSessionId: session.id });
-      response.status(200).json({ url: session.url });
+      response.status(200).json({ url: session.url, sessionId: session.id, amount: items.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0), currency: 'SEK' });
     } catch (error) {
       console.error('Product checkout creation error:', error);
       response.status(400).json({ error: error.message || 'Kassan kunde inte startas.' });
@@ -260,7 +260,7 @@ exports.createBookingCheckout = onRequest(
       // Store the server-computed price as the authoritative value before Stripe redirects the customer.
       await pendingRef.set({ price, serviceLabel: label, stripeCheckoutSessionId: session.id }, { merge: true });
 
-      response.status(200).json({ url: session.url });
+      response.status(200).json({ url: session.url, sessionId: session.id, amount: price, currency: 'SEK' });
     } catch (error) {
       console.error('Booking checkout creation error:', error);
       response.status(400).json({ error: error.message || 'Betalningen kunde inte startas.' });

@@ -12,17 +12,23 @@
 <!-- Event snippet for Köp conversion page -->
 <script>
   (function () {
+    const transactionId = new URLSearchParams(window.location.search).get('session_id') || '';
+    if (!transactionId) return;
     let bookingAmount = 0;
+    let bookingCurrency = 'SEK';
     try {
-      const pendingBooking = JSON.parse(sessionStorage.getItem('pendingBooking') || 'null');
-      bookingAmount = Number(pendingBooking && pendingBooking.price) || 0;
+      const pendingCheckout = JSON.parse(sessionStorage.getItem('pendingBookingConversion') || 'null');
+      bookingAmount = Number(pendingCheckout && pendingCheckout.amount) || 0;
+      bookingCurrency = String((pendingCheckout && pendingCheckout.currency) || 'SEK');
     } catch (_) {}
+    if (bookingAmount <= 0) return;
     gtag('event', 'conversion', {
         'send_to': 'AW-18457408182/iJ8WCPua8vocELblluFE',
         'value': bookingAmount,
-        'currency': 'SEK',
-        'transaction_id': new URLSearchParams(window.location.search).get('session_id') || ''
+        'currency': bookingCurrency,
+        'transaction_id': transactionId
     });
+    sessionStorage.removeItem('pendingBookingConversion');
   })();
 </script>
 
