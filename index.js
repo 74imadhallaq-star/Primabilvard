@@ -260,10 +260,49 @@ exports.createBookingCheckout = onRequest(
       // Store the server-computed price as the authoritative value before Stripe redirects the customer.
       await pendingRef.set({ price, serviceLabel: label, stripeCheckoutSessionId: session.id }, { merge: true });
 
-      response.status(200).json({ url: session.url, sessionId: session.id, amount: price, currency: 'SEK' });
+      response.status(200).json({ url: session.url });
     } catch (error) {
       console.error('Booking checkout creation error:', error);
       response.status(400).json({ error: error.message || 'Betalningen kunde inte startas.' });
+    }
+  }
+);
+
+exports.getBookingCheckoutSummary = onRequest(
+  { region: 'europe-west1', secrets: [stripeSecretKey], invoker: 'public' },
+  async (request, response) => {
+    allowCors(response);
+    if (request.method === 'OPTIONS') {
+      response.status(204).send('');
+      return;
+    }
+    if (request.method !== 'POST') {
+      response.status(405).json({ error: 'Method not allowed' });
+      return;
+    }
+
+    try {
+      const bookingId = String(request.body?.bookingId || '').trim();
+      const sessionId = String(request.body?.sessionId || '').trim();
+      if (!bookingId || !sessionId) {
+        response.status(400).json({ error: 'bookingId and sessionId are required.' });
+        return;
+      }
+
+      const stripe = new Stripe(stripeSecretKey.value());
+      const session = await stripe.checkout.sessions.retrieve(sessionId);
+      if (!session || String(session.client_reference_id || '') !== bookingId || session.payment_status !== 'paid') {
+        response.status(404).json({ error: 'No paid checkout summary found.' });
+        return;
+      }
+
+      response.status(200).json({
+        amount: Number(session.amount_total || 0) / 100,
+        currency: String(session.currency || 'sek').toUpperCase()
+      });
+    } catch (error) {
+      console.error('Booking checkout summary error:', error);
+      response.status(400).json({ error: error.message || 'Checkout summary could not be loaded.' });
     }
   }
 );

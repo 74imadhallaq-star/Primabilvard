@@ -1132,7 +1132,7 @@ async function createDynamicBookingCheckout(bookingId) {
   });
   const result = await response.json();
   if (!response.ok || !result.url) throw new Error(result.error || 'Betalningen kunde inte startas.');
-  return result;
+  return result.url;
 }
 
 function updateStripePayButton() {
@@ -1318,10 +1318,6 @@ if (bookingForm) bookingForm.addEventListener('submit', async function(e) {
     await savePendingBooking(booking);
     setPendingBookingCookie(booking.id);
     sessionStorage.setItem('pendingBooking', JSON.stringify(booking));
-    sessionStorage.setItem('pendingBookingConversion', JSON.stringify({
-      amount: Number(booking.price) || 0,
-      currency: 'SEK'
-    }));
   } catch (err) {
     console.error('Pending booking save error:', err);
     alert('Kunde inte starta betalningen just nu. Försök igen om en stund.');
@@ -3381,22 +3377,14 @@ document.addEventListener('DOMContentLoaded', async function() {
           await savePendingBooking(booking);
           setPendingBookingCookie(booking.id);
           sessionStorage.setItem('pendingBooking', JSON.stringify(booking));
-          sessionStorage.setItem('pendingBookingConversion', JSON.stringify({
-            amount: Number(booking.price) || 0,
-            currency: 'SEK'
-          }));
           window.location.href = getStripeCheckoutUrl(paymentLink, booking.id);
         } else if (isCombo) {
           console.log('Combo booking - creating dynamic Stripe checkout session');
           await savePendingBooking(booking);
-          const checkoutSession = await createDynamicBookingCheckout(booking.id);
+          const checkoutUrl = await createDynamicBookingCheckout(booking.id);
           setPendingBookingCookie(booking.id);
           sessionStorage.setItem('pendingBooking', JSON.stringify(booking));
-          sessionStorage.setItem('pendingBookingConversion', JSON.stringify({
-            amount: Number(checkoutSession.amount) || 0,
-            currency: String(checkoutSession.currency || 'SEK')
-          }));
-          window.location.href = checkoutSession.url;
+          window.location.href = checkoutUrl;
         } else {
           console.log('No payment link, saving booking as pending');
           
