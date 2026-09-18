@@ -10,9 +10,20 @@
 </script>
 <!-- Event snippet for Köp conversion page -->
 <script>
-  gtag('event', 'conversion', {
-      'send_to': 'AW-18457408182/iJ8WCPua8vocELblluFE',
-      'transaction_id': new URLSearchParams(window.location.search).get('session_id') || ''
-  });
+  (function () {
+    let orderAmount = 0;
+    try {
+      const cart = JSON.parse(localStorage.getItem('primabilvard_product_cart_v1') || '[]');
+      orderAmount = Array.isArray(cart)
+        ? cart.reduce((sum, item) => sum + ((Number(item && item.price) || 0) * (Number(item && item.quantity) || 0)), 0)
+        : 0;
+    } catch (_) {}
+    gtag('event', 'conversion', {
+        'send_to': 'AW-18457408182/iJ8WCPua8vocELblluFE',
+        'value': orderAmount,
+        'currency': 'SEK',
+        'transaction_id': new URLSearchParams(window.location.search).get('session_id') || ''
+    });
+  })();
 </script>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Order mottagen - Prima Bilvård</title><link rel="stylesheet" href="shop.css?v=1"><link rel="stylesheet" href="style.css?v=17"></head><body class="shop-page" data-no-cart><main class="order-result"><p class="shop-eyebrow">Prima Bilvård</p><div class="order-result-icon">✓</div><h1>Tack för din beställning</h1><p>Betalningen är mottagen. Vi återkommer med bekräftelse och information om frakt eller upphämtning.</p><a class="shop-primary-button" href="shop.html">Till produkterna</a></main><script src="cart.js?v=2"></script><script>window.addEventListener('DOMContentLoaded', function () { try { localStorage.removeItem('primabilvard_product_cart_v1'); } catch (_) {} if (window.productCart) window.productCart.clear(); });</script></body></html>

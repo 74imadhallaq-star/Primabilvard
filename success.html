@@ -11,10 +11,19 @@
 </script>
 <!-- Event snippet for Köp conversion page -->
 <script>
-  gtag('event', 'conversion', {
-      'send_to': 'AW-18457408182/iJ8WCPua8vocELblluFE',
-      'transaction_id': new URLSearchParams(window.location.search).get('session_id') || ''
-  });
+  (function () {
+    let bookingAmount = 0;
+    try {
+      const pendingBooking = JSON.parse(sessionStorage.getItem('pendingBooking') || 'null');
+      bookingAmount = Number(pendingBooking && pendingBooking.price) || 0;
+    } catch (_) {}
+    gtag('event', 'conversion', {
+        'send_to': 'AW-18457408182/iJ8WCPua8vocELblluFE',
+        'value': bookingAmount,
+        'currency': 'SEK',
+        'transaction_id': new URLSearchParams(window.location.search).get('session_id') || ''
+    });
+  })();
 </script>
 
   <meta charset="UTF-8" />
