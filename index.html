@@ -27,7 +27,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Cormorant+Garamond:wght@400;500;600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=17">
+<link rel="stylesheet" href="style.css?v=32">
 <link rel="stylesheet" href="cart.css?v=1">
 </head>
 <body>
@@ -132,8 +132,8 @@
         <option value="large">Stor - 279 kr</option>
       </select>
       <select class="card-size card-addon-asphalt">
-        <option value="none">Asfaltrengöring: Ingen extra</option>
-        <option value="yes">Asfaltrengöring (+250/+300/+350 kr, +30 min)</option>
+        <option value="none">Asfaltborttagning: Ingen extra</option>
+        <option value="yes">Asfaltborttagning (+299 kr, +30 min)</option>
       </select>
       <span class="price">Från 199 kr</span>
     </div>
@@ -171,8 +171,8 @@
         <option value="large">Stor - 479 kr</option>
       </select>
       <select class="card-size card-addon-asphalt">
-        <option value="none">Asfaltrengöring: Ingen extra</option>
-        <option value="yes">Asfaltrengöring (+250/+300/+350 kr, +30 min)</option>
+        <option value="none">Asfaltborttagning: Ingen extra</option>
+        <option value="yes">Asfaltborttagning (+299 kr, +30 min)</option>
       </select>
       <span class="price">Från 399 kr</span>
     </div>
@@ -193,8 +193,8 @@
         <option value="large">Stor - 1500 kr</option>
       </select>
       <select class="card-size card-addon-asphalt">
-        <option value="none">Asfaltrengöring: Ingen extra</option>
-        <option value="yes">Asfaltrengöring (+250/+300/+350 kr, +30 min)</option>
+        <option value="none">Asfaltborttagning: Ingen extra</option>
+        <option value="yes">Asfaltborttagning (+299 kr, +30 min)</option>
       </select>
       <span class="price">Från 1000 kr</span>
     </div>
@@ -289,10 +289,70 @@
       </div>
       </div>
     </div>
+
+    <div class="service-category-card accordion-item" data-category="wash-special">
+      <div class="accordion-header">
+        <div class="category-icon">🎯</div>
+        <div>
+          <h3>Specialbehandlingar</h3>
+          <p class="category-description">Klädsel, lyktor och asfalt</p>
+        </div>
+        <span class="accordion-arrow">▼</span>
+      </div>
+      <div class="accordion-content">
+      <div class="service-items">
+    <div class="service-card service-item" data-service="upholstery-2" style="cursor: pointer;">
+      <h3>Endast Klädseltvätt</h3>
+      <p>Enbart klädseltvätt – ingen annan tvätt ingår.</p>
+      <ul class="service-features">
+        <li>Djuprengöring av textilklädsel</li>
+        <li>Borttagning av fläckar och smuts</li>
+        <li>Valfritt antal säten: 2 eller 5</li>
+      </ul>
+      <select class="card-variant">
+        <option value="upholstery-2">2 säten - 399 kr (ca 1 timme)</option>
+        <option value="upholstery-5">5 säten - 699 kr (ca 1,5 timmar)</option>
+      </select>
+      <span class="price">399 kr</span>
+    </div>
+    <div class="service-card service-item" data-service="headlight-2" style="cursor: pointer;">
+      <h3>Polering av Lyktor</h3>
+      <p>Matta och gulnade lyktor poleras för bättre ljus och ett fräschare utseende.</p>
+      <ul class="service-features">
+        <li>Slipning och polering av lyktglas</li>
+        <li>Klarare ljus och bättre synlighet</li>
+        <li>Välj 2 eller 4 lyktor</li>
+      </ul>
+      <select class="card-variant">
+        <option value="headlight-2">2 lyktor - 399 kr (ca 20 min)</option>
+        <option value="headlight-4">4 lyktor - 499 kr (ca 30 min)</option>
+      </select>
+      <span class="price">399 kr</span>
+    </div>
+    <div class="service-card service-item" data-service="asphalt-removal" style="cursor: pointer;">
+      <h3>Asfaltborttagning</h3>
+      <p>Vi tar bort asfalt och tjärfläckar från lacken. Utvändig tvätt ingår.</p>
+      <ul class="service-features">
+        <li>Borttagning av asfalt och tjära</li>
+        <li>Utvändig handtvätt ingår</li>
+        <li>Grundlig fälgtvätt</li>
+      </ul>
+      <p><strong>Tid: ca 50 minuter</strong></p>
+      <select class="card-size">
+        <option value="small">Liten - 449 kr</option>
+        <option value="medium">Mellan - 549 kr</option>
+        <option value="large">Stor - 629 kr</option>
+      </select>
+      <span class="price">Från 449 kr</span>
+    </div>
+      </div>
+      </div>
+    </div>
   </div>
   </div>
 
   <!-- BILSERVICE TAB CONTENT -->
+
   <div class="tab-content" id="car-service">
   <div class="service-categories">
     
@@ -566,15 +626,31 @@
       </div>
       <div class="wizard-step" data-step="3">
         <div class="step-circle">3</div>
-        <div class="step-label">Datum & Tid</div>
+        <div class="step-label">Tillval</div>
       </div>
       <div class="wizard-step" data-step="4">
         <div class="step-circle">4</div>
-        <div class="step-label">Dina Uppgifter</div>
+        <div class="step-label">Datum & Tid</div>
       </div>
       <div class="wizard-step" data-step="5">
         <div class="step-circle">5</div>
+        <div class="step-label">Dina Uppgifter</div>
+      </div>
+      <div class="wizard-step" data-step="6">
+        <div class="step-circle">6</div>
         <div class="step-label">Bekräfta</div>
+      </div>
+    </div>
+
+    <!-- Selection summary -->
+    <div class="wizard-selection" id="wizardSelectionBar" style="display:none;">
+      <div class="wizard-selection-main">
+        <small>Vald tjänst</small>
+        <strong id="wizardSelectionLabel"></strong>
+      </div>
+      <div class="wizard-selection-price">
+        <small>Pris</small>
+        <strong id="wizardSelectionPrice"></strong>
       </div>
     </div>
 
@@ -595,6 +671,7 @@
             <span id="wizardComboStatusText">1. Välj en tvätt  2. Välj en bilservice</span>
           </div>
           <div class="service-options" id="serviceOptionsWash">
+            <h5 class="service-group-title">Tvätt</h5>
             <div class="service-option" data-service="basic">
               <div class="service-option-icon">💧</div>
               <h4>Utvändig Handtvätt</h4>
@@ -619,6 +696,7 @@
               <p>Inkl. sätstädning</p>
               <span class="service-option-price">Från 1000 kr</span>
             </div>
+            <h5 class="service-group-title">Rekond &amp; lackskydd</h5>
             <div class="service-option" data-service="interior">
               <div class="service-option-icon">💎</div>
               <h4>Hel Glans</h4>
@@ -637,10 +715,42 @@
               <p>Exklusiv rekond med keramisk coating</p>
               <span class="service-option-price">Från 3499 kr</span>
             </div>
+            <h5 class="service-group-title">Specialbehandlingar</h5>
+            <div class="service-option" data-service="upholstery-2">
+              <div class="service-option-icon">🪑</div>
+              <h4>Endast Klädseltvätt – 2 säten</h4>
+              <p>Bara klädseltvätt</p>
+              <span class="service-option-price">399 kr</span>
+            </div>
+            <div class="service-option" data-service="upholstery-5">
+              <div class="service-option-icon">🪑</div>
+              <h4>Endast Klädseltvätt – 5 säten</h4>
+              <p>Bara klädseltvätt</p>
+              <span class="service-option-price">699 kr</span>
+            </div>
+            <div class="service-option" data-service="headlight-2">
+              <div class="service-option-icon">💡</div>
+              <h4>Polering av Lyktor – 2 st</h4>
+              <p>Klarare ljus och glans</p>
+              <span class="service-option-price">399 kr</span>
+            </div>
+            <div class="service-option" data-service="headlight-4">
+              <div class="service-option-icon">💡</div>
+              <h4>Polering av Lyktor – 4 st</h4>
+              <p>Klarare ljus och glans</p>
+              <span class="service-option-price">499 kr</span>
+            </div>
+            <div class="service-option" data-service="asphalt-removal">
+              <div class="service-option-icon">🛣️</div>
+              <h4>Asfaltborttagning</h4>
+              <p>Inkl. utvändig tvätt</p>
+              <span class="service-option-price">Från 449 kr</span>
+            </div>
 
           </div>
 
           <div class="service-options" id="serviceOptionsService" style="display:none;">
+            <h5 class="service-group-title">Däckservice</h5>
             <div class="service-option" data-service="tire-change">
               <div class="service-option-icon">🛞</div>
               <h4>Däckbyte</h4>
@@ -659,6 +769,7 @@
               <p>Lagning av punktering</p>
               <span class="service-option-price">Från 200 kr</span>
             </div>
+            <h5 class="service-group-title">Service &amp; bromsar</h5>
             <div class="service-option" data-service="basic-service">
               <div class="service-option-icon">⚙️</div>
               <h4>Basservice</h4>
@@ -677,12 +788,20 @@
               <p>Bromsar & säkerhet</p>
               <span class="service-option-price">Från 1200 kr</span>
             </div>
+            <h5 class="service-group-title">Besiktning</h5>
             <div class="service-option" data-service="pre-inspection">
               <div class="service-option-icon">📋</div>
               <h4>Förbered Besiktning</h4>
               <p>Kontroll inför besiktning</p>
               <span class="service-option-price">Från 1 000 kr</span>
             </div>
+            <div class="service-option" data-service="inspection-fix">
+              <div class="service-option-icon">📋</div>
+              <h4>Åtgärda Besiktning</h4>
+              <p>Ring oss för offert</p>
+              <span class="service-option-price">Pris efter offert</span>
+            </div>
+            <h5 class="service-group-title">Felsökning &amp; diagnos</h5>
             <div class="service-option" data-service="computer-diagnosis">
               <div class="service-option-icon">💻</div>
               <h4>Datordiagnos</h4>
@@ -700,12 +819,6 @@
               <h4>Motordiagnos</h4>
               <p>Motoranalys</p>
               <span class="service-option-price">Från 1200 kr</span>
-            </div>
-            <div class="service-option" data-service="inspection-fix">
-              <div class="service-option-icon">📋</div>
-              <h4>Åtgärda Besiktning</h4>
-              <p>Ring oss för offert</p>
-              <span class="service-option-price">Pris efter offert</span>
             </div>
           </div>
         </div>
@@ -768,19 +881,6 @@
             </div>
           </div>
 
-          <div class="form-section" id="wizardAsphaltAddon" style="display:none;">
-            <label>Asfaltrengöring (tillval)</label>
-            <div class="addon-selector">
-              <div class="addon-option active" data-addon="none">
-                <span>Ingen</span>
-              </div>
-              <div class="addon-option" data-addon="yes">
-                <span>Lägg till</span>
-                <small id="wizardAsphaltAddonPrice">+250 kr, +30 min</small>
-              </div>
-            </div>
-          </div>
-
           <div class="form-section">
             <label for="wizardRegistration">Registreringsnummer *</label>
             <input type="text" id="wizardRegistration" placeholder="ABC 123" required>
@@ -788,8 +888,19 @@
         </div>
       </div>
 
-      <!-- Step 3: Date & Time -->
+      <!-- Step 3: Extras -->
       <div class="wizard-panel" data-panel="3">
+        <h3>Lägg till tillval</h3>
+        <p class="extras-intro">Valfritt – välj extra behandlingar som du vill lägga till. Du kan hoppa över detta steg.</p>
+        <div id="wizardExtrasList" class="extras-list"></div>
+        <div class="extras-total" id="wizardExtrasTotal" style="display:none;">
+          <span>Tillval totalt:</span>
+          <strong id="wizardExtrasTotalValue">0 kr</strong>
+        </div>
+      </div>
+
+      <!-- Step 4: Date & Time -->
+      <div class="wizard-panel" data-panel="4">
         <h3>Välj datum och tid</h3>
         <div class="datetime-selector">
           <div class="calendar-container">
@@ -817,8 +928,8 @@
         </div>
       </div>
 
-      <!-- Step 4: Contact Info -->
-      <div class="wizard-panel" data-panel="4">
+      <!-- Step 5: Contact Info -->
+      <div class="wizard-panel" data-panel="5">
         <h3>Dina kontaktuppgifter</h3>
         <div class="wizard-form">
           <div class="form-section">
@@ -848,8 +959,8 @@
         </div>
       </div>
 
-      <!-- Step 5: Confirmation -->
-      <div class="wizard-panel" data-panel="5">
+      <!-- Step 6: Confirmation -->
+      <div class="wizard-panel" data-panel="6">
         <h3>Bekräfta din bokning</h3>
         <div class="booking-summary">
           <div class="summary-section">
@@ -1361,7 +1472,7 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 <script src="firebase-config.js?v=4"></script>
-<script src="script.js?v=107"></script>
+<script src="script.js?v=110"></script>
 <script src="cart.js?v=1"></script>
 <script>
 (function() {

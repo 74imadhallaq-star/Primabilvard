@@ -130,6 +130,11 @@ const DEFAULT_SERVICE_DURATIONS = {
   'interior': 180,
   'full': 210,
   'ceramic': 300,
+  'upholstery-2': 60,
+  'upholstery-5': 90,
+  'headlight-2': 20,
+  'headlight-4': 30,
+  'asphalt-removal': 50,
   // Car service durations
   'tire-change': 30,
   'tire-storage': 15,
@@ -154,6 +159,11 @@ const SERVICE_LABELS = {
   'interior': 'Hel Glans',
   'full': 'Fullservice Rekond',
   'ceramic': 'Keramiskt Lackskydd',
+  'upholstery-2': 'Endast Klädseltvätt (2 säten)',
+  'upholstery-5': 'Endast Klädseltvätt (5 säten)',
+  'headlight-2': 'Polering av Lyktor (2 st)',
+  'headlight-4': 'Polering av Lyktor (4 st)',
+  'asphalt-removal': 'Asfaltborttagning (inkl. utvändig tvätt)',
   // Car service labels
   'tire-change': 'Däckbyte',
   'tire-storage': 'Däckhotell',
@@ -171,6 +181,32 @@ const SERVICE_LABELS = {
 // Global list of bilservice (non-wash) services
 const SERVICE_SERVICES = ['tire-change', 'tire-storage', 'tire-repair', 'basic-service', 'major-service', 'brake-service', 'pre-inspection', 'inspection-fix', 'computer-diagnosis', 'electrical-diagnosis', 'engine-diagnosis'];
 
+// Fasta priser oavsett bilstorlek; betalas via dynamisk Stripe-kassa (ingen färdig betalningslänk).
+const FIXED_PRICE_WASH_SERVICES = ['upholstery-2', 'upholstery-5', 'headlight-2', 'headlight-4'];
+const DYNAMIC_CHECKOUT_SERVICES = [...FIXED_PRICE_WASH_SERVICES, 'asphalt-removal'];
+
+// Tillval som kan läggas till på en bokning. Priser och tider är preliminära och justeras här (spegla ändringar i index.js).
+const EXTRAS_CATALOG = [
+  { id: 'quick-wax', category: 'Utvändigt', label: 'Snabbvax', description: 'Snabb vaxning för extra glans och skydd', price: 100, minutes: 0, hideFor: ['interior', 'full', 'ceramic'] },
+  { id: 'asphalt', category: 'Utvändigt', label: 'Asfaltborttagning', description: 'Tar bort asfalt och tjärfläckar', price: 299, minutes: 30, hideFor: ['asphalt-removal'] },
+  { id: 'lights-2', category: 'Utvändigt', group: 'lights', label: 'Polering av lyktor (2 st)', description: 'Klarare ljus och fräschare utseende', price: 399, minutes: 20, hideFor: ['headlight-2', 'headlight-4'] },
+  { id: 'lights-4', category: 'Utvändigt', group: 'lights', label: 'Polering av lyktor (4 st)', description: 'Klarare ljus och fräschare utseende', price: 499, minutes: 30, hideFor: ['headlight-2', 'headlight-4'] },
+  { id: 'window-repellent', category: 'Utvändigt', label: 'Vattenavvisande rutor', description: 'Bättre sikt i regn', price: 149, minutes: 0, hideFor: [] },
+  { id: 'engine-wash', category: 'Utvändigt', label: 'Motortvätt', description: 'Skonsam rengöring av motorrummet', price: 200, minutes: 30, hideFor: ['full'] },
+  { id: 'seats-2', category: 'Invändigt', group: 'seats', label: 'Klädseltvätt (2 säten)', description: 'Djuprengöring av textilsäten', price: 399, minutes: 60, hideFor: ['upholstery-2', 'upholstery-5', 'inout', 'interior', 'full', 'ceramic'] },
+  { id: 'seats-5', category: 'Invändigt', group: 'seats', label: 'Klädseltvätt (5 säten)', description: 'Djuprengöring av alla säten', price: 699, minutes: 90, hideFor: ['upholstery-2', 'upholstery-5', 'inout', 'interior', 'full', 'ceramic'] },
+  { id: 'pet-hair', category: 'Invändigt', label: 'Hundhårsborttagning', description: 'Grundlig borttagning av djurhår', price: 99, minutes: 0, hideFor: [] },
+  { id: 'odor-removal', category: 'Invändigt', label: 'Luktsanering', description: 'Pris enligt offert, betalas efter bedömning', price: 0, quote: true, minutes: 0, hideFor: [] }
+];
+
+function getExtraPrice(extra, size) {
+  return typeof extra.price === 'number' ? extra.price : (extra.price[size] || extra.price.small);
+}
+
+function getExtraLabel(extra) {
+  return extra.quote ? `${extra.label} (offert)` : extra.label;
+}
+
 const SEAT_ADDON_OPTIONS = {
   none: { label: 'Ingen', price: 0, minutes: 0 },
   '2': { label: '2 säten', price: 399, minutes: 150 },
@@ -180,7 +216,7 @@ const SEAT_ADDON_OPTIONS = {
 
 const ASPHALT_ADDON_OPTIONS = {
   none: { label: 'Ingen', minutes: 0, pricesBySize: { small: 0, medium: 0, large: 0 } },
-  yes: { label: 'Asfaltrengöring', minutes: 30, pricesBySize: { small: 250, medium: 300, large: 350 } }
+  yes: { label: 'Asfaltborttagning', minutes: 30, pricesBySize: { small: 299, medium: 299, large: 299 } }
 };
 
 function serviceSupportsSeatAddon(service) {
@@ -984,6 +1020,11 @@ const servicePrices = {
   'interior': { small: 1500, medium: 1700, large: 1900 },
   'full': { small: 2000, medium: 2300, large: 2600 },
   'ceramic': { small: 3499, medium: 3799, large: 3999 },
+  'upholstery-2': { small: 399, medium: 399, large: 399 },
+  'upholstery-5': { small: 699, medium: 699, large: 699 },
+  'headlight-2': { small: 399, medium: 399, large: 399 },
+  'headlight-4': { small: 499, medium: 499, large: 499 },
+  'asphalt-removal': { small: 449, medium: 549, large: 629 },
   // Car service prices (fixed prices, not size-dependent but we use 'small' for consistency)
   'tire-change': { small: 500, medium: 500, large: 500 },
   'tire-storage': { small: 750, medium: 750, large: 750 },
@@ -1425,7 +1466,7 @@ function renderBookingsTable(serverBookings) {
   const statusFilter = document.getElementById('bookingStatusFilter')?.value || 'all';
   
   // Define wash and service categories
-  const washServices = ['basic', 'interior-wash', 'premium', 'inout', 'interior', 'full'];
+  const washServices = ['basic', 'interior-wash', 'premium', 'inout', 'interior', 'full', ...DYNAMIC_CHECKOUT_SERVICES];
   const serviceServices = ['tire-change', 'tire-storage', 'tire-repair', 'basic-service', 'major-service', 'brake-service', 'pre-inspection', 'inspection-fix', 'computer-diagnosis', 'electrical-diagnosis', 'engine-diagnosis'];
   
   // Filter bookings
@@ -2180,8 +2221,15 @@ document.addEventListener('DOMContentLoaded', async function() {
     const sizeSelect = card.querySelector('.card-size');
     const seatAddonSelect = card.querySelector('.card-addon-seat');
     const asphaltAddonSelect = card.querySelector('.card-addon-asphalt');
+    const variantSelect = card.querySelector('.card-variant');
 
     const updateCardPrice = () => {
+      if (variantSelect) {
+        const variantPrice = servicePrices[variantSelect.value]?.small;
+        const variantPriceSpan = card.querySelector('.price');
+        if (variantPriceSpan && variantPrice) variantPriceSpan.textContent = variantPrice + ' kr';
+        return;
+      }
       if (!sizeSelect) return;
       const chosenSize = sizeSelect.value;
       const seatAddonType = seatAddonSelect ? seatAddonSelect.value : 'none';
@@ -2197,8 +2245,15 @@ document.addEventListener('DOMContentLoaded', async function() {
       const chosenSize = sizeSelect ? sizeSelect.value : 'small';
       const chosenSeatAddon = seatAddonSelect ? seatAddonSelect.value : 'none';
       const chosenAsphaltAddon = asphaltAddonSelect ? asphaltAddonSelect.value : 'none';
-      bookService(service, chosenSize, chosenSeatAddon, chosenAsphaltAddon);
+      bookService(variantSelect ? variantSelect.value : service, chosenSize, chosenSeatAddon, chosenAsphaltAddon);
     });
+    if (variantSelect) {
+      variantSelect.addEventListener('click', (e) => e.stopPropagation());
+      variantSelect.addEventListener('change', (e) => {
+        e.stopPropagation();
+        updateCardPrice();
+      });
+    }
     // change size inside card updates price display and keeps card selected
     if (sizeSelect) {
       sizeSelect.addEventListener('click', (e) => e.stopPropagation());
@@ -2528,9 +2583,8 @@ document.addEventListener('DOMContentLoaded', async function() {
   // ===== CAR SERVICE INTERACTIONS =====
   // Handle both service-item (old cards) and service-card clicks
   document.querySelectorAll('.service-item, .service-card').forEach(item => {
-    const serviceName = item.dataset.service;
-    
     item.addEventListener('click', () => {
+      const serviceName = item.querySelector('.card-variant')?.value || item.dataset.service;
       console.log('Service clicked:', serviceName);
       
       // Set service in wizard data
@@ -2642,12 +2696,6 @@ document.addEventListener('DOMContentLoaded', async function() {
     });
   });
 
-  // Open first accordion by default
-  const firstAccordion = document.querySelector('.accordion-item');
-  if (firstAccordion) {
-    firstAccordion.classList.add('open');
-  }
-
   // ===== BOOKING WIZARD =====
   const wizardData = {
     currentStep: 1,
@@ -2657,6 +2705,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     size: '',
     seatAddon: 'none',
     asphaltAddon: 'none',
+    extras: [],
     registration: '',
     date: null,
     time: '',
@@ -2685,6 +2734,23 @@ document.addEventListener('DOMContentLoaded', async function() {
     return getWizardServices().find(id => SERVICE_SERVICES.includes(id)) || '';
   }
 
+  // Valda tillval som fortfarande gäller för den valda tjänsten.
+  function wizardAvailableExtras() {
+    const services = getWizardServices();
+    return EXTRAS_CATALOG.filter(extra => !services.some(id => extra.hideFor.includes(id)) && !(extra.sizedOnly && wizardIsSizeless()));
+  }
+
+  function wizardActiveExtras() {
+    const available = new Set(wizardAvailableExtras().map(extra => extra.id));
+    return EXTRAS_CATALOG.filter(extra => (wizardData.extras || []).includes(extra.id) && available.has(extra.id));
+  }
+
+  // True when every selected service has a fixed price regardless of car size.
+  function wizardIsSizeless() {
+    const services = getWizardServices();
+    return services.length > 0 && services.every(id => SERVICE_SERVICES.includes(id) || FIXED_PRICE_WASH_SERVICES.includes(id));
+  }
+
   // Combined duration in minutes for every selected service, with addons applied once (to the wash service).
   function wizardComboDuration() {
     const services = getWizardServices();
@@ -2696,11 +2762,11 @@ document.addEventListener('DOMContentLoaded', async function() {
     const addonMinutes = washService
       ? getSeatAddonMinutes(washService, seatAddon) + getAsphaltAddonMinutes(washService, asphaltAddon)
       : 0;
-    return baseTotal + addonMinutes;
+    return baseTotal + addonMinutes + wizardActiveExtras().reduce((sum, extra) => sum + extra.minutes, 0);
   }
 
   // Combined price for every selected service at a given size, with addons applied once (to the wash service).
-  function wizardComboPrice(size) {
+  function wizardComboPrice(size, includeExtras = false) {
     const services = getWizardServices();
     if (!services.length) return 0;
     const washService = wizardWashService();
@@ -2716,7 +2782,8 @@ document.addEventListener('DOMContentLoaded', async function() {
     const addonPrice = washService
       ? getSeatAddonPrice(washService, seatAddon) + getAsphaltAddonPrice(washService, chosenSize, asphaltAddon)
       : 0;
-    return baseTotal + addonPrice;
+    const extrasPrice = includeExtras ? wizardActiveExtras().reduce((sum, extra) => sum + getExtraPrice(extra, chosenSize), 0) : 0;
+    return baseTotal + addonPrice + extrasPrice;
   }
 
   function updateComboStatusBanner() {
@@ -2757,7 +2824,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     const pickupSection = document.getElementById('wizardPickupSection');
     const washService = wizardWashService();
     const hasServiceKind = !!wizardServiceKind();
-    const isServiceBooking = hasServiceKind && !washService;
+    const isServiceBooking = wizardIsSizeless();
 
     if (seatAddon) {
       seatAddon.style.display = washService && serviceSupportsSeatAddon(washService) ? 'block' : 'none';
@@ -2767,7 +2834,14 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
     if (sizeSection) {
       sizeSection.style.display = isServiceBooking ? 'none' : 'block';
-      if (isServiceBooking) wizardData.size = 'small';
+      if (isServiceBooking) {
+        wizardData.size = 'small';
+        wizardData.sizeAuto = true;
+        document.querySelectorAll('.size-option').forEach(opt => opt.classList.remove('selected'));
+      } else if (wizardData.sizeAuto) {
+        wizardData.size = '';
+        wizardData.sizeAuto = false;
+      }
     }
     if (pickupSection) {
       const pickupEligible = hasServiceKind || ['inout', 'interior', 'full', 'ceramic'].includes(washService);
@@ -2816,7 +2890,9 @@ document.addEventListener('DOMContentLoaded', async function() {
     wizardData.services = service ? [service] : [];
     wizardData.size = size;
     wizardData.seatAddon = service === 'ceramic' && seatAddon === 'none' ? '2' : seatAddon;
-    wizardData.asphaltAddon = asphaltAddon;
+    wizardData.asphaltAddon = 'none';
+    wizardData.extras = asphaltAddon === 'yes' && serviceSupportsAsphaltAddon(service) ? ['asphalt'] : [];
+    wizardData.sizeAuto = false;
     updateWizardSizePrices();
     updateWizardDetailsVisibility();
     updateComboStatusBanner();
@@ -2876,21 +2952,142 @@ document.addEventListener('DOMContentLoaded', async function() {
     const submitBtn = document.getElementById('wizardSubmitBtn');
     
     if (prevBtn) prevBtn.style.display = step > 1 ? 'block' : 'none';
-    if (nextBtn) nextBtn.style.display = step < 5 ? 'block' : 'none';
-    if (submitBtn) submitBtn.style.display = step === 5 ? 'block' : 'none';
+    if (nextBtn) nextBtn.style.display = step < 6 ? 'block' : 'none';
+    if (submitBtn) submitBtn.style.display = step === 6 ? 'block' : 'none';
     
     // Load step-specific data
     if (step === 3) {
+      renderWizardExtras();
+    } else if (step === 4) {
       renderWizardCalendar();
-    } else if (step === 5) {
+      const timesSection = document.getElementById('wizardTimesSection');
+      if (timesSection && !wizardData.time) timesSection.style.display = 'none';
+    } else if (step === 6) {
       updateBookingSummary();
     }
+    updateWizardSelectionBar();
+  }
+
+  function updateWizardSelectionBar() {
+    const bar = document.getElementById('wizardSelectionBar');
+    if (!bar) return;
+    const services = getWizardServices();
+    if (wizardData.currentStep < 2 || !services.length) {
+      bar.style.display = 'none';
+      return;
+    }
+    const extras = wizardActiveExtras();
+    const label = [...services.map(id => SERVICE_LABELS[id] || id), ...extras.map(getExtraLabel)].join(' + ');
+    const hasPrice = wizardIsSizeless() || !!wizardData.size;
+    const price = wizardComboPrice(wizardData.size || 'small', true);
+    document.getElementById('wizardSelectionLabel').textContent = label;
+    document.getElementById('wizardSelectionPrice').textContent = price > 0 ? `${hasPrice ? '' : 'Från '}${price} kr` : '';
+    bar.style.display = 'flex';
+  }
+
+  function formatWizardMinutes(minutes) {
+    const h = Math.floor(minutes / 60);
+    const m = minutes % 60;
+    return [h ? `${h} tim` : '', m ? `${m} min` : ''].filter(Boolean).join(' ');
+  }
+
+  function updateWizardExtrasTotal() {
+    const total = wizardActiveExtras().reduce((sum, extra) => sum + getExtraPrice(extra, wizardData.size || 'small'), 0);
+    const wrap = document.getElementById('wizardExtrasTotal');
+    const value = document.getElementById('wizardExtrasTotalValue');
+    if (wrap) wrap.style.display = total > 0 ? 'flex' : 'none';
+    if (value) value.textContent = `+${total} kr`;
+  }
+
+  function renderWizardExtras() {
+    const list = document.getElementById('wizardExtrasList');
+    if (!list) return;
+
+    const available = wizardAvailableExtras();
+    const availableIds = new Set(available.map(extra => extra.id));
+    wizardData.extras = (wizardData.extras || []).filter(id => availableIds.has(id));
+
+    list.innerHTML = '';
+    const skip = document.createElement('button');
+    skip.type = 'button';
+    skip.className = 'extras-skip';
+    const pickedCount = wizardData.extras.length;
+    skip.textContent = pickedCount
+      ? `${pickedCount} tillval – gå vidare →`
+      : 'Inga tillval – gå vidare →';
+    skip.addEventListener('click', () => updateWizardStep(4));
+    list.appendChild(skip);
+
+    ['Utvändigt', 'Invändigt'].forEach(category => {
+      const items = available.filter(extra => extra.category === category);
+      if (!items.length) return;
+
+      const title = document.createElement('h4');
+      title.className = 'extras-category';
+      title.textContent = category;
+      list.appendChild(title);
+
+      items.forEach(extra => {
+        const row = document.createElement('button');
+        row.type = 'button';
+        row.className = 'extra-option' + (wizardData.extras.includes(extra.id) ? ' selected' : '');
+        row.dataset.extra = extra.id;
+        row.setAttribute('aria-pressed', wizardData.extras.includes(extra.id) ? 'true' : 'false');
+
+        const check = document.createElement('span');
+        check.className = 'extra-check';
+        const info = document.createElement('span');
+        info.className = 'extra-info';
+        const name = document.createElement('strong');
+        name.textContent = extra.label;
+        const desc = document.createElement('small');
+        const descText = document.createElement('span');
+        descText.className = 'extra-desc';
+        descText.textContent = extra.description;
+        const timeText = document.createElement('span');
+        timeText.className = 'extra-time';
+        timeText.textContent = extra.minutes ? `+${formatWizardMinutes(extra.minutes)}` : 'ingen extra tid';
+        desc.append(descText, timeText);
+        info.append(name, desc);
+        const price = document.createElement('span');
+        price.className = 'extra-price';
+        price.textContent = extra.quote ? 'Offert' : `+${getExtraPrice(extra, wizardData.size || 'small')} kr`;
+        row.append(check, info, price);
+
+        row.addEventListener('click', () => toggleWizardExtra(extra));
+        list.appendChild(row);
+      });
+    });
+
+    updateWizardExtrasTotal();
+    updateWizardSelectionBar();
+  }
+
+  function toggleWizardExtra(extra) {
+    const selected = new Set(wizardData.extras || []);
+    if (selected.has(extra.id)) {
+      selected.delete(extra.id);
+    } else {
+      if (extra.group) {
+        EXTRAS_CATALOG.filter(other => other.group === extra.group).forEach(other => selected.delete(other.id));
+      }
+      selected.add(extra.id);
+    }
+    wizardData.extras = Array.from(selected);
+
+    // Tidsgången ändras, så tidigare vald tid måste väljas om.
+    wizardData.date = null;
+    wizardData.time = '';
+    wizardSelectedDate = null;
+    wizardSelectedTime = null;
+
+    renderWizardExtras();
   }
 
   function validateWizardStep(step) {
     const washService = wizardWashService();
     const hasServiceKind = !!wizardServiceKind();
-    const isServiceBooking = hasServiceKind && !washService;
+    const isServiceBooking = wizardIsSizeless();
     switch(step) {
       case 1:
         if (wizardData.comboMode) return !!washService && hasServiceKind;
@@ -2899,8 +3096,10 @@ document.addEventListener('DOMContentLoaded', async function() {
         if (isServiceBooking) return !!wizardData.registration;
         return !!wizardData.size && !!wizardData.registration;
       case 3:
-        return !!wizardData.date && !!wizardData.time;
+        return true;
       case 4:
+        return !!wizardData.date && !!wizardData.time;
+      case 5:
         const baseValid = !!wizardData.name && wizardData.name.trim() !== '' && 
                !!wizardData.phone && wizardData.phone.trim() !== '' && 
                !!wizardData.email && wizardData.email.trim() !== '';
@@ -3001,6 +3200,7 @@ document.addEventListener('DOMContentLoaded', async function() {
       option.classList.add('selected');
       wizardData.size = option.dataset.size;
       updateWizardAsphaltPrice();
+      updateWizardSelectionBar();
     });
   });
 
@@ -3009,6 +3209,7 @@ document.addEventListener('DOMContentLoaded', async function() {
       document.querySelectorAll('#wizardSeatAddon .addon-option').forEach(opt => opt.classList.remove('active'));
       option.classList.add('active');
       wizardData.seatAddon = option.dataset.addon;
+      updateWizardSelectionBar();
     });
   });
 
@@ -3017,6 +3218,7 @@ document.addEventListener('DOMContentLoaded', async function() {
       document.querySelectorAll('#wizardAsphaltAddon .addon-option').forEach(opt => opt.classList.remove('active'));
       option.classList.add('active');
       wizardData.asphaltAddon = option.dataset.addon;
+      updateWizardSelectionBar();
     });
   });
 
@@ -3195,7 +3397,8 @@ document.addEventListener('DOMContentLoaded', async function() {
     if (wizardData.asphaltAddon && wizardData.asphaltAddon !== 'none') {
       addons.push(getAsphaltAddonLabel(washService, wizardData.asphaltAddon));
     }
-    
+    wizardActiveExtras().forEach(extra => addons.push(getExtraLabel(extra)));
+    addons = addons.filter(Boolean);
     const addonRow = document.getElementById('summaryAddonRow');
     if (addons.length > 0) {
       document.getElementById('summaryAddons').textContent = addons.join(', ');
@@ -3221,7 +3424,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     document.getElementById('summaryEmail').textContent = wizardData.email;
     
     // Calculate total price across all selected services
-    const totalPrice = wizardComboPrice(wizardData.size);
+    const totalPrice = wizardComboPrice(wizardData.size, true);
     
     document.getElementById('summaryTotal').textContent = `${totalPrice} kr`;
   }
@@ -3255,7 +3458,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         updateWizardDetailsVisibility();
       }
       
-      if (wizardData.currentStep < 5) {
+      if (wizardData.currentStep < 6) {
         updateWizardStep(wizardData.currentStep + 1);
         if (mobileScrollTop !== null) {
           const root = document.documentElement;
@@ -3280,7 +3483,7 @@ document.addEventListener('DOMContentLoaded', async function() {
       const isCombo = services.length > 1;
       const washService = wizardWashService();
       const hasServiceKind = !!wizardServiceKind();
-      const isServiceOnlyBooking = hasServiceKind && !washService;
+      const isServiceOnlyBooking = wizardIsSizeless();
 
       // Validate all required data with detailed error messages
       const validationErrors = [];
@@ -3308,7 +3511,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         const slotAvailable = await isSlotAvailableForDuration(wizardData.date, wizardData.time, totalDuration);
         if (!slotAvailable) {
           alert('Den valda tiden är inte längre tillgänglig. Välj en annan tid.');
-          updateWizardStep(3);
+          updateWizardStep(4);
           return;
         }
       } catch (error) {
@@ -3323,8 +3526,9 @@ document.addEventListener('DOMContentLoaded', async function() {
         const dateString = wizardData.date.toLocaleDateString('sv-SE');
         
         // Calculate combined price across all selected services
-        const totalPrice = wizardComboPrice(wizardData.size);
-        const serviceLabel = services.map(id => SERVICE_LABELS[id] || id).join(' + ');
+        const extras = wizardActiveExtras();
+        const totalPrice = wizardComboPrice(wizardData.size, true);
+        const serviceLabel = [...services.map(id => SERVICE_LABELS[id] || id), ...extras.map(getExtraLabel)].join(' + ');
 
         console.log('Creating booking:', {
           services,
@@ -3334,7 +3538,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         });
 
         // Get Stripe payment link FIRST (combo bookings with multiple services have no fixed link yet)
-        const paymentLink = isCombo ? null : getStripePaymentLink(
+        const paymentLink = (isCombo || extras.length) ? null : getStripePaymentLink(
           wizardData.service,
           wizardData.size,
           wizardData.seatAddon,
@@ -3357,6 +3561,7 @@ document.addEventListener('DOMContentLoaded', async function() {
           time: wizardData.time,
           seatAddon: wizardData.seatAddon || 'none',
           asphaltAddon: wizardData.asphaltAddon || 'none',
+          extras: extras.map(extra => extra.id),
           duration: totalDuration,
           price: totalPrice,
           paymentStatus: 'Pending',
@@ -3378,7 +3583,7 @@ document.addEventListener('DOMContentLoaded', async function() {
           setPendingBookingCookie(booking.id);
           sessionStorage.setItem('pendingBooking', JSON.stringify(booking));
           window.location.href = getStripeCheckoutUrl(paymentLink, booking.id);
-        } else if (isCombo) {
+        } else if (isCombo || extras.length || services.some(id => DYNAMIC_CHECKOUT_SERVICES.includes(id))) {
           console.log('Combo booking - creating dynamic Stripe checkout session');
           await savePendingBooking(booking);
           const checkoutUrl = await createDynamicBookingCheckout(booking.id);

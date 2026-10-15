@@ -8,6 +8,11 @@ const SERVICE_LABELS = {
   'interior': 'Hel Glans',
   'full': 'Fullservice Rekond',
   'ceramic': 'Keramiskt Lackskydd',
+  'upholstery-2': 'Endast Klädseltvätt (2 säten)',
+  'upholstery-5': 'Endast Klädseltvätt (5 säten)',
+  'headlight-2': 'Polering av Lyktor (2 st)',
+  'headlight-4': 'Polering av Lyktor (4 st)',
+  'asphalt-removal': 'Asfaltborttagning (inkl. utvändig tvätt)',
   'tire-change': 'Däckbyte',
   'tire-storage': 'Däckhotell',
   'tire-repair': 'Däckreparation',
@@ -22,7 +27,7 @@ const SERVICE_LABELS = {
   'ac-service': 'AC-Service'
 };
 
-const WASH_SERVICES = new Set(['basic', 'interior-wash', 'premium', 'inout', 'interior', 'full', 'ceramic']);
+const WASH_SERVICES = new Set(['basic', 'interior-wash', 'premium', 'inout', 'interior', 'full', 'ceramic', 'upholstery-2', 'upholstery-5', 'headlight-2', 'headlight-4', 'asphalt-removal']);
 
 const OWNER_SESSION_KEY = 'primabilvard_owner_session_v2';
 const OWNER_SESSION_MAX_AGE_MS = 5 * 60 * 60 * 1000;
@@ -68,7 +73,117 @@ const servicePrices = {
   'interior': { small: 1500, medium: 1700, large: 1900 },
   'full': { small: 2000, medium: 2300, large: 2600 },
   'ceramic': { small: 3499, medium: 3799, large: 3999 },
+  'upholstery-2': { small: 399, medium: 399, large: 399 },
+  'upholstery-5': { small: 699, medium: 699, large: 699 },
+  'headlight-2': { small: 399, medium: 399, large: 399 },
+  'headlight-4': { small: 499, medium: 499, large: 499 },
+  'asphalt-removal': { small: 449, medium: 549, large: 629 },
+  'tire-change': { small: 500, medium: 500, large: 500 },
+  'tire-storage': { small: 750, medium: 750, large: 750 },
+  'tire-repair': { small: 200, medium: 200, large: 200 },
+  'basic-service': { small: 1800, medium: 1800, large: 1800 },
+  'major-service': { small: 3500, medium: 3500, large: 3500 },
+  'brake-service': { small: 1200, medium: 1200, large: 1200 },
+  'pre-inspection': { small: 1000, medium: 1000, large: 1000 },
+  'computer-diagnosis': { small: 600, medium: 600, large: 600 },
+  'electrical-diagnosis': { small: 900, medium: 900, large: 900 },
+  'engine-diagnosis': { small: 1200, medium: 1200, large: 1200 }
 };
+
+const SERVICE_DURATIONS = {
+  'basic': 20, 'interior-wash': 40, 'premium': 100, 'inout': 240, 'interior': 180, 'full': 210, 'ceramic': 300,
+  'upholstery-2': 60, 'upholstery-5': 90, 'headlight-2': 20, 'headlight-4': 30, 'asphalt-removal': 50,
+  'tire-change': 30, 'tire-storage': 15, 'tire-repair': 20, 'basic-service': 60, 'major-service': 150, 'brake-service': 90,
+  'pre-inspection': 45, 'inspection-fix': 60, 'computer-diagnosis': 30, 'electrical-diagnosis': 60, 'engine-diagnosis': 90
+};
+
+// Speglar EXTRAS_CATALOG i script.js (priser och tider).
+const EXTRAS_CATALOG = [
+  { id: 'quick-wax', label: 'Snabbvax', price: 100, minutes: 0 },
+  { id: 'asphalt', label: 'Asfaltborttagning', price: 299, minutes: 30 },
+  { id: 'lights-2', group: 'lights', label: 'Polering av lyktor (2 st)', price: 399, minutes: 20 },
+  { id: 'lights-4', group: 'lights', label: 'Polering av lyktor (4 st)', price: 499, minutes: 30 },
+  { id: 'window-repellent', label: 'Vattenavvisande rutor', price: 149, minutes: 0 },
+  { id: 'engine-wash', label: 'Motortvätt', price: 200, minutes: 30 },
+  { id: 'seats-2', group: 'seats', label: 'Klädseltvätt (2 säten)', price: 399, minutes: 60 },
+  { id: 'seats-5', group: 'seats', label: 'Klädseltvätt (5 säten)', price: 699, minutes: 90 },
+  { id: 'pet-hair', label: 'Hundhårsborttagning', price: 99, minutes: 0 },
+  { id: 'odor-removal', label: 'Luktsanering (offert)', price: 0, minutes: 0 }
+];
+
+function getExtraPrice(extra, size) {
+  return typeof extra.price === 'number' ? extra.price : (extra.price[size] || extra.price.small);
+}
+
+function getBookingExtras(booking) {
+  const ids = Array.isArray(booking && booking.extras) ? booking.extras : [];
+  return ids.map(id => EXTRAS_CATALOG.find(extra => extra.id === id)).filter(Boolean);
+}
+
+function getSelectedOwnerExtras() {
+  const checked = Array.from(document.querySelectorAll('#ownerExtrasList input:checked')).map(input => input.value);
+  return EXTRAS_CATALOG.filter(extra => checked.includes(extra.id));
+}
+
+function updateOwnerPricePreview() {
+  const priceInput = document.getElementById('ownerPrice');
+  if (!priceInput) return;
+  const service = document.getElementById('ownerService')?.value || '';
+  const size = document.getElementById('ownerSize')?.value || 'small';
+  const base = (servicePrices[service] && (servicePrices[service][size] || servicePrices[service].small)) || 0;
+  const extrasTotal = getSelectedOwnerExtras().reduce((sum, extra) => sum + getExtraPrice(extra, size), 0);
+  priceInput.placeholder = service ? `Pris (auto: ${base + extrasTotal} kr)` : 'Pris (valfritt)';
+}
+
+function updateOwnerExtrasLabel() {
+  const toggle = document.getElementById('ownerExtrasToggle');
+  if (!toggle) return;
+  const count = getSelectedOwnerExtras().length;
+  toggle.textContent = count ? `${count} tillval valda` : 'Tillval (valfritt)';
+}
+
+function renderOwnerExtras() {
+  const list = document.getElementById('ownerExtrasList');
+  if (!list || list.children.length) return;
+  const toggle = document.getElementById('ownerExtrasToggle');
+  const closeList = () => {
+    list.hidden = true;
+    toggle?.setAttribute('aria-expanded', 'false');
+  };
+  toggle?.addEventListener('click', () => {
+    list.hidden = !list.hidden;
+    toggle.setAttribute('aria-expanded', String(!list.hidden));
+  });
+  document.addEventListener('click', (event) => {
+    if (!document.getElementById('ownerExtras')?.contains(event.target)) closeList();
+  });
+  document.getElementById('ownerManualBookingForm')?.addEventListener('reset', () => {
+    setTimeout(() => { updateOwnerExtrasLabel(); updateOwnerPricePreview(); }, 0);
+  });
+  EXTRAS_CATALOG.forEach(extra => {
+    const label = document.createElement('label');
+    label.className = 'owner-extra-chip';
+    const input = document.createElement('input');
+    input.type = 'checkbox';
+    input.value = extra.id;
+    const text = document.createElement('span');
+    text.textContent = `${extra.label} (+${typeof extra.price === 'number' ? extra.price : extra.price.small} kr)`;
+    label.append(input, text);
+    input.addEventListener('change', () => {
+      if (input.checked && extra.group) {
+        list.querySelectorAll('input:checked').forEach(other => {
+          const otherExtra = EXTRAS_CATALOG.find(item => item.id === other.value);
+          if (other !== input && otherExtra && otherExtra.group === extra.group) other.checked = false;
+        });
+      }
+      updateOwnerPricePreview();
+      updateOwnerExtrasLabel();
+    });
+    list.appendChild(label);
+  });
+  document.getElementById('ownerService')?.addEventListener('change', updateOwnerPricePreview);
+  document.getElementById('ownerSize')?.addEventListener('change', updateOwnerPricePreview);
+}
 
 let cachedBookings = [];
 let blockedDateIds = new Set();
@@ -472,24 +587,29 @@ function renderBookingsTable() {
   });
 
   if (!filteredBookings.length) {
-    tbody.innerHTML = '<tr><td colspan="11" style="padding:12px;color:var(--text-secondary);">Inga bokningar matchar filtret</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="12" style="padding:12px;color:var(--text-secondary);">Inga bokningar matchar filtret</td></tr>';
     return;
   }
 
   filteredBookings.forEach(b => {
     const tr = document.createElement('tr');
+    const cell = 'padding:10px;border-bottom:1px solid var(--border);color:var(--text-primary);';
+    const extrasHtml = getBookingExtras(b).length
+      ? getBookingExtras(b).map(extra => `<span class="booking-extra-tag">${escapeHtml(extra.label)}</span>`).join(' ')
+      : '-';
     tr.innerHTML = `
-      <td style="padding:10px;border-bottom:1px solid var(--border);color:var(--text-primary);">${escapeHtml(b.name)}</td>
-      <td style="padding:10px;border-bottom:1px solid var(--border);color:var(--text-primary);">${escapeHtml(b.email || '-')}</td>
-      <td style="padding:10px;border-bottom:1px solid var(--border);color:var(--text-primary);">${escapeHtml(b.phone || '-')}</td>
-      <td style="padding:10px;border-bottom:1px solid var(--border);color:var(--text-primary);">${escapeHtml(b.registration || '-')}</td>
-      <td style="padding:10px;border-bottom:1px solid var(--border);color:var(--text-primary);">${escapeHtml(getServiceLabel(b))}</td>
-      <td style="padding:10px;border-bottom:1px solid var(--border);color:var(--text-primary);">${escapeHtml(b.size || '-')}</td>
-      <td style="padding:10px;border-bottom:1px solid var(--border);color:var(--text-primary);">${escapeHtml(b.date || '-')}</td>
-      <td style="padding:10px;border-bottom:1px solid var(--border);color:var(--text-primary);">${escapeHtml(b.time || '-')}</td>
-      <td style="padding:10px;border-bottom:1px solid var(--border);color:var(--text-primary);"><span style="background:#3d3d00;padding:4px 8px;border-radius:4px;font-size:0.85rem;">${escapeHtml(b.paymentStatus || 'Pending')} - ${b.price ? b.price + ' kr' : '-'}</span></td>
-      <td style="padding:10px;border-bottom:1px solid var(--border);color:var(--text-primary);">${b.pickup ? ('🚗 ' + escapeHtml(b.pickupAddress || '-')) : '-'}</td>
-      <td style="padding:10px;border-bottom:1px solid var(--border);"><button class="delete-btn" data-id="${b.id}" style="background:#aa3333;padding:6px 10px;border-radius:6px;border:none;color:#fff;cursor:pointer;">Ta bort</button></td>
+      <td data-label="Namn" style="${cell}">${escapeHtml(b.name)}</td>
+      <td data-label="E-post" style="${cell}">${escapeHtml(b.email || '-')}</td>
+      <td data-label="Telefon" style="${cell}">${escapeHtml(b.phone || '-')}</td>
+      <td data-label="Reg.nr" style="${cell}">${escapeHtml(b.registration || '-')}</td>
+      <td data-label="Tjänst" style="${cell}">${escapeHtml(getServiceLabel(b))}</td>
+      <td data-label="Tillval" style="${cell}">${extrasHtml}</td>
+      <td data-label="Storlek" style="${cell}">${escapeHtml(b.size || '-')}</td>
+      <td data-label="Datum" style="${cell}">${escapeHtml(b.date || '-')}</td>
+      <td data-label="Tid" style="${cell}">${escapeHtml(b.time || '-')}</td>
+      <td data-label="Betalning" style="${cell}"><span style="background:#3d3d00;padding:4px 8px;border-radius:4px;font-size:0.85rem;">${escapeHtml(b.paymentStatus || 'Pending')} - ${b.price ? b.price + ' kr' : '-'}</span></td>
+      <td data-label="Hemhämtning" style="${cell}">${b.pickup ? ('🚗 ' + escapeHtml(b.pickupAddress || '-')) : '-'}</td>
+      <td data-label="" style="padding:10px;border-bottom:1px solid var(--border);"><button class="delete-btn" data-id="${b.id}" style="background:#aa3333;padding:6px 10px;border-radius:6px;border:none;color:#fff;cursor:pointer;">Ta bort</button></td>
     `;
     tbody.appendChild(tr);
   });
@@ -565,7 +685,7 @@ function exportCSV() {
   let csv = 'Namn,E-post,Telefon,Registreringsnummer,Tjänst,Storlek,Pris,Datum,Tid,Betalningsstatus\n';
   cachedBookings.forEach(b => {
     const safe = v => '"' + String(v ?? '').replace(/"/g, '""') + '"';
-    csv += [safe(b.name), safe(b.email), safe(b.phone), safe(b.registration), safe(getServiceLabel(b)), safe(b.size), safe(b.price), safe(b.date), safe(b.time), safe(b.paymentStatus || 'Pending')].join(',') + '\n';
+    csv += [safe(b.name), safe(b.email), safe(b.phone), safe(b.registration), safe(getServiceLabel(b) + getBookingExtras(b).map(extra => ' + ' + extra.label).join('')), safe(b.size), safe(b.price), safe(b.date), safe(b.time), safe(b.paymentStatus || 'Pending')].join(',') + '\n';
   });
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
@@ -894,6 +1014,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('bookingSearchInput')?.addEventListener('input', renderBookingsTable);
 
   const ownerManualBookingForm = document.getElementById('ownerManualBookingForm');
+  renderOwnerExtras();
   if (ownerManualBookingForm) {
     ownerManualBookingForm.addEventListener('submit', async function(e) {
       e.preventDefault();
@@ -909,7 +1030,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const priceInput = document.getElementById('ownerPrice')?.value || '';
       const paymentStatus = document.getElementById('ownerPaymentStatus')?.value || 'Manuell (Telefon)';
 
-      if (!name || !phone || !service || !size || !dateId || !time) {
+      if (!name || !phone || !service || !dateId || !time) {
         alert('Fyll i alla obligatoriska fält.');
         return;
       }
@@ -923,9 +1044,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
       }
 
+      const extras = getSelectedOwnerExtras();
+      const priceSize = size || 'small';
+      const baseServicePrice = (servicePrices[service] && (servicePrices[service][priceSize] || servicePrices[service].small)) || 0;
+      const extrasPrice = extras.reduce((sum, extra) => sum + getExtraPrice(extra, priceSize), 0);
       const computedPrice = priceInput !== ''
         ? Math.max(0, Number(priceInput))
-        : ((servicePrices[service] && servicePrices[service][size]) || 0);
+        : baseServicePrice + extrasPrice;
 
       const sortKey = new Date(
         bookingDate.getFullYear(),
@@ -955,13 +1080,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         price: computedPrice,
         paymentStatus,
         sortKey,
-        source: 'owner-manual'
+        source: 'owner-manual',
+        extras: extras.map(extra => extra.id),
+        ...(extras.length ? { duration: (SERVICE_DURATIONS[service] || 100) + extras.reduce((sum, extra) => sum + extra.minutes, 0) } : {})
       };
 
       try {
         await saveBooking(booking);
         renderBookingsTable();
         ownerManualBookingForm.reset();
+        updateOwnerPricePreview();
         alert('Manuell bokning sparad.');
       } catch (error) {
         console.error('Firebase manual booking save error:', error);

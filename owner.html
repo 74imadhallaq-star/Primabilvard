@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Cormorant+Garamond:wght@400;500;600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=11">
+<link rel="stylesheet" href="style.css?v=32">
 <link rel="stylesheet" href="cart.css?v=1">
 </head>
 <body data-no-cart>
@@ -66,7 +66,7 @@
       
       <div id="ownerBookingsContent" style="max-height:3000px;opacity:1;overflow:hidden;transition:max-height 0.35s ease,opacity 0.25s ease;">
       <div style="max-height:65vh;overflow:auto;border-radius:12px;border:1px solid var(--border);">
-        <table id="bookingsTable" style="width:100%;border-collapse:collapse;background:var(--bg-secondary);min-width:980px;">
+        <table id="bookingsTable" style="width:100%;border-collapse:collapse;background:var(--bg-secondary);min-width:1100px;">
           <thead>
             <tr style="background:#0a0a0a;position:sticky;top:0;z-index:1;">
               <th style="padding:14px;border-bottom:2px solid var(--border);color:var(--text-primary);font-weight:700;text-align:left;">Namn</th>
@@ -74,6 +74,7 @@
               <th style="padding:14px;border-bottom:2px solid var(--border);color:var(--text-primary);font-weight:700;text-align:left;">Telefon</th>
               <th style="padding:14px;border-bottom:2px solid var(--border);color:var(--text-primary);font-weight:700;text-align:left;">Reg.nr</th>
               <th style="padding:14px;border-bottom:2px solid var(--border);color:var(--text-primary);font-weight:700;text-align:left;">Tjänst</th>
+              <th style="padding:14px;border-bottom:2px solid var(--border);color:var(--text-primary);font-weight:700;text-align:left;">Tillval</th>
               <th style="padding:14px;border-bottom:2px solid var(--border);color:var(--text-primary);font-weight:700;text-align:left;">Storlek</th>
               <th style="padding:14px;border-bottom:2px solid var(--border);color:var(--text-primary);font-weight:700;text-align:left;">Datum</th>
               <th style="padding:14px;border-bottom:2px solid var(--border);color:var(--text-primary);font-weight:700;text-align:left;">Tid</th>
@@ -132,8 +133,8 @@
           </optgroup>
         </select>
 
-        <select id="ownerSize" style="padding:12px 16px;border-radius:10px;border:2px solid var(--border);background:#1a1a1a;color:var(--text-primary);font-size:0.95rem;font-weight:600;cursor:pointer;transition:all 0.3s;" required>
-          <option value="">Storlek *</option>
+        <select id="ownerSize" style="padding:12px 16px;border-radius:10px;border:2px solid var(--border);background:#1a1a1a;color:var(--text-primary);font-size:0.95rem;font-weight:600;cursor:pointer;transition:all 0.3s;">
+          <option value="">Storlek (valfritt)</option>
           <option value="small">Liten</option>
           <option value="medium">Mellan</option>
           <option value="large">Stor</option>
@@ -141,6 +142,11 @@
 
         <input id="ownerDate" type="date" style="padding:12px 16px;border-radius:10px;border:2px solid var(--border);background:#1a1a1a;color:var(--text-primary);font-size:0.95rem;transition:all 0.3s;" required />
         <input id="ownerTime" type="time" step="1800" style="padding:12px 16px;border-radius:10px;border:2px solid var(--border);background:#1a1a1a;color:var(--text-primary);font-size:0.95rem;transition:all 0.3s;" required />
+
+        <div id="ownerExtras" class="owner-extras">
+          <button type="button" id="ownerExtrasToggle" class="owner-extras-toggle" aria-expanded="false">Tillval (valfritt)</button>
+          <div id="ownerExtrasList" class="owner-extras-list" hidden></div>
+        </div>
 
         <input id="ownerPrice" type="number" min="0" step="1" placeholder="Pris (valfritt)" style="padding:12px 16px;border-radius:10px;border:2px solid var(--border);background:#1a1a1a;color:var(--text-primary);font-size:0.95rem;transition:all 0.3s;" />
         <select id="ownerPaymentStatus" style="padding:12px 16px;border-radius:10px;border:2px solid var(--border);background:#1a1a1a;color:var(--text-primary);font-size:0.95rem;font-weight:600;cursor:pointer;transition:all 0.3s;">
@@ -350,7 +356,7 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
 <script src="firebase-config.js?v=6"></script>
-<script src="owner.js?v=50"></script>
+<script src="owner.js?v=54"></script>
 <script src="cart.js?v=1"></script>
 </body>
 </html>

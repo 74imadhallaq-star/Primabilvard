@@ -124,6 +124,11 @@ const SERVICE_CATALOG = {
   interior: { small: 1500, medium: 1700, large: 1900 },
   full: { small: 2000, medium: 2300, large: 2600 },
   ceramic: { small: 3499, medium: 3799, large: 3999 },
+  'upholstery-2': { small: 399, medium: 399, large: 399 },
+  'upholstery-5': { small: 699, medium: 699, large: 699 },
+  'headlight-2': { small: 399, medium: 399, large: 399 },
+  'headlight-4': { small: 499, medium: 499, large: 499 },
+  'asphalt-removal': { small: 449, medium: 549, large: 629 },
   'tire-change': { small: 500, medium: 500, large: 500 },
   'tire-storage': { small: 750, medium: 750, large: 750 },
   'tire-repair': { small: 200, medium: 200, large: 200 },
@@ -145,6 +150,11 @@ const SERVICE_LABELS_MAP = {
   interior: 'Hel Glans',
   full: 'Fullservice Rekond',
   ceramic: 'Keramiskt Lackskydd',
+  'upholstery-2': 'Endast Klädseltvätt (2 säten)',
+  'upholstery-5': 'Endast Klädseltvätt (5 säten)',
+  'headlight-2': 'Polering av Lyktor (2 st)',
+  'headlight-4': 'Polering av Lyktor (4 st)',
+  'asphalt-removal': 'Asfaltborttagning (inkl. utvändig tvätt)',
   'tire-change': 'Däckbyte',
   'tire-storage': 'Däckhotell',
   'tire-repair': 'Däckreparation',
@@ -155,6 +165,20 @@ const SERVICE_LABELS_MAP = {
   'computer-diagnosis': 'Datordiagnos',
   'electrical-diagnosis': 'Eldiagnos',
   'engine-diagnosis': 'Motordiagnos'
+};
+
+// Måste matcha EXTRAS_CATALOG i script.js (priser och namn).
+const EXTRAS_CATALOG = {
+  'quick-wax': { label: 'Snabbvax', price: 100 },
+  asphalt: { label: 'Asfaltborttagning', price: 299 },
+  'lights-2': { label: 'Polering av lyktor (2 st)', price: 399 },
+  'lights-4': { label: 'Polering av lyktor (4 st)', price: 499 },
+  'window-repellent': { label: 'Vattenavvisande rutor', price: 149 },
+  'engine-wash': { label: 'Motortvätt', price: 200 },
+  'seats-2': { label: 'Klädseltvätt (2 säten)', price: 399 },
+  'seats-5': { label: 'Klädseltvätt (5 säten)', price: 699 },
+  'pet-hair': { label: 'Hundhårsborttagning', price: 99 },
+  'odor-removal': { label: 'Luktsanering (offert)', price: 0 }
 };
 
 const CAR_SERVICE_IDS = new Set([
@@ -180,11 +204,11 @@ function getSeatAddonPrice(service, addonType) {
 
 function getAsphaltAddonPrice(service, size, addonType) {
   if (!serviceSupportsAsphaltAddon(service) || addonType !== 'yes') return 0;
-  const prices = { small: 250, medium: 300, large: 350 };
+  const prices = { small: 299, medium: 299, large: 299 };
   return prices[size] || 0;
 }
 
-function computeBookingPrice(services, size, seatAddon, asphaltAddon) {
+function computeBookingPrice(services, size, seatAddon, asphaltAddon, extras = []) {
   const chosenSize = size || 'small';
   const washService = services.find(id => !CAR_SERVICE_IDS.has(id));
   const base = services.reduce((sum, id) => {
@@ -195,7 +219,11 @@ function computeBookingPrice(services, size, seatAddon, asphaltAddon) {
   }, 0);
   const seatPrice = washService ? getSeatAddonPrice(washService, seatAddon || 'none') : 0;
   const asphaltPrice = washService ? getAsphaltAddonPrice(washService, chosenSize, asphaltAddon || 'none') : 0;
-  return base + seatPrice + asphaltPrice;
+  const extrasPrice = extras.reduce((sum, id) => {
+    const extraPrice = EXTRAS_CATALOG[id].price;
+    return sum + (typeof extraPrice === 'number' ? extraPrice : extraPrice[chosenSize] || extraPrice.small);
+  }, 0);
+  return base + seatPrice + asphaltPrice + extrasPrice;
 }
 
 // Combo bookings (wash + car service) have no pre-made Stripe Payment Link, since every
@@ -234,10 +262,12 @@ exports.createBookingCheckout = onRequest(
       const size = booking.size || 'small';
       const seatAddon = booking.seatAddon || 'none';
       const asphaltAddon = booking.asphaltAddon || 'none';
-      const price = computeBookingPrice(services, size, seatAddon, asphaltAddon);
+      const extras = [...new Set(Array.isArray(booking.extras) ? booking.extras.map(String) : [])];
+      if (extras.some(id => !EXTRAS_CATALOG[id])) throw new Error('Ogiltigt tillval i bokningen.');
+      const price = computeBookingPrice(services, size, seatAddon, asphaltAddon, extras);
       if (!Number.isInteger(price) || price < 1) throw new Error('Ogiltigt pris för denna bokning.');
 
-      const label = services.map(id => SERVICE_LABELS_MAP[id] || id).join(' + ');
+      const label = [...services.map(id => SERVICE_LABELS_MAP[id] || id), ...extras.map(id => EXTRAS_CATALOG[id].label)].join(' + ');
 
       const stripe = new Stripe(stripeSecretKey.value());
       const siteUrl = 'https://primabilvard.com';
