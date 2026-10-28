@@ -170,6 +170,7 @@ const SERVICE_LABELS_MAP = {
 // Måste matcha EXTRAS_CATALOG i script.js (priser och namn).
 const EXTRAS_CATALOG = {
   'quick-wax': { label: 'Snabbvax', price: 100 },
+  'paint-polish': { label: 'Lackpolering', price: { small: 1200, medium: 1300, large: 1400 }, hideFor: ['full', 'ceramic'], sizedOnly: true },
   asphalt: { label: 'Asfaltborttagning', price: 299 },
   'lights-2': { label: 'Polering av lyktor (2 st)', price: 399 },
   'lights-4': { label: 'Polering av lyktor (4 st)', price: 499 },
@@ -185,6 +186,7 @@ const CAR_SERVICE_IDS = new Set([
   'tire-change', 'tire-storage', 'tire-repair', 'basic-service', 'major-service',
   'brake-service', 'pre-inspection', 'computer-diagnosis', 'electrical-diagnosis', 'engine-diagnosis'
 ]);
+const SIZE_BASED_WASH_SERVICES = new Set(['basic', 'interior-wash', 'premium', 'inout', 'interior', 'full', 'ceramic']);
 
 function serviceSupportsSeatAddon(service) {
   return service === 'interior' || service === 'full' || service === 'ceramic';
@@ -263,7 +265,14 @@ exports.createBookingCheckout = onRequest(
       const seatAddon = booking.seatAddon || 'none';
       const asphaltAddon = booking.asphaltAddon || 'none';
       const extras = [...new Set(Array.isArray(booking.extras) ? booking.extras.map(String) : [])];
-      if (extras.some(id => !EXTRAS_CATALOG[id])) throw new Error('Ogiltigt tillval i bokningen.');
+      if (extras.some(id => {
+        const extra = EXTRAS_CATALOG[id];
+        return !extra ||
+          (extra.hideFor || []).some(service => services.includes(service)) ||
+          (extra.sizedOnly && !services.some(service => SIZE_BASED_WASH_SERVICES.has(service)));
+      })) {
+        throw new Error('Ogiltigt eller redan inkluderat tillval i bokningen.');
+      }
       const price = computeBookingPrice(services, size, seatAddon, asphaltAddon, extras);
       if (!Number.isInteger(price) || price < 1) throw new Error('Ogiltigt pris för denna bokning.');
 

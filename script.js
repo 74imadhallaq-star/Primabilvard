@@ -1,5 +1,12 @@
 // Mobile hamburger menu is handled centrally in cart.js (loaded on every page).
 
+document.querySelectorAll('#services .service-item[data-service]').forEach((card) => {
+  const note = document.createElement('p');
+  note.className = 'service-addon-note';
+  note.textContent = 'Tillval väljs vid bokning.';
+  card.append(note);
+});
+
 // ===== CALENDAR FUNCTIONALITY =====
 
 let currentDate = new Date();
@@ -188,6 +195,7 @@ const DYNAMIC_CHECKOUT_SERVICES = [...FIXED_PRICE_WASH_SERVICES, 'asphalt-remova
 // Tillval som kan läggas till på en bokning. Priser och tider är preliminära och justeras här (spegla ändringar i index.js).
 const EXTRAS_CATALOG = [
   { id: 'quick-wax', category: 'Utvändigt', label: 'Snabbvax', description: 'Snabb vaxning för extra glans och skydd', price: 100, minutes: 0, hideFor: ['interior', 'full', 'ceramic'] },
+  { id: 'paint-polish', category: 'Utvändigt', label: 'Lackpolering', description: 'Polering av bilens lack för extra glans och en jämnare finish', price: { small: 1200, medium: 1300, large: 1400 }, minutes: 120, hideFor: ['full', 'ceramic'], sizedOnly: true },
   { id: 'asphalt', category: 'Utvändigt', label: 'Asfaltborttagning', description: 'Tar bort asfalt och tjärfläckar', price: 299, minutes: 30, hideFor: ['asphalt-removal'] },
   { id: 'lights-2', category: 'Utvändigt', group: 'lights', label: 'Polering av lyktor (2 st)', description: 'Klarare ljus och fräschare utseende', price: 399, minutes: 20, hideFor: ['headlight-2', 'headlight-4'] },
   { id: 'lights-4', category: 'Utvändigt', group: 'lights', label: 'Polering av lyktor (4 st)', description: 'Klarare ljus och fräschare utseende', price: 499, minutes: 30, hideFor: ['headlight-2', 'headlight-4'] },
@@ -2737,7 +2745,10 @@ document.addEventListener('DOMContentLoaded', async function() {
   // Valda tillval som fortfarande gäller för den valda tjänsten.
   function wizardAvailableExtras() {
     const services = getWizardServices();
-    return EXTRAS_CATALOG.filter(extra => !services.some(id => extra.hideFor.includes(id)) && !(extra.sizedOnly && wizardIsSizeless()));
+    return EXTRAS_CATALOG.filter(extra =>
+      !services.some(id => extra.hideFor.includes(id)) &&
+      !(extra.sizedOnly && (wizardIsSizeless() || !wizardWashService()))
+    );
   }
 
   function wizardActiveExtras() {

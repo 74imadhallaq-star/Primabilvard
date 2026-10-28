@@ -149,7 +149,7 @@ body {
 /* ===== HERO ===== */
 .hero {
   /* background image with overlay for professional appearance */
-  background: url('bil2.png') center center / cover no-repeat;
+  background: url('dator1.png') center center / cover no-repeat;
   color: var(--text-primary);
   text-align: center;
   min-height: 65vh;
@@ -2171,6 +2171,7 @@ body.owner-login-active {
 
   /* --- HERO --- */
   .hero {
+    background-image: url('mobil1.png');
     min-height: 52vh;
     padding: 24px 16px 30px;
   }
@@ -3073,8 +3074,8 @@ body.owner-login-active {
   }
   to {
     opacity: 1;
-    transform: translateY(0) rotateX(0);
-    filter: blur(0);
+    transform: none;
+    filter: none;
   }
 }
 
@@ -3089,8 +3090,8 @@ body.owner-login-active {
   }
   100% {
     opacity: 1;
-    transform: translateY(0) scale(1) rotateX(0);
-    filter: blur(0);
+    transform: none;
+    filter: none;
   }
 }
 
@@ -3102,8 +3103,8 @@ body.owner-login-active {
   }
   to {
     opacity: 1;
-    transform: translateY(0) rotateX(0);
-    filter: blur(0);
+    transform: none;
+    filter: none;
   }
 }
 
@@ -3115,8 +3116,8 @@ body.owner-login-active {
   }
   to {
     opacity: 1;
-    transform: translateY(0);
-    filter: blur(0);
+    transform: none;
+    filter: none;
   }
 }
 
@@ -3131,8 +3132,8 @@ body.owner-login-active {
   }
   100% {
     opacity: 1;
-    transform: translateY(0) scale(1);
-    filter: blur(0);
+    transform: none;
+    filter: none;
   }
 }
 
@@ -3143,7 +3144,7 @@ body.owner-login-active {
   }
   to {
     opacity: 1;
-    transform: perspective(1200px) rotateX(0) translateY(0);
+    transform: none;
   }
 }
 
@@ -4136,4 +4137,238 @@ section[id] {
 
 .owner-extra-chip:has(input:checked) {
   background: rgba(30, 90, 168, 0.22);
+}
+
+/* Refined service cards */
+.service-items {
+  gap: 18px;
+  background: transparent;
+}
+
+.service-items > .service-item {
+  min-width: 0;
+  min-height: 100%;
+  padding: 22px;
+  border: 1px solid rgba(139, 188, 255, 0.18);
+  border-radius: 8px;
+  background: linear-gradient(155deg, rgba(25, 36, 47, 0.98), rgba(15, 22, 29, 0.98));
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.2);
+  transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+}
+
+.service-items > .service-item:hover {
+  transform: translateY(-3px);
+  border-color: rgba(91, 155, 213, 0.65);
+  background: linear-gradient(155deg, rgba(29, 43, 56, 0.98), rgba(17, 26, 34, 0.98));
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.32);
+}
+
+.service-item-header {
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+  margin-bottom: 14px;
+}
+
+.service-item h4 {
+  flex: 1 1 150px;
+  margin: 0;
+  font-size: 1.12rem;
+  line-height: 1.35;
+}
+
+.service-price {
+  flex: 0 1 auto;
+  padding: 6px 11px;
+  border-color: rgba(91, 155, 213, 0.5);
+  border-radius: 6px;
+  background: rgba(30, 90, 168, 0.2);
+  color: #a9d2fa;
+  font-size: 0.88rem;
+}
+
+.service-item > p {
+  margin-bottom: 16px;
+  color: #c4ced8;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.service-features {
+  display: grid;
+  gap: 7px;
+  margin: 0 0 16px;
+}
+
+.service-item:not(.service-card) .service-features li {
+  margin: 0;
+  padding-left: 0;
+  color: #c4ced8;
+  line-height: 1.45;
+}
+
+.service-item:not(.service-card) .service-features li::before {
+  content: none;
+}
+
+.service-timing {
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid rgba(139, 188, 255, 0.16);
+  color: #9dc9f2;
+  font-size: 0.84rem;
+}
+
+.service-card.service-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-content: start;
+  gap: 10px 12px;
+}
+
+.service-card.service-item > :not(h3):not(.price) {
+  grid-column: 1 / -1;
+}
+
+.car-wash-categories .service-card h3 {
+  grid-column: 1;
+  grid-row: 1;
+  align-self: center;
+  padding-right: 0;
+  margin: 0;
+  font-size: 1.08rem;
+  line-height: 1.35;
+}
+
+.car-wash-categories .service-card .price {
+  position: static;
+  grid-column: 2;
+  grid-row: 1;
+  align-self: start;
+  margin: 0;
+  padding: 6px 9px;
+  border-color: rgba(91, 155, 213, 0.5);
+  border-radius: 6px;
+  background: rgba(30, 90, 168, 0.2);
+  color: #a9d2fa;
+  font-size: 0.84rem;
+}
+
+.car-wash-categories .service-card .card-size,
+.car-wash-categories .service-card .card-variant {
+  min-height: 44px;
+  margin: 0;
+  padding: 9px 12px;
+  border: 1px solid rgba(139, 188, 255, 0.24);
+  border-radius: 6px;
+  background: #101820;
+  font-size: 0.9rem;
+}
+
+.car-wash-categories .service-card .card-size:focus,
+.car-wash-categories .service-card .card-variant:focus {
+  border-color: #5b9bd5;
+  box-shadow: 0 0 0 3px rgba(91, 155, 213, 0.18);
+}
+
+@media (max-width: 768px) {
+  .service-items {
+    gap: 12px;
+  }
+
+  .service-items > .service-item {
+    padding: 15px;
+  }
+
+  .service-item h4 {
+    font-size: 1.02rem;
+  }
+
+  .service-item-header {
+    flex-direction: row;
+    gap: 8px 10px;
+    margin-bottom: 10px;
+  }
+
+  .service-price {
+    padding: 5px 9px;
+    font-size: 0.82rem;
+  }
+
+  .service-item > p {
+    margin-bottom: 11px;
+    font-size: 0.84rem;
+    line-height: 1.5;
+  }
+
+  .service-features {
+    gap: 5px;
+    margin-bottom: 11px;
+  }
+
+  .service-item:not(.service-card) .service-features li {
+    font-size: 0.78rem;
+  }
+
+  .service-timing {
+    padding-top: 9px;
+    font-size: 0.78rem;
+  }
+
+  .service-items .service-card.service-item {
+    gap: 8px 9px;
+    padding: 14px;
+  }
+
+  .car-wash-categories .service-card h3 {
+    font-size: 0.98rem;
+  }
+
+  .car-wash-categories .service-card .price {
+    padding: 5px 7px;
+    font-size: 0.76rem;
+  }
+
+  .car-wash-categories .service-card > p {
+    margin-bottom: 6px;
+    font-size: 0.82rem;
+    line-height: 1.4;
+  }
+
+  .car-wash-categories .service-features li {
+    margin-bottom: 2px;
+    font-size: 0.76rem;
+    line-height: 1.3;
+  }
+
+  .car-wash-categories .service-card > p strong {
+    margin-top: 5px;
+    padding-top: 6px;
+    font-size: 0.76rem;
+  }
+
+  .car-wash-categories .service-card .card-size,
+  .car-wash-categories .service-card .card-variant {
+    min-height: 40px;
+    padding: 7px 9px;
+    font-size: 0.82rem;
+  }
+}
+
+.service-items .card-addon-asphalt,
+.service-items .card-addon-seat {
+  display: none !important;
+}
+
+.service-items > .service-item > .service-addon-note {
+  grid-column: 1 / -1;
+  margin: 8px 0 0;
+  padding: 8px 10px;
+  border: 1px solid rgba(91, 155, 213, 0.32);
+  border-radius: 6px;
+  background: rgba(30, 90, 168, 0.14);
+  color: #b9daf7;
+  font-size: 0.8rem;
+  font-weight: 600;
+  line-height: 1.4;
 }

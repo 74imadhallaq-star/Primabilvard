@@ -28,6 +28,7 @@ const SERVICE_LABELS = {
 };
 
 const WASH_SERVICES = new Set(['basic', 'interior-wash', 'premium', 'inout', 'interior', 'full', 'ceramic', 'upholstery-2', 'upholstery-5', 'headlight-2', 'headlight-4', 'asphalt-removal']);
+const SIZE_BASED_WASH_SERVICES = new Set(['basic', 'interior-wash', 'premium', 'inout', 'interior', 'full', 'ceramic']);
 
 const OWNER_SESSION_KEY = 'primabilvard_owner_session_v2';
 const OWNER_SESSION_MAX_AGE_MS = 5 * 60 * 60 * 1000;
@@ -100,6 +101,7 @@ const SERVICE_DURATIONS = {
 // Speglar EXTRAS_CATALOG i script.js (priser och tider).
 const EXTRAS_CATALOG = [
   { id: 'quick-wax', label: 'Snabbvax', price: 100, minutes: 0 },
+  { id: 'paint-polish', label: 'Lackpolering', price: { small: 1200, medium: 1300, large: 1400 }, minutes: 120, hideFor: ['full', 'ceramic'], sizedOnly: true },
   { id: 'asphalt', label: 'Asfaltborttagning', price: 299, minutes: 30 },
   { id: 'lights-2', group: 'lights', label: 'Polering av lyktor (2 st)', price: 399, minutes: 20 },
   { id: 'lights-4', group: 'lights', label: 'Polering av lyktor (4 st)', price: 499, minutes: 30 },
@@ -122,7 +124,12 @@ function getBookingExtras(booking) {
 
 function getSelectedOwnerExtras() {
   const checked = Array.from(document.querySelectorAll('#ownerExtrasList input:checked')).map(input => input.value);
-  return EXTRAS_CATALOG.filter(extra => checked.includes(extra.id));
+  const service = document.getElementById('ownerService')?.value || '';
+  return EXTRAS_CATALOG.filter(extra =>
+    checked.includes(extra.id) &&
+    !(extra.hideFor || []).includes(service) &&
+    !(extra.sizedOnly && !SIZE_BASED_WASH_SERVICES.has(service))
+  );
 }
 
 function updateOwnerPricePreview() {
@@ -140,6 +147,22 @@ function updateOwnerExtrasLabel() {
   if (!toggle) return;
   const count = getSelectedOwnerExtras().length;
   toggle.textContent = count ? `${count} tillval valda` : 'Tillval (valfritt)';
+}
+
+function updateOwnerExtrasAvailability() {
+  const list = document.getElementById('ownerExtrasList');
+  const service = document.getElementById('ownerService')?.value || '';
+  if (!list) return;
+  EXTRAS_CATALOG.forEach(extra => {
+    const input = list.querySelector(`input[value="${extra.id}"]`);
+    const label = input?.closest('.owner-extra-chip');
+    if (!input || !label) return;
+    label.hidden = (extra.hideFor || []).includes(service) ||
+      (extra.sizedOnly && !SIZE_BASED_WASH_SERVICES.has(service));
+    if (label.hidden) input.checked = false;
+  });
+  updateOwnerPricePreview();
+  updateOwnerExtrasLabel();
 }
 
 function renderOwnerExtras() {
@@ -167,7 +190,10 @@ function renderOwnerExtras() {
     input.type = 'checkbox';
     input.value = extra.id;
     const text = document.createElement('span');
-    text.textContent = `${extra.label} (+${typeof extra.price === 'number' ? extra.price : extra.price.small} kr)`;
+    const priceText = typeof extra.price === 'number'
+      ? `+${extra.price} kr`
+      : `+${extra.price.small}/${extra.price.medium}/${extra.price.large} kr (liten/mellan/stor)`;
+    text.textContent = `${extra.label} (${priceText})`;
     label.append(input, text);
     input.addEventListener('change', () => {
       if (input.checked && extra.group) {
@@ -181,7 +207,8 @@ function renderOwnerExtras() {
     });
     list.appendChild(label);
   });
-  document.getElementById('ownerService')?.addEventListener('change', updateOwnerPricePreview);
+  updateOwnerExtrasAvailability();
+  document.getElementById('ownerService')?.addEventListener('change', updateOwnerExtrasAvailability);
   document.getElementById('ownerSize')?.addEventListener('change', updateOwnerPricePreview);
 }
 
