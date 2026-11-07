@@ -386,26 +386,160 @@ exports.stripeWebhook = onRequest(
       const pendingRef = database.collection('pendingBookings').doc(String(bookingId));
       const bookingRef = database.collection('bookings').doc(String(bookingId));
       const availabilityRef = database.collection('availability').doc(String(bookingId));
+      const emailOutboxRef = database.collection('bookingConfirmationEmails').doc(String(bookingId));
 
-      await database.runTransaction(async (transaction) => {
+      const emailOutbox = await database.runTransaction(async (transaction) => {
         const pendingSnapshot = await transaction.get(pendingRef);
-        if (!pendingSnapshot.exists) return;
+        const outboxSnapshot = await transaction.get(emailOutboxRef);
+        if (!pendingSnapshot.exists) {
+          const outbox = outboxSnapshot.exists ? outboxSnapshot.data() : null;
+          return outbox?.status === 'pending' ? outbox : null;
+        }
 
-        const booking = pendingSnapshot.data();
-        transaction.set(bookingRef, {
-          ...booking,
+        const booking = {
+          ...pendingSnapshot.data(),
+          email: session.customer_details?.email || pendingSnapshot.data().email || '',
           paymentStatus: 'Paid',
           stripeCheckoutSessionId: session.id,
           paidAt: admin.firestore.FieldValue.serverTimestamp()
-        });
+        };
+        transaction.set(bookingRef, booking);
         transaction.set(availabilityRef, availabilityFromBooking(booking));
         transaction.delete(pendingRef);
+        if (!outboxSnapshot.exists) {
+          const emailBooking = { ...booking };
+          delete emailBooking.paidAt;
+          transaction.set(emailOutboxRef, {
+            bookingId: String(bookingId),
+            recipient: booking.email,
+            booking: emailBooking,
+            status: 'pending',
+            createdAt: admin.firestore.FieldValue.serverTimestamp()
+          });
+        }
+        const outbox = outboxSnapshot.exists
+          ? outboxSnapshot.data()
+          : { bookingId: String(bookingId), recipient: booking.email, booking: { ...booking, paidAt: null }, status: 'pending' };
+        return outbox.status === 'pending' ? outbox : null;
       });
+
+      if (emailOutbox) {
+        await sendBookingConfirmationEmail(emailOutbox);
+        await emailOutboxRef.update({
+          status: 'sent',
+          sentAt: admin.firestore.FieldValue.serverTimestamp()
+        });
+      }
     }
 
     response.status(200).send('Received');
   }
 );
+
+function escapeEmailHtml(value) {
+  return String(value ?? '').replace(/[&<>"']/g, character => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  })[character]);
+}
+
+function getBookingServiceLabel(booking) {
+  const serviceIds = Array.isArray(booking.services) && booking.services.length
+    ? booking.services
+    : [booking.service].filter(Boolean);
+  const base = booking.serviceLabel || serviceIds.map(id => SERVICE_LABELS_MAP[id] || id).join(' + ') || 'Bokad bilvård';
+  const additions = [];
+  if (!booking.serviceLabel && Array.isArray(booking.extras)) {
+    additions.push(...booking.extras.map(id => EXTRAS_CATALOG[id]?.label || id));
+  }
+  if (booking.seatAddon && booking.seatAddon !== 'none') {
+    additions.push(`Tvätt av ${booking.seatAddon} säten`);
+  }
+  if (booking.asphaltAddon && booking.asphaltAddon !== 'none') {
+    additions.push('Asfaltrengöring');
+  }
+  if (!additions.length && booking.addonLabel) additions.push(booking.addonLabel);
+  return additions.length ? `${base} + ${additions.join(' + ')}` : base;
+}
+
+async function sendBookingConfirmationEmail(outbox) {
+  const apiKey = resendApiKey.value();
+  const booking = outbox.booking || {};
+  const recipient = String(outbox.recipient || booking.email || '').trim();
+  if (!recipient) throw new Error(`Booking ${outbox.bookingId} has no customer email address.`);
+
+  const details = [
+    ['Bokningsnummer', outbox.bookingId],
+    ['Tjänst', getBookingServiceLabel(booking)],
+    ['Datum', booking.date || '-'],
+    ['Tid', booking.time || '-'],
+    ['Registreringsnummer', booking.registration || '-'],
+    ['Storlek', booking.size || '-'],
+    ['Pris', Number.isFinite(Number(booking.price)) ? `${booking.price} kr` : '-']
+  ];
+  if (booking.pickup) {
+    details.push(['Hämtning/lämning', booking.pickupAddress || 'Hämtning/lämning är bokad']);
+  }
+
+  const htmlDetails = details.map(([label, value]) => `
+    <tr>
+      <td style="padding:10px 12px;border-bottom:1px solid #e8edf3;color:#526174;">${escapeEmailHtml(label)}</td>
+      <td style="padding:10px 12px;border-bottom:1px solid #e8edf3;color:#17283f;font-weight:600;">${escapeEmailHtml(value)}</td>
+    </tr>`).join('');
+  const textDetails = details.map(([label, value]) => `${label}: ${value}`).join('\n');
+  const firstName = String(booking.name || '').trim().split(/\s+/)[0] || 'kund';
+
+  try {
+    const response = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+        'Idempotency-Key': `booking-confirmation-${outbox.bookingId}`
+      },
+      body: JSON.stringify({
+        from: 'Prima Bilvård <foretag@primabilvard.com>',
+        to: [recipient],
+        reply_to: 'foretag@primabilvard.com',
+        subject: `Bokningsbekräftelse – Prima Bilvård (${booking.date || 'din bokning'})`,
+        html: `<!doctype html>
+<html lang="sv">
+  <body style="margin:0;padding:24px;background:#f2f5f9;font-family:Arial,Helvetica,sans-serif;color:#17283f;">
+    <table role="presentation" style="width:100%;max-width:620px;margin:0 auto;background:#ffffff;border-radius:14px;overflow:hidden;">
+      <tr><td style="padding:28px 30px 18px;text-align:center;background:#0a3d78;">
+        <img src="https://primabilvard.com/logo.png" alt="Prima Bilvård" width="140" style="display:block;width:140px;max-width:100%;height:auto;margin:0 auto 12px;">
+        <div style="font-size:13px;letter-spacing:2px;color:#dbe8f8;">DÄR GLANS MÖTER ELEGANS</div>
+      </td></tr>
+      <tr><td style="padding:28px 30px;">
+        <h1 style="margin:0 0 12px;font-size:24px;color:#0a3d78;">Tack ${escapeEmailHtml(firstName)} – din bokning är bekräftad!</h1>
+        <p style="margin:0 0 20px;line-height:1.6;color:#526174;">Vi har tagit emot din betalning och bekräftat din tid. Här är uppgifterna för din bokning:</p>
+        <table role="presentation" style="width:100%;border-collapse:collapse;background:#fbfcfe;">${htmlDetails}</table>
+        <p style="margin:22px 0 8px;line-height:1.6;color:#526174;">Har du frågor eller behöver ändra din tid? Kontakta oss så hjälper vi dig.</p>
+        <p style="margin:0;line-height:1.8;color:#17283f;"><strong>Prima Bilvård</strong><br>
+          <a href="tel:0737542220" style="color:#1a5da8;">073-754 22 20</a><br>
+          <a href="mailto:foretag@primabilvard.com" style="color:#1a5da8;">foretag@primabilvard.com</a><br>
+          <a href="https://primabilvard.com" style="color:#1a5da8;">primabilvard.com</a>
+        </p>
+      </td></tr>
+      <tr><td style="padding:16px 30px;background:#f7f9fc;text-align:center;font-size:12px;color:#718096;">Detta mejl gäller din bokning hos Prima Bilvård.</td></tr>
+    </table>
+  </body>
+</html>`,
+        text: `Hej ${firstName}!\n\nTack för din bokning hos Prima Bilvård. Vi har tagit emot din betalning och bekräftat din tid.\n\n${textDetails}\n\nFrågor eller ändringar? Ring 073-754 22 20 eller mejla foretag@primabilvard.com.\nhttps://primabilvard.com\n\nVänliga hälsningar,\nPrima Bilvård`
+      })
+    });
+    if (!response.ok) {
+      const responseBody = await response.text();
+      throw new Error(`Resend returned ${response.status}: ${responseBody}`);
+    }
+  } catch (error) {
+    console.error(`Booking confirmation email failed for booking ${outbox.bookingId}:`, error);
+    throw error;
+  }
+}
 
 async function sendProductOrderNotification(order) {
   let apiKey = '';

@@ -161,14 +161,13 @@
     <div class="status" id="statusBadge">✔ Betalning mottagen</div>
     <div class="icon">✅</div>
     <h1 id="successTitle">Tack! Betalningen gick igenom</h1>
-    <p id="successText1">Din betalning är registrerad hos Prima Bilvård.</p>
-    <p id="successText2">Vi kontaktar dig snart för att bekräfta bokningen och tiden.</p>
+    <p id="successText1">Din betalning är registrerad och din bokning bekräftad.</p>
+    <p id="successText2">En bekräftelse med dina bokningsuppgifter skickas till din e-postadress.</p>
 
     <div class="summary" id="summaryBox">
-      <strong>Nästa steg:</strong><br>
-      1. Vi granskar din bokning<br>
-      2. Du får bekräftelse via telefon eller e-post<br>
-      3. Vi ses på din bokade tid ✨
+      <strong>Bokningen är bekräftad.</strong><br>
+      En bekräftelse med alla bokningsuppgifter skickas till din e-postadress.<br>
+      Vi ses på din bokade tid ✨
     </div>
 
     <div class="actions">
@@ -258,7 +257,8 @@
 
       statusBadge.textContent = 'Betalning mottagen';
       successTitle.textContent = 'Tack! Betalningen gick igenom';
-      successText1.textContent = 'Din bokning registreras automatiskt och bekräftas snart.';
+      successText1.textContent = 'Din betalning är registrerad och din bokning bekräftad.';
+      successText2.textContent = 'En bekräftelse med dina bokningsuppgifter skickas till din e-postadress.';
 
       try {
         const pendingBooking = JSON.parse(sessionStorage.getItem('pendingBooking') || 'null');
