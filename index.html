@@ -27,7 +27,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Cormorant+Garamond:wght@400;500;600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=32">
+<link rel="preload" as="image" href="mobil1.jpg" media="(max-width: 768px)" fetchpriority="high">
+<link rel="preload" as="image" href="dator1.jpg" media="(min-width: 769px)" fetchpriority="high">
+<link rel="stylesheet" href="style.css?v=33">
 <link rel="stylesheet" href="cart.css?v=1">
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-DR804JMHC0"></script>
@@ -1477,11 +1479,38 @@
   </div>
 </section>
 
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-<script src="firebase-config.js?v=4"></script>
-<script src="script.js?v=110"></script>
-<script src="cart.js?v=1"></script>
+<script>
+window.firebaseStatus = 'loading';
+window.firebaseReady = (async function() {
+  const firebaseScripts = [
+    'https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js',
+    'https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js'
+  ];
+
+  try {
+    const loadScript = src => new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.async = false;
+      script.src = src;
+      script.onload = resolve;
+      script.onerror = () => reject(new Error(`Failed to load ${src}`));
+      document.head.appendChild(script);
+    });
+
+    await Promise.all(firebaseScripts.map(loadScript));
+    await loadScript('firebase-config.js?v=4');
+
+    window.firebaseStatus = window.db ? 'ready' : 'unavailable';
+    return window.firebaseStatus === 'ready';
+  } catch (error) {
+    console.error('Firebase initialization failed:', error);
+    window.firebaseStatus = 'unavailable';
+    return false;
+  }
+})();
+</script>
+<script src="script.js?v=112" defer></script>
+<script src="cart.js?v=1" defer></script>
 <script>
 (function() {
   const KEY = 'pb_owner_auth';

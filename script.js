@@ -12,6 +12,8 @@ document.querySelectorAll('#services .service-item[data-service]').forEach((card
 let currentDate = new Date();
 let selectedDate = null;
 let selectedTime = null;
+let availabilityDataReady = false;
+let availabilityDataFailed = false;
 const MAX_CONCURRENT_BOOKINGS = 2;
 const SLOT_STEP_MINUTES = 30;
 
@@ -446,21 +448,23 @@ function isTimeBlocked(date, time) {
 async function loadBlockedDatesFromFirebase() {
   if (!canUseFirestore()) {
     blockedDateIds = new Set(readLocalArray(LOCAL_STORAGE_KEYS.blockedDates).map(v => String(v)));
-    return;
+    return false;
   }
   try {
     const snapshot = await window.db.collection('blockedDates').get();
     blockedDateIds = new Set(snapshot.docs.map(doc => String(doc.id)));
+    return true;
   } catch (e) {
     console.error('Firebase blockedDates load error:', e);
     blockedDateIds = new Set(readLocalArray(LOCAL_STORAGE_KEYS.blockedDates).map(v => String(v)));
+    return false;
   }
 }
 
 async function loadBlockedTimesFromFirebase() {
   if (!canUseFirestore()) {
     blockedTimeIds = new Set(readLocalArray(LOCAL_STORAGE_KEYS.blockedTimes).map(v => String(v)).filter(Boolean));
-    return;
+    return false;
   }
   try {
     const snapshot = await window.db.collection('blockedTimes').get();
@@ -476,9 +480,11 @@ async function loadBlockedTimesFromFirebase() {
         return blockedTimeKey(fallbackDate || '', fallbackTime || '');
       }).filter(v => v && !v.startsWith('|') && !v.endsWith('|'))
     );
+    return true;
   } catch (e) {
     console.error('Firebase blockedTimes load error:', e);
     blockedTimeIds = new Set(readLocalArray(LOCAL_STORAGE_KEYS.blockedTimes).map(v => String(v)).filter(Boolean));
+    return false;
   }
 }
 
@@ -1296,6 +1302,13 @@ document.querySelectorAll('#asphaltAddonButtons .addon-btn').forEach(btn => {
 const bookingForm = document.getElementById('bookingForm');
 if (bookingForm) bookingForm.addEventListener('submit', async function(e) {
   e.preventDefault();
+
+  if (window.firebaseStatus === 'loading' || (window.firebaseStatus === 'ready' && !availabilityDataReady)) {
+    alert(availabilityDataFailed
+      ? 'Kunde inte kontrollera kalenderns tillgänglighet. Ladda om sidan och försök igen.'
+      : 'Kalenderns tillgänglighet laddas fortfarande. Försök igen om en liten stund.');
+    return;
+  }
   
   const name = document.getElementById('name').value;
   const email = document.getElementById('email').value;
@@ -1432,17 +1445,35 @@ async function loadBookingsFromFirebase() {
 }
 
 function subscribeToAvailability() {
-  if (!canUseFirestore() || typeof window.db.collection('availability').onSnapshot !== 'function') return;
+  if (!canUseFirestore() || typeof window.db.collection('availability').onSnapshot !== 'function') {
+    return Promise.resolve(false);
+  }
   if (unsubscribeAvailability) unsubscribeAvailability();
 
-  unsubscribeAvailability = window.db.collection('availability').onSnapshot(snapshot => {
-    cachedBookings = snapshot.docs.map(doc => doc.data());
-    cachedBookings.sort((a, b) => (b.sortKey || 0) - (a.sortKey || 0));
-    writeLocalArray(LOCAL_STORAGE_KEYS.bookings, cachedBookings);
-    renderCalendar();
-    if (selectedDate) showTimeSlots(selectedDate);
-  }, error => {
-    console.error('Firebase realtime availability error:', error);
+  return new Promise(resolve => {
+    let initialSnapshotReceived = false;
+    const finishInitialSnapshot = loaded => {
+      if (initialSnapshotReceived) return;
+      initialSnapshotReceived = true;
+      resolve(loaded);
+    };
+
+    try {
+      unsubscribeAvailability = window.db.collection('availability').onSnapshot(snapshot => {
+        cachedBookings = snapshot.docs.map(doc => doc.data());
+        cachedBookings.sort((a, b) => (b.sortKey || 0) - (a.sortKey || 0));
+        writeLocalArray(LOCAL_STORAGE_KEYS.bookings, cachedBookings);
+        renderCalendar();
+        if (selectedDate) showTimeSlots(selectedDate);
+        if (!snapshot.metadata?.fromCache) finishInitialSnapshot(true);
+      }, error => {
+        console.error('Firebase realtime availability error:', error);
+        finishInitialSnapshot(false);
+      });
+    } catch (error) {
+      console.error('Firebase realtime availability setup failed:', error);
+      finishInitialSnapshot(false);
+    }
   });
 }
 
@@ -2192,8 +2223,6 @@ document.addEventListener('DOMContentLoaded', async function() {
 
   syncMobilePaymentSection();
   window.addEventListener('resize', syncMobilePaymentSection);
-  await loadCurrentUpdate();
-
   // Reset scroll to top
   window.scrollTo(0, 0);
   
@@ -2211,11 +2240,6 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
   }
   
-  // Load bookings + blocked dates from Firebase so calendar availability is correct
-  await loadBookingsFromFirebase();
-  subscribeToAvailability();
-  await loadBlockedDatesFromFirebase();
-  await loadBlockedTimesFromFirebase();
   loadServiceDurationsFromCards();
   initCalendar();
   renderBlockedDatesList();
@@ -2582,11 +2606,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 
   // ===== AD CONFIGURATION SYSTEM =====
   ensureAdStyles();
-  await loadAdConfigFromFirebase();
   renderAdConfigControls();
-  if (shouldShowAdOnLoad()) {
-    showAdPopup(adConfig.html);
-  }
 
   // ===== CAR SERVICE INTERACTIONS =====
   // Handle both service-item (old cards) and service-card clicks
@@ -3488,6 +3508,14 @@ document.addEventListener('DOMContentLoaded', async function() {
   if (wizardSubmitBtn) {
     wizardSubmitBtn.addEventListener('click', async (e) => {
       e.preventDefault();
+
+      if (window.firebaseStatus === 'loading' || (window.firebaseStatus === 'ready' && !availabilityDataReady)) {
+        alert(availabilityDataFailed
+          ? 'Kunde inte kontrollera kalenderns tillgänglighet. Ladda om sidan och försök igen.'
+          : 'Kalenderns tillgänglighet laddas fortfarande. Försök igen om en liten stund.');
+        return;
+      }
+
       console.log('Wizard submit clicked', wizardData);
       
       const services = getWizardServices();
@@ -3628,4 +3656,52 @@ document.addEventListener('DOMContentLoaded', async function() {
   
   // Initialize wizard
   updateWizardStep(1);
+
+  void (async () => {
+    try {
+      const firebaseAvailable = await window.firebaseReady;
+      let contentInitialization = Promise.resolve();
+      if (firebaseAvailable) {
+        const availabilitySnapshot = subscribeToAvailability();
+        contentInitialization = Promise.all([
+          loadCurrentUpdate(),
+          loadAdConfigFromFirebase()
+        ]).then(() => {
+          renderAdConfigControls();
+          if (shouldShowAdOnLoad()) showAdPopup(adConfig.html);
+        }).catch(error => {
+          console.error('Homepage content initialization failed:', error);
+        });
+        const [snapshotLoaded, blockedDatesLoaded, blockedTimesLoaded] = await Promise.all([
+          availabilitySnapshot,
+          loadBlockedDatesFromFirebase(),
+          loadBlockedTimesFromFirebase()
+        ]);
+        availabilityDataReady = snapshotLoaded && blockedDatesLoaded && blockedTimesLoaded;
+        availabilityDataFailed = !availabilityDataReady;
+      } else {
+        await Promise.all([
+          loadCurrentUpdate(),
+          loadBookingsFromFirebase(),
+          loadBlockedDatesFromFirebase(),
+          loadBlockedTimesFromFirebase(),
+          loadAdConfigFromFirebase()
+        ]);
+        availabilityDataReady = true;
+      }
+
+      renderCalendar();
+      renderBlockedDatesList();
+      renderBlockedTimesList();
+      if (selectedDate) showTimeSlots(selectedDate);
+      if (firebaseAvailable) await contentInitialization;
+      else {
+        renderAdConfigControls();
+        if (shouldShowAdOnLoad()) showAdPopup(adConfig.html);
+      }
+    } catch (error) {
+      availabilityDataFailed = true;
+      console.error('Homepage data initialization failed:', error);
+    }
+  })();
 });

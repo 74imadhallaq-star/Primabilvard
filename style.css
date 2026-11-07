@@ -149,7 +149,7 @@ body {
 /* ===== HERO ===== */
 .hero {
   /* background image with overlay for professional appearance */
-  background: url('dator1.png') center center / cover no-repeat;
+  background: url('dator1.jpg') center center / cover no-repeat;
   color: var(--text-primary);
   text-align: center;
   min-height: 65vh;
@@ -2171,7 +2171,7 @@ body.owner-login-active {
 
   /* --- HERO --- */
   .hero {
-    background-image: url('mobil1.png');
+    background-image: url('mobil1.jpg');
     min-height: 52vh;
     padding: 24px 16px 30px;
   }
