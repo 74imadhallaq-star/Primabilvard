@@ -21,7 +21,7 @@
   "url": "https://primabilvard.com/",
   "logo": "https://primabilvard.com/logo.png",
   "image": "https://primabilvard.com/logo.png",
-  "sameAs": ["https://www.instagram.com/priimabilvard/"]
+  "sameAs": ["https://www.instagram.com/prima_bilvard/"]
 }
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -233,7 +233,7 @@
         <li>Rengöring av fönster och dörrkarmar</li>
         <li>Klädseltvätt kan väljas till</li>
       </ul>
-      <p>Ge din bil en ordentlig uppfräschning med vårt Premiumpaket! Här ingår en noggrann handtvätt både in- och utvändigt, djupgående interiörrekonditionering, applicering av vax för extra skydd och glans samt en grundlig rengöring av fönster, dörrkarmar och trösklar. Perfekt för dig som vill att bilen ska se och kännas som ny – varje dag. Du kan även välja till klädseltvätt mot en extra kostnad för ett ännu fräschare resultat.</p>
+      <p>Ge din bil en ordentlig uppfräschning med vårt Premiumpaket! Här ingår en noggrann handtvätt både in- och utvändigt, djupgående interiörrekonditionering, applicering av vax för extra glans och skydd, samt putsning av fönster och dörrkarmar.</p>
       <p><strong>Tid: ca 3 timmar</strong></p>
       <select class="card-size">
         <option value="small">Liten - 1500 kr</option>
@@ -258,7 +258,7 @@
         <li>Komplett interiörrekonditionering</li>
         <li>Klädseltvätt kan väljas till</li>
       </ul>
-      <p>För dig som vill ge bilen det allra bästa erbjuder vi vårt Exklusivpaket. Paketet inkluderar fullständig handtvätt in- och utvändigt, avancerad polering för maximal glans och borttagning av djupare repor, samt professionellt lackskydd med keramisk coating eller högkvalitativt vax. Motortvätt och komplett interiörrekonditionering ingår också, vilket ger din bil en total förvandling från hjul till tak. Detta paket är perfekt för bilentusiaster, företagskunder med höga krav och bilhandlare som vill säkerställa att deras bilar är i toppskick. Du kan även välja till klädseltvätt mot en extra kostnad för en ännu mer komplett rekond.</p>
+      <p>För dig som vill ge bilen det allra bästa erbjuder vi vårt Exklusivpaket. Paketet inkluderar fullständig handtvätt in- och utvändigt, avancerad polering för maximal glans och borttagning av repor och smuts, lackskydd för långvarigt skydd samt komplett interiörrekonditionering.</p>
       <p><strong>Tid: ca 3,5 timmar</strong></p>
       <select class="card-size">
         <option value="small">Liten - 2000 kr</option>
@@ -842,8 +842,8 @@
             <h4 style="margin:0 0 12px 0;color:#5b9bd5;">📋 Åtgärda Besiktningsanmärkningar</h4>
             <p style="margin:0 0 16px 0;color:var(--text-secondary);">Denna tjänst kräver en individuell offert. Ring eller mejla oss så hjälper vi dig snabbt!</p>
             <div style="display:flex;flex-wrap:wrap;gap:12px;">
-              <a href="tel:0737542220" style="display:inline-flex;align-items:center;gap:8px;padding:12px 20px;background:#1a5da8;color:#fff;border-radius:10px;text-decoration:none;font-weight:600;">📞 Ring oss: 073-754 22 20</a>
-              <a href="mailto:foretag@primabilvard.com" style="display:inline-flex;align-items:center;gap:8px;padding:12px 20px;background:#0a3d78;color:#fff;border-radius:10px;text-decoration:none;font-weight:600;">✉️ foretag@primabilvard.com</a>
+              <a href="tel:0737542220" style="display:inline-flex;align-items:center;gap:8px;padding:12px 20px;background:#1a5da8;color:#fff;border-radius:10px;text-decoration:none;font-weight:600;">📞 Ring oss</a>
+              <a href="mailto:foretag@primabilvard.com" style="display:inline-flex;align-items:center;gap:8px;padding:12px 20px;background:#0a3d78;color:#fff;border-radius:10px;text-decoration:none;font-weight:600;">✉️ Mejla oss</a>
             </div>
           </div>
           <div class="form-section" id="wizardSizeSection">
@@ -1003,10 +1003,6 @@
               <span>Tid:</span>
               <strong id="summaryTime">-</strong>
             </div>
-            <div class="summary-row">
-              <span>Beräknad tid:</span>
-              <strong id="summaryDuration">-</strong>
-            </div>
           </div>
 
           <div class="summary-section">
@@ -1024,165 +1020,24 @@
               <strong id="summaryEmail">-</strong>
             </div>
           </div>
-
-          <div class="summary-section summary-total">
-            <div class="summary-row">
-              <span class="total-label">Totalt pris:</span>
-              <strong class="total-price" id="summaryTotal">-</strong>
-            </div>
-          </div>
-
-          <div id="wizardPaymentSection" class="payment-section"></div>
         </div>
       </div>
     </div>
 
-    <!-- Navigation Buttons -->
-    <div class="wizard-navigation">
-      <button type="button" class="wizard-btn wizard-btn-secondary" id="wizardPrevBtn" style="display:none;">← Tillbaka</button>
-      <button type="button" class="wizard-btn wizard-btn-primary" id="wizardNextBtn">Nästa →</button>
-      <button type="button" class="wizard-btn wizard-btn-success" id="wizardSubmitBtn" style="display:none;">Betala & Bekräfta</button>
-    </div>
-  </div>
-
-  <!-- Old Form (Hidden, kept for compatibility) -->
-  <div class="booking-container" style="display:none;">
-    <div class="booking-form-section">
-      <h2>Boka Din Tid</h2>
-      <form id="bookingForm" class="booking-form">
-        <div class="form-group">
-          <label for="name">Namn</label>
-          <input type="text" id="name" placeholder="Ditt fullständiga namn" required>
-        </div>
-
-        <div class="form-group">
-          <label for="phone">Telefonnummer</label>
-          <input type="tel" id="phone" placeholder="073-754 22 20" required>
-        </div>
-
-        <div class="form-group">
-          <label for="email">E-post</label>
-          <input type="email" id="email" placeholder="din@email.se" required>
-        </div>
-
-        <div class="form-group">
-          <label for="service">Välj Tjänst</label>
-          <select id="service" required>
-            <option value="">-- Välj tjänst --</option>
-            <optgroup label="🚗 Bilvård">
-              <option value="basic">Utvändig Handtvätt</option>
-              <option value="interior-wash">Invändig Tvätt</option>
-              <option value="premium">Komplett In- & Utvändig Tvätt</option>
-              <option value="inout">In- & Utvändig Tvätt Med Säten</option>
-              <option value="interior">HelGlans</option>
-              <option value="full">Fullservice Rekond</option>
-              <option value="ceramic">Keramiskt Lackskydd</option>
-            </optgroup>
-            <optgroup label="🛞 Däckservice">
-              <option value="tire-change">Däckbyte</option>
-              <option value="tire-storage">Däckhotell</option>
-              <option value="tire-repair">Däckreparation</option>
-            </optgroup>
-            <optgroup label="⚙️ Fullservice">
-              <option value="basic-service">Basservice</option>
-              <option value="major-service">Storservice</option>
-              <option value="brake-service">Bromsservice</option>
-            </optgroup>
-            <optgroup label="📋 Besiktning">
-              <option value="pre-inspection">Förbered Besiktning</option>
-              <option value="inspection-fix">Åtgärda Besiktningsanmärkningar</option>
-            </optgroup>
-            <optgroup label="🔍 Felsökning & Diagnos">
-              <option value="computer-diagnosis">Datordiagnos</option>
-              <option value="electrical-diagnosis">Eldiagnos</option>
-              <option value="engine-diagnosis">Motordiagnos</option>
-            </optgroup>
-          </select>
-        </div>
-
-        <div class="form-group" id="seatAddonGroup">
-          <label>Extra tillbehör: Tvätt av säten</label>
-          <div class="addon-buttons" id="seatAddonButtons">
-            <button type="button" class="addon-btn active" data-addon="none">Ingen</button>
-            <button type="button" class="addon-btn" data-addon="2">2 säten (+399 kr, +2,5h)</button>
-            <button type="button" class="addon-btn" data-addon="3">3 säten (+399 kr, +2,5h)</button>
-            <button type="button" class="addon-btn" data-addon="5">5 säten (+699 kr, +3,5h)</button>
-          </div>
-          <p id="seatAddonHelp" class="addon-help">Välj Hel Glans, Fullservice Rekond eller Keramiskt Lackskydd för att aktivera tillval.</p>
-        </div>
-
-        <div class="form-group" id="asphaltAddonGroup">
-          <label>Extra tillbehör: Asfaltrengöring</label>
-          <div class="addon-buttons" id="asphaltAddonButtons">
-            <button type="button" class="addon-btn active" data-addon="none">Ingen</button>
-            <button type="button" class="addon-btn" data-addon="yes">Lägg till asfaltrengöring (+250/+300/+350 kr, +30 min)</button>
-          </div>
-          <p id="asphaltAddonHelp" class="addon-help">Välj Utvändig Handtvätt, Komplett In- & Utvändig Tvätt eller In- & Utvändig Tvätt Med Säten för att aktivera tillval.</p>
-        </div>
-
-        <div class="form-group">
-          <label for="size">Bilstorlek</label>
-          <select id="size" required>
-            <option value="">-- Välj storlek --</option>
-            <option value="small">Liten</option>
-            <option value="medium">Mellan</option>
-            <option value="large">Stor</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label for="registration">Registreringsnummer</label>
-          <input type="text" id="registration" placeholder="ABC 123" required>
-        </div>
-
-        <div id="paymentSectionHome"></div>
-        <div class="payment-section" id="paymentSection">
-          <h3>Betalning</h3>
-          <div class="price-info">
-            <span>Pris:</span>
-            <span id="totalPrice">-</span>
-          </div>
-          <button type="submit" form="bookingForm" id="stripePayBtn" class="submit-btn" style="background:#5469d4;border-color:#5469d4;">Betala &amp; Bekräfta Bokning</button>
-          <p class="payment-note">* Betalning är obligatorisk för att bekräfta bokningen</p>
-          <p class="booking-policy-note"><strong>Obs:</strong> Vid extra smutsig bil kan en tilläggsavgift tillkomma efter bedömning på plats. Uteblivet besök eller avbokning sent kan medföra en avgift.</p>
-        </div>
-      </form>
-    </div>
-
-    <div class="calendar-section">
-      <h2>Lediga Tider</h2>
-      <p id="calendarHint" class="calendar-hint">Välj tjänst först för att se möjliga datum och tider.</p>
-      <div class="calendar-container">
-        <div class="calendar-header">
-          <button id="prevMonth" class="month-nav">&lt;</button>
-          <h3 id="monthYear"></h3>
-          <button id="nextMonth" class="month-nav">&gt;</button>
-        </div>
-        <div class="calendar-weekdays">
-          <div class="weekday">Mån</div>
-          <div class="weekday">Tis</div>
-          <div class="weekday">Ons</div>
-          <div class="weekday">Tor</div>
-          <div class="weekday">Fre</div>
-          <div class="weekday">Lör</div>
-          <div class="weekday">Sön</div>
-        </div>
-        <div id="calendarDays" class="calendar-days"></div>
-      </div>
-
-      <div id="timesSection" class="times-section" style="display: none;">
-        <h3>Lediga Tider för <span id="selectedDate"></span></h3>
-        <div id="timeSlots" class="time-slots"></div>
-      </div>
-
-      <div id="mobilePaymentMount"></div>
+    <!-- Navigation buttons -->
+    <div class="wizard-actions">
+      <button type="button" class="wizard-back" id="wizardBackBtn" style="display:none;">Tillbaka</button>
+      <button type="button" class="wizard-next" id="wizardNextBtn">Nästa</button>
     </div>
   </div>
 </section>
 
 <!-- CONTACT -->
 <section id="contact" class="contact">
-  <h2>Kontakt</h2>
+  <div class="section-header">
+    <p class="section-label">Kontakt</p>
+    <h2>Kontakta Prima Bilvård</h2>
+  </div>
   <div class="contact-info">
     <div class="contact-item">
       <span class="icon">📞</span>
@@ -1194,7 +1049,7 @@
     </div>
     <div class="contact-item">
       <span class="icon">📍</span>
-      <p><strong>Adress:</strong> Karlsgatan 21, 291 95 Kristianstad</p>
+      <p><strong>Adress:</strong> Karlsgatan 21, 291 59 Kristianstad</p>
     </div>
     <div class="contact-item">
       <span class="icon">🕐</span>
@@ -1208,7 +1063,7 @@
     <div class="contact-item">
       <span class="icon">📸</span>
       <p><strong>Instagram:</strong></p>
-      <a href="https://www.instagram.com/priimabilvard/" target="_blank" rel="noopener noreferrer" class="contact-facebook-btn">Besök vår Instagram</a>
+      <a href="https://www.instagram.com/prima_bilvard/" target="_blank" rel="noopener noreferrer" class="contact-facebook-btn">Besök vår Instagram</a>
     </div>
   </div>
 </section>
@@ -1228,325 +1083,3 @@
     <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:20px;">
       <div>
         <h2 style="margin:0 0 8px 0;color:#ffffff;font-size:2.2rem;font-weight:800;">📊 Admin Dashboard</h2>
-        <p style="margin:0;color:#b8d4f1;font-size:1rem;">Hantera bokningar, kalender och inställningar</p>
-      </div>
-      <div style="display:flex;gap:12px;flex-wrap:wrap;">
-        <button id="exportBtn" class="submit-btn" style="padding:12px 20px;background:#ffffff;color:#1a5da8;border:none;font-weight:600;box-shadow:0 4px 12px rgba(0,0,0,0.2);">📥 Exportera</button>
-        <button id="clearBtn" class="submit-btn" style="padding:12px 20px;background:#dc3545;border:none;font-weight:600;box-shadow:0 4px 12px rgba(0,0,0,0.2);">🗑️ Rensa</button>
-        <button id="closeOwnerBtn" class="submit-btn" style="padding:12px 20px;background:rgba(0,0,0,0.3);border:none;font-weight:600;box-shadow:0 4px 12px rgba(0,0,0,0.2);">✕ Stäng</button>
-      </div>
-    </div>
-  </div>
-
-  <div style="background:#0f0f0f;border-radius:16px;padding:30px;margin-bottom:30px;border:1px solid var(--border);box-shadow:0 4px 20px rgba(0,0,0,0.2);">
-    <h3 style="margin:0 0 10px 0;color:var(--text-primary);font-size:1.5rem;font-weight:700;">➕ Lägg till manuell bokning</h3>
-    <p style="margin:0 0 20px 0;color:var(--text-secondary);font-size:0.95rem;">För telefon- eller personliga bokningar</p>
-    <form id="ownerManualBookingForm" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;">
-      <input id="ownerName" type="text" placeholder="Namn *" style="padding:12px 16px;border-radius:10px;border:2px solid var(--border);background:#1a1a1a;color:var(--text-primary);font-size:0.95rem;" required />
-      <input id="ownerPhone" type="text" placeholder="Telefon *" style="padding:12px 16px;border-radius:10px;border:2px solid var(--border);background:#1a1a1a;color:var(--text-primary);font-size:0.95rem;" required />
-      <input id="ownerEmail" type="email" placeholder="E-post (valfritt)" style="padding:12px 16px;border-radius:10px;border:2px solid var(--border);background:#1a1a1a;color:var(--text-primary);font-size:0.95rem;" />
-      <input id="ownerReg" type="text" placeholder="Reg.nr (valfritt)" style="padding:12px 16px;border-radius:10px;border:2px solid var(--border);background:#1a1a1a;color:var(--text-primary);font-size:0.95rem;" />
-
-      <select id="ownerService" style="padding:12px 16px;border-radius:10px;border:2px solid var(--border);background:#1a1a1a;color:var(--text-primary);font-size:0.95rem;font-weight:600;cursor:pointer;" required>
-        <option value="">Välj Tjänst *</option>
-        <optgroup label="🚗 Bilvård">
-          <option value="basic">Utvändig Handtvätt</option>
-          <option value="interior-wash">Invändig Tvätt</option>
-          <option value="premium">Komplett In- &amp; Utvändig Tvätt</option>
-              <option value="inout">In- &amp; Utvändig Tvätt Med Säten</option>
-          <option value="interior">Hel Glans</option>
-          <option value="full">Fullservice Rekond</option>
-          <option value="ceramic">Keramiskt Lackskydd</option>
-        </optgroup>
-        <optgroup label="🛞 Däckservice">
-          <option value="tire-change">Däckbyte</option>
-          <option value="tire-storage">Däckhotell</option>
-          <option value="tire-repair">Däckreparation</option>
-        </optgroup>
-        <optgroup label="⚙️ Fullservice">
-          <option value="basic-service">Basservice</option>
-          <option value="major-service">Storservice</option>
-          <option value="brake-service">Bromsservice</option>
-        </optgroup>
-        <optgroup label="📋 Besiktning">
-          <option value="pre-inspection">Förbered Besiktning</option>
-          <option value="inspection-fix">Åtgärda Besiktningsanmärkningar</option>
-        </optgroup>
-        <optgroup label="🔍 Felsökning">
-          <option value="computer-diagnosis">Datordiagnos</option>
-          <option value="electrical-diagnosis">Eldiagnos</option>
-          <option value="engine-diagnosis">Motordiagnos</option>
-          <option value="ac-service">AC-Service</option>
-        </optgroup>
-      </select>
-
-      <select id="ownerSize" style="padding:12px 16px;border-radius:10px;border:2px solid var(--border);background:#1a1a1a;color:var(--text-primary);font-size:0.95rem;font-weight:600;cursor:pointer;" required>
-        <option value="">Storlek *</option>
-        <option value="small">Liten</option>
-        <option value="medium">Mellan</option>
-        <option value="large">Stor</option>
-      </select>
-
-      <input id="ownerDate" type="date" style="padding:12px 16px;border-radius:10px;border:2px solid var(--border);background:#1a1a1a;color:var(--text-primary);font-size:0.95rem;" required />
-      <input id="ownerTime" type="time" step="1800" style="padding:12px 16px;border-radius:10px;border:2px solid var(--border);background:#1a1a1a;color:var(--text-primary);font-size:0.95rem;" required />
-
-      <input id="ownerPrice" type="number" min="0" step="1" placeholder="Pris (valfritt)" style="padding:12px 16px;border-radius:10px;border:2px solid var(--border);background:#1a1a1a;color:var(--text-primary);font-size:0.95rem;" />
-      <select id="ownerPaymentStatus" style="padding:12px 16px;border-radius:10px;border:2px solid var(--border);background:#1a1a1a;color:var(--text-primary);font-size:0.95rem;font-weight:600;cursor:pointer;">
-        <option value="Manuell (Telefon)">📞 Manuell</option>
-        <option value="Paid">✅ Betald</option>
-        <option value="Pending">⏳ Väntande</option>
-      </select>
-
-      <button type="submit" class="submit-btn" style="grid-column:1/-1;padding:14px 20px;font-size:1rem;font-weight:700;background:linear-gradient(135deg, #1a5da8, #0a3d78);border:none;border-radius:10px;">💾 Spara Bokning</button>
-    </form>
-  </div>
-
-  <div style="background:#0f0f0f;border-radius:16px;padding:30px;margin-bottom:30px;border:1px solid var(--border);box-shadow:0 4px 20px rgba(0,0,0,0.2);">
-    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:15px;">
-      <h3 onclick="(function(){var c=document.getElementById('bookingsContent');var i=document.getElementById('bookingsChevron');var open=c.style.maxHeight!=='0px';c.style.maxHeight=open?'0px':'3000px';c.style.opacity=open?'0':'1';i.style.transform=open?'rotate(-90deg)':'rotate(0deg)';})()" style="margin:0;color:var(--text-primary);font-size:1.6rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:10px;user-select:none;">
-        <span id="bookingsChevron" style="display:inline-block;transition:transform 0.3s;">▼</span>
-        📋 Bokningar
-      </h3>
-      <div style="display:flex;gap:12px;flex-wrap:wrap;">
-        <select id="bookingTypeFilter" style="padding:10px 16px;border-radius:10px;border:2px solid var(--border);background:#1a1a1a;color:var(--text-primary);font-weight:600;cursor:pointer;">
-          <option value="all">📦 Alla Bokningar</option>
-          <option value="wash">🧼 Endast Tvätt</option>
-          <option value="service">🔧 Endast Service</option>
-        </select>
-        <select id="bookingStatusFilter" style="padding:10px 16px;border-radius:10px;border:2px solid var(--border);background:#1a1a1a;color:var(--text-primary);font-weight:600;cursor:pointer;">
-          <option value="all">Alla Status</option>
-          <option value="Paid">✅ Betalda</option>
-          <option value="Pending">⏳ Väntande</option>
-          <option value="Manuell (Telefon)">📞 Manuella</option>
-        </select>
-      </div>
-    </div>
-    <div id="bookingsContent" style="overflow:hidden;max-height:3000px;opacity:1;transition:max-height 0.4s ease,opacity 0.3s ease;margin-top:20px;">
-      <div style="overflow-x:auto;border-radius:12px;border:1px solid var(--border);">
-        <table id="bookingsTable" style="width:100%;border-collapse:collapse;background:var(--bg-secondary);">
-          <thead>
-            <tr style="background:#0a0a0a;">
-              <th style="padding:14px;border-bottom:2px solid var(--border);color:var(--text-primary);font-weight:700;text-align:left;">Namn</th>
-              <th style="padding:14px;border-bottom:2px solid var(--border);color:var(--text-primary);font-weight:700;text-align:left;">E-post</th>
-              <th style="padding:14px;border-bottom:2px solid var(--border);color:var(--text-primary);font-weight:700;text-align:left;">Telefon</th>
-              <th style="padding:14px;border-bottom:2px solid var(--border);color:var(--text-primary);font-weight:700;text-align:left;">Reg.nr</th>
-              <th style="padding:14px;border-bottom:2px solid var(--border);color:var(--text-primary);font-weight:700;text-align:left;">Tjänst</th>
-              <th style="padding:14px;border-bottom:2px solid var(--border);color:var(--text-primary);font-weight:700;text-align:left;">Storlek</th>
-              <th style="padding:14px;border-bottom:2px solid var(--border);color:var(--text-primary);font-weight:700;text-align:left;">Datum</th>
-              <th style="padding:14px;border-bottom:2px solid var(--border);color:var(--text-primary);font-weight:700;text-align:left;">Tid</th>
-              <th style="padding:14px;border-bottom:2px solid var(--border);color:var(--text-primary);font-weight:700;text-align:left;">Betalning</th>
-              <th style="padding:14px;border-bottom:2px solid var(--border);color:var(--text-primary);font-weight:700;text-align:left;">Hemhämtning</th>
-              <th style="padding:14px;border-bottom:2px solid var(--border);color:var(--text-primary);font-weight:700;text-align:center;">Åtgärder</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
-  <!-- Kalenderhantering -->
-  <div style="background:#0f0f0f;border-radius:16px;padding:30px;margin-bottom:30px;border:1px solid var(--border);box-shadow:0 4px 20px rgba(0,0,0,0.2);">
-    <h3 style="margin:0 0 20px 0;color:var(--text-primary);font-size:1.5rem;font-weight:700;">📅 Kalenderhantering</h3>
-    
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:25px;">
-      <!-- Blockera Datum -->
-      <div style="padding:20px;background:#1a1a1a;border-radius:12px;border:1px solid var(--border);">
-        <h4 style="margin:0 0 12px 0;color:var(--text-primary);font-size:1.1rem;font-weight:700;">🚫 Blockera Datum</h4>
-        <p style="margin:0 0 15px 0;color:var(--text-secondary);font-size:0.9rem;">Gör hela dagar otillgängliga</p>
-        <div style="display:flex;flex-direction:column;gap:10px;">
-          <input type="date" id="blockDateInput" style="padding:12px;border-radius:8px;border:2px solid var(--border);background:#0f0f0f;color:var(--text-primary);font-size:0.95rem;" />
-          <div style="display:flex;gap:8px;">
-            <button id="addBlockedDateBtn" class="submit-btn" style="flex:1;padding:10px;font-size:0.9rem;font-weight:600;">✓ Blockera</button>
-            <button id="removeBlockedDateBtn" class="submit-btn" style="flex:1;padding:10px;background:#dc3545;border:none;font-size:0.9rem;font-weight:600;">✕ Ta bort</button>
-          </div>
-        </div>
-        <div style="margin-top:15px;padding:12px;background:#0f0f0f;border-radius:8px;max-height:150px;overflow-y:auto;">
-          <strong style="color:var(--text-secondary);font-size:0.9rem;">Blockerade:</strong>
-          <ul id="blockedDatesList" style="margin:8px 0 0 18px;color:var(--text-primary);font-size:0.9rem;"></ul>
-        </div>
-      </div>
-
-      <!-- Blockera Tider -->
-      <div style="padding:20px;background:#1a1a1a;border-radius:12px;border:1px solid var(--border);">
-        <h4 style="margin:0 0 12px 0;color:var(--text-primary);font-size:1.1rem;font-weight:700;">⏰ Blockera Tider</h4>
-        <p style="margin:0 0 15px 0;color:var(--text-secondary);font-size:0.9rem;">Gör specifika tider otillgängliga</p>
-        <div style="display:flex;flex-direction:column;gap:10px;">
-          <input type="date" id="blockTimeDateInput" style="padding:12px;border-radius:8px;border:2px solid var(--border);background:#0f0f0f;color:var(--text-primary);font-size:0.95rem;" />
-          <input type="time" id="blockTimeInput" step="1800" style="padding:12px;border-radius:8px;border:2px solid var(--border);background:#0f0f0f;color:var(--text-primary);font-size:0.95rem;" />
-          <div style="display:flex;gap:8px;">
-            <button id="addBlockedTimeBtn" class="submit-btn" style="flex:1;padding:10px;font-size:0.9rem;font-weight:600;">✓ Blockera</button>
-            <button id="removeBlockedTimeBtn" class="submit-btn" style="flex:1;padding:10px;background:#dc3545;border:none;font-size:0.9rem;font-weight:600;">✕ Ta bort</button>
-          </div>
-        </div>
-        <div style="margin-top:15px;padding:12px;background:#0f0f0f;border-radius:8px;max-height:150px;overflow-y:auto;">
-          <strong style="color:var(--text-secondary);font-size:0.9rem;">Blockerade:</strong>
-          <ul id="blockedTimesList" style="margin:8px 0 0 18px;color:var(--text-primary);font-size:0.9rem;"></ul>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Annonsinställningar (Collapsible) -->
-  <div style="background:#0f0f0f;border-radius:16px;padding:30px;border:1px solid var(--border);box-shadow:0 4px 20px rgba(0,0,0,0.2);">
-    <h3 style="margin:0 0 10px 0;color:var(--text-primary);font-size:1.5rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:10px;user-select:none;" onclick="const content = this.nextElementSibling; content.style.display = content.style.display === 'none' ? 'block' : 'none'; this.querySelector('.collapse-icon').textContent = this.querySelector('.collapse-icon').textContent === '▼' ? '▶' : '▼';">
-      <span class="collapse-icon">▼</span>
-      📢 Annonsinställningar
-    </h3>
-    <div style="display:block;">
-    <p style="margin:0 0 20px 0;color:var(--text-secondary);font-size:0.95rem;">Skapa och hantera pop-up annonser</p>
-    
-    <div style="display:grid;grid-template-columns:1fr;gap:12px;">
-      <label style="display:flex;align-items:center;gap:8px;color:var(--text-primary);">
-        <input type="checkbox" id="ownerAdEnabled" style="width:16px;height:16px;cursor:pointer;" />
-        <span>Aktivera annons</span>
-      </label>
-
-      <!-- ENKELT LÄGE -->
-      <div style="padding:12px;border:1px solid var(--border);border-radius:8px;background:var(--bg-secondary);">
-        <h4 style="margin:0 0 10px 0;color:var(--text-primary);font-size:0.95rem;cursor:pointer;display:flex;align-items:center;gap:6px;" onclick="this.parentElement.querySelector('.content').style.display = this.parentElement.querySelector('.content').style.display === 'none' ? 'block' : 'none'; this.querySelector('.icon').textContent = this.querySelector('.icon').textContent === '▼' ? '▶' : '▼';">
-          <span class="icon">▼</span>📸 Enkelt läge (Bild + Text)
-        </h4>
-        <div class="content" style="display:block;">
-        
-        <div style="margin-bottom:12px;">
-          <label for="ownerAdImage" style="display:block;margin-bottom:6px;color:var(--text-primary);font-weight:500;font-size:0.9rem;">Dra in bild här eller klicka:</label>
-          <div id="imageDropZone" style="border:2px dashed var(--border);border-radius:8px;padding:20px;text-align:center;background:#0a0a0a;cursor:pointer;transition:all 0.2s;">
-            <p style="margin:0;color:var(--text-secondary);font-size:0.9rem;">📁 Dra bild hit eller klicka för att välja</p>
-            <input type="file" id="ownerAdImage" accept="image/*" style="display:none;" />
-            <div id="imagePreview" style="margin-top:10px;"></div>
-          </div>
-        </div>
-
-        <div style="margin-bottom:12px;">
-          <label for="ownerAdText" style="display:block;margin-bottom:6px;color:var(--text-primary);font-weight:500;font-size:0.9rem;">Annons text (valfritt):</label>
-          <textarea id="ownerAdText" placeholder="Skriv din annonse text här..." style="width:100%;height:80px;padding:10px;border-radius:8px;border:1px solid var(--border);background:#0f0f0f;color:var(--text-primary);font-family:inherit;font-size:0.9rem;resize:vertical;"></textarea>
-        </div>
-
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
-          <div>
-            <label for="ownerAdService" style="display:block;margin-bottom:6px;color:var(--text-primary);font-weight:500;font-size:0.9rem;">Tjänst (valfritt):</label>
-            <select id="ownerAdService" style="width:100%;padding:10px;border-radius:8px;border:1px solid var(--border);background:#0f0f0f;color:var(--text-primary);">
-              <option value="">Ingen tjänst</option>
-              <option value="basic">Utvändig Handtvätt</option>
-              <option value="interior-wash">Invändig Tvätt</option>
-              <option value="premium">Komplett In- & Utvändig</option>
-              <option value="inout">In- & Utvändig Med Säten</option>
-              <option value="interior">Hel Glans</option>
-              <option value="full">Fullservice Rekond</option>
-            </select>
-          </div>
-          <div>
-            <label for="ownerAdCurrentPrice" style="display:block;margin-bottom:6px;color:var(--text-primary);font-weight:500;font-size:0.9rem;">Pris nu (kr):</label>
-            <input type="number" id="ownerAdCurrentPrice" placeholder="299" style="width:100%;padding:10px;border-radius:8px;border:1px solid var(--border);background:#0f0f0f;color:var(--text-primary);" />
-          </div>
-        </div>
-
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
-          <div>
-            <label for="ownerAdOldPrice" style="display:block;margin-bottom:6px;color:var(--text-primary);font-weight:500;font-size:0.9rem;">Ordinarie pris (kr):</label>
-            <input type="number" id="ownerAdOldPrice" placeholder="499" style="width:100%;padding:10px;border-radius:8px;border:1px solid var(--border);background:#0f0f0f;color:var(--text-primary);" />
-          </div>
-          <div>
-            <label for="ownerAdButtonText" style="display:block;margin-bottom:6px;color:var(--text-primary);font-weight:500;font-size:0.9rem;">Knapp text:</label>
-            <input type="text" id="ownerAdButtonText" placeholder="Boka nu" value="Boka nu" style="width:100%;padding:10px;border-radius:8px;border:1px solid var(--border);background:#0f0f0f;color:var(--text-primary);" />
-          </div>
-        </div>
-
-        <button id="generateAdBtn" class="submit-btn" style="width:100%;margin:0;padding:10px 14px;background:#5a7aff;border-color:#7d99ff;">🎨 Skapa annons från bild + text</button>
-        </div>
-      </div>
-
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-        <div>
-          <label for="ownerAdMaxPerDay" style="display:block;margin-bottom:6px;color:var(--text-primary);font-weight:500;font-size:0.95rem;">Max gånger per dag:</label>
-          <input type="number" id="ownerAdMaxPerDay" min="1" value="1" style="width:100%;padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:#0f0f0f;color:var(--text-primary);" />
-        </div>
-        <div style="display:flex;align-items:flex-end;">
-          <label style="display:flex;align-items:center;gap:8px;color:var(--text-primary);width:100%;">
-            <input type="checkbox" id="ownerAdShowOnLoad" style="width:16px;height:16px;cursor:pointer;" />
-            <span>Visa vid sidladdning</span>
-          </label>
-        </div>
-      </div>
-
-      <div style="display:flex;gap:8px;flex-wrap:wrap;">
-        <button id="saveAdConfigBtn" class="submit-btn" style="width:auto;margin:0;padding:10px 14px;">💾 Spara annons</button>
-        <button id="showAdNowBtn" class="submit-btn" style="width:auto;margin:0;padding:10px 14px;background:#4a7c4e;border-color:#7dcc7d;">👁️ Förhandsgranska</button>
-      </div>
-    </div>
-    </div>
-  </div>
-</section>
-
-<script>
-window.firebaseStatus = 'loading';
-window.firebaseReady = (async function() {
-  const firebaseScripts = [
-    'https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js',
-    'https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js'
-  ];
-
-  try {
-    const loadScript = src => new Promise((resolve, reject) => {
-      const script = document.createElement('script');
-      script.async = false;
-      script.src = src;
-      script.onload = resolve;
-      script.onerror = () => reject(new Error(`Failed to load ${src}`));
-      document.head.appendChild(script);
-    });
-
-    await Promise.all(firebaseScripts.map(loadScript));
-    await loadScript('firebase-config.js?v=4');
-
-    window.firebaseStatus = window.db ? 'ready' : 'unavailable';
-    return window.firebaseStatus === 'ready';
-  } catch (error) {
-    console.error('Firebase initialization failed:', error);
-    window.firebaseStatus = 'unavailable';
-    return false;
-  }
-})();
-</script>
-<script src="script.js?v=112" defer></script>
-<script src="cart.js?v=1" defer></script>
-<script>
-(function() {
-  const KEY = 'pb_owner_auth';
-  const FIVE_HOURS = 5 * 60 * 60 * 1000;
-
-  // Expose helpers so script.js can call them
-  window.ownerSession = {
-    set: function() {
-      localStorage.setItem(KEY, JSON.stringify({ ts: Date.now() }));
-    },
-    clear: function() {
-      localStorage.removeItem(KEY);
-    },
-    isValid: function() {
-      try {
-        var d = JSON.parse(localStorage.getItem(KEY));
-        if (!d || !d.ts) return false;
-        if (Date.now() - d.ts > FIVE_HOURS) {
-          localStorage.removeItem(KEY);
-          return false;
-        }
-        // Refresh timestamp on valid check
-        localStorage.setItem(KEY, JSON.stringify({ ts: Date.now() }));
-        return true;
-      } catch(e) { return false; }
-    }
-  };
-
-  // Redirect owner link to owner.html
-  var ownerBtn = document.getElementById('ownerPageLink');
-  if (ownerBtn) {
-    ownerBtn.addEventListener('click', function() {
-      window.location.href = 'owner.html?v=6';
-    });
-  }
-})();
-</script>
-</body>
-</html>
